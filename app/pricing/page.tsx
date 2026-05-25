@@ -309,6 +309,10 @@ function PriceCalculator() {
   const [customerEmail, setCustomerEmail] = useState("")
   const [showContactForm, setShowContactForm] = useState(false)
 
+  const todayStr = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+  .toISOString()
+  .split("T")[0]
+  
   const summaryRef = useRef<HTMLDivElement>(null)
 
   const addEvent = (name: string) => {
@@ -551,6 +555,7 @@ function PriceCalculator() {
                   <input
                     type="date"
                     value={eventDate}
+                    min={todayStr}
                     onChange={(e) => setEventDate(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-sm text-slate-900 dark:text-white focus:border-amber-500/50 focus:outline-none transition-colors dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-60 dark:[&::-webkit-calendar-picker-indicator]:invert"
                   />

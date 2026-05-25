@@ -132,11 +132,11 @@ function BookingForm() {
   const updateField = (field: string, value: string) => setForm({ ...form, [field]: value })
 
   // Validation helpers
-  const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone.replace(/[\s\-+91]/g, ""))
+  const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone)
   const isValidEmail = (email: string) => !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   const todayStr = new Date().toISOString().split("T")[0]
 
-  const step1Valid = form.name.trim().length >= 2 && isValidPhone(form.phone)
+  const step1Valid = form.name.trim().length >= 2 && isValidPhone(form.phone) &&isValidEmail(form.email)
   const step1Errors = {
     name: form.name.length > 0 && form.name.trim().length < 2,
     phone: form.phone.length > 0 && !isValidPhone(form.phone),
@@ -247,7 +247,7 @@ function BookingForm() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Phone Number *</label>
-                <input type="tel" value={form.phone} onChange={(e) => updateField("phone", e.target.value.replace(/[^\d+\-\s]/g, ""))} placeholder="e.g. 98456 XXXXX" maxLength={15} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border ${step1Errors.phone ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all`} />
+                <input type="tel" value={form.phone} onChange={(e) => updateField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder="e.g. 98456 XXXXX" maxLength={15} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border ${step1Errors.phone ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all`} />
                 {step1Errors.phone && <p className="text-red-500 text-xs mt-1">Enter a valid 10-digit Indian mobile number</p>}
               </div>
               <div>
