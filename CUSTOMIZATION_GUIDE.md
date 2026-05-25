@@ -37,7 +37,7 @@
 ```ts
 export const PHONE_NUMBER = "919845332306"       // WhatsApp number (no +, no spaces)
 export const PHONE_DISPLAY = "+91 98453 32306"   // How it appears on screen
-export const EMAIL = "hello@orvexvisuals.com"    // Contact email
+export const EMAIL = "orvexvisuals@gmail.com"    // Contact email
 export const BRAND_NAME = "Orvex Visuals"        // Brand name everywhere
 export const DOMAIN = "https://orvexvisuals.com" // Your live domain
 ```
@@ -94,7 +94,7 @@ url: "https://images.unsplash.com/..."  // Replace with your own hosted image UR
 **Business schema** (structured data for Google):
 ```ts
 telephone: "+91-9845332306"
-email: "hello@orvexvisuals.com"
+email: "orvexvisuals@gmail.com"
 streetAddress: "Koramangala"
 addressLocality: "Bangalore"
 postalCode: "560034"

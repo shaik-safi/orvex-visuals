@@ -87,7 +87,7 @@ export default function RootLayout({
       "Professional photography & videography studio in Bangalore. Wedding, pre-wedding, baby shoots, events & more. 5-day delivery, transparent pricing.",
     url: "https://orvexvisuals.com",
     telephone: "+91-9845332306",
-    email: "hello@orvexvisuals.com",
+    email: "orvexvisuals@gmail.com",
     image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&h=630&q=80",
     logo: "https://orvexvisuals.com/logo.png",
     priceRange: "₹7,999 - ₹1,50,000",

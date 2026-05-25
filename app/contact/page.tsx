@@ -91,13 +91,13 @@ function ContactSection() {
                 </div>
               </a>
 
-              <a href="mailto:hello@orvexvisuals.com" className="group flex items-start gap-4 bg-slate-50 dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/30 transition-all">
+              <a href="mailto:orvexvisuals@gmail.com" className="group flex items-start gap-4 bg-slate-50 dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/30 transition-all">
                 <div className="w-10 h-10 bg-blue-50 dark:bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                   <Mail size={18} className="text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <p className="font-semibold text-slate-900 dark:text-white text-sm">Email</p>
-                  <p className="text-slate-600 dark:text-slate-300 text-sm">hello@orvexvisuals.com</p>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm">orvexvisuals@gmail.com</p>
                   <p className="text-xs text-slate-400 mt-0.5">Responds within 24 hours</p>
                 </div>
               </a>

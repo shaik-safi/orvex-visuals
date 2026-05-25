@@ -5,7 +5,7 @@
 
 export const PHONE_NUMBER = "919845332306"
 export const PHONE_DISPLAY = "+91 98453 32306"
-export const EMAIL = "hello@orvexvisuals.com"
+export const EMAIL = "orvexvisuals@gmail.com"
 export const BRAND_NAME = "Orvex Visuals"
 export const DOMAIN = "https://orvexvisuals.com"
 

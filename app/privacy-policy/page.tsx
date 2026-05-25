@@ -27,10 +27,10 @@ export default function PrivacyPolicyPage() {
             <p>We use: WhatsApp Business (Meta) for communication, Google Drive for photo delivery, Vercel for hosting. Each has its own privacy policy governing their handling of data.</p>
 
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-8">7. Your Rights</h2>
-            <p>You may request: access to your stored data, correction of inaccurate data, deletion of your data, or withdrawal of portfolio consent at any time. Contact us at hello@orvexvisuals.com for any privacy-related requests.</p>
+            <p>You may request: access to your stored data, correction of inaccurate data, deletion of your data, or withdrawal of portfolio consent at any time. Contact us at orvexvisuals@gmail.com for any privacy-related requests.</p>
 
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-8">8. Contact</h2>
-            <p>For privacy concerns, email us at <strong>hello@orvexvisuals.com</strong> or message us on WhatsApp at +91 98453 32306.</p>
+            <p>For privacy concerns, email us at <strong>orvexvisuals@gmail.com</strong> or message us on WhatsApp at +91 98453 32306.</p>
           </div>
         </div>
       </section>
