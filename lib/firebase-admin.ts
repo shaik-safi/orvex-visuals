@@ -4,33 +4,39 @@ import { cert, getApps, initializeApp } from "firebase-admin/app"
 import { getFirestore } from "firebase-admin/firestore"
 
 function getPrivateKey() {
-  const value = process.env.FIREBASE_PRIVATE_KEY
+  let value = process.env.FIREBASE_PRIVATE_KEY
   if (!value) {
     console.warn("⚠️ FIREBASE_PRIVATE_KEY environment variable is not set")
     return undefined
   }
 
-  // Decode from Base64 if it doesn't look like a standard PEM header
+  // Strip outer quotes if present (common with env var storage)
+  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    value = value.slice(1, -1)
+  }
+
+  // Replace escaped newlines with actual newlines
+  value = value.replace(/\\n/g, "\n").trim()
+
+  // Try to decode from Base64 if it doesn't look like a standard PEM header
   if (!value.startsWith("-----BEGIN PRIVATE KEY-----")) {
     try {
+      console.log("Attempting to decode private key from Base64...")
       const decoded = Buffer.from(value, "base64").toString("utf8")
       return decoded.trim().replace(/\\n/g, "\n")
     } catch (e) {
-      console.error("Failed to decode Base64 private key:", e)
+      console.error("❌ Failed to decode Base64 private key:", e)
       return undefined
     }
   }
 
-  // Handle escaped newlines in PEM format
-  let processedKey = value.trim().replace(/\\n/g, "\n")
-  
   // Validate the key format
-  if (!processedKey.startsWith("-----BEGIN PRIVATE KEY-----") || !processedKey.endsWith("-----END PRIVATE KEY-----")) {
-    console.error("❌ Private key format is invalid. Expected PEM format with BEGIN/END markers")
+  if (!value.endsWith("-----END PRIVATE KEY-----")) {
+    console.error("❌ Private key format is invalid. Missing END PRIVATE KEY marker")
     return undefined
   }
-  
-  return processedKey
+
+  return value
 }
 
 const projectId = process.env.FIREBASE_PROJECT_ID
