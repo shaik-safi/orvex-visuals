@@ -137,15 +137,13 @@ export default function Navbar() {
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            <a
-              href={getWhatsAppLink(WA_MESSAGES.booking)}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/pricing"
               className="hidden sm:inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0"
             >
               <MessageCircle size={16} />
               Book Now
-            </a>
+            </Link>
 
             <button onClick={() => setIsOpen(!isOpen)} className={mobileToggleClasses}>
               {isOpen ? <X size={22} /> : <Menu size={22} />}
