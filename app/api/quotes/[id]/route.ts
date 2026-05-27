@@ -4,39 +4,11 @@ import { adminDb } from "@/lib/firebase-admin"
 import { decryptQuotePayload, hashAccessToken } from "@/lib/quote-security"
 import type { QuotePayload } from "@/lib/save-quote"
 
-// type QuoteDocument = {
-//   status?: string
-//   createdAt?: Date | { toDate?: () => Date }
-//   accessTokenHash?: string
-//   encryptedPayload?: string
-// }
 type QuoteDocument = {
   status?: string
   createdAt?: Date | { toDate?: () => Date }
   accessTokenHash?: string
-
-  source?: string
-
-  customerName?: string
-  customerPhone?: string
-  customerEmail?: string
-
-  date?: string
-  timeSlot?: string
-
-  city?: string
-  venue?: string
-
-  service?: string
-  budget?: string
-
-  notes?: string
-  foundVia?: string
-
-  events?: unknown[]
-  globalAddOns?: unknown[]
-
-  total?: number
+  encryptedPayload?: string
 }
 
 export async function GET(
@@ -61,10 +33,7 @@ export async function GET(
     }
 
     const data = snapshot.data() as QuoteDocument
-    // if (!data.accessTokenHash || !data.encryptedPayload) {
-    //   return NextResponse.json({ error: "Booking data is invalid" }, { status: 500 })
-    // }
-    if (!data.accessTokenHash) {
+    if (!data.accessTokenHash || !data.encryptedPayload) {
       return NextResponse.json({ error: "Booking data is invalid" }, { status: 500 })
     }
 
@@ -72,7 +41,7 @@ export async function GET(
       return NextResponse.json({ error: "Invalid access token" }, { status: 403 })
     }
 
-    // const payload = decryptQuotePayload<QuotePayload>(data.encryptedPayload)
+    const payload = decryptQuotePayload<QuotePayload>(data.encryptedPayload)
     const createdAt =
       data.createdAt instanceof Date
         ? data.createdAt.toISOString()
@@ -80,42 +49,13 @@ export async function GET(
           ? data.createdAt.toDate().toISOString()
           : null
 
-    // return NextResponse.json({
-    //   quote: {
-    //     ...payload,
-    //     status: data.status ?? "new",
-    //     createdAt,
-    //   },
-    // })
     return NextResponse.json({
-        quote: {
-          source: data.source ?? "",
-
-          customerName: data.customerName ?? "",
-          customerPhone: data.customerPhone ?? "",
-          customerEmail: data.customerEmail ?? "",
-
-          date: data.date ?? "",
-          timeSlot: data.timeSlot ?? "",
-
-          city: data.city ?? "",
-          venue: data.venue ?? "",
-
-          service: data.service ?? "",
-          budget: data.budget ?? "",
-
-          notes: data.notes ?? "",
-          foundVia: data.foundVia ?? "",
-
-          events: data.events ?? [],
-          globalAddOns: data.globalAddOns ?? [],
-
-          total: data.total ?? 0,
-
-          status: data.status ?? "new",
-          createdAt,
-        },
-      })
+      quote: {
+        ...payload,
+        status: data.status ?? "new",
+        createdAt,
+      },
+    })
   } catch {
     return NextResponse.json({ error: "Unable to load booking" }, { status: 500 })
   }

@@ -1120,10 +1120,10 @@ function PricingCTA() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="/book"
+            href="/pricing#calculator"
             className="inline-flex items-center justify-center gap-2 bg-white text-amber-700 hover:bg-slate-900 hover:text-white px-8 py-4 rounded-xl font-bold transition-all duration-300"
           >
-            Book Now &mdash; 30% Advance Only
+            Build Package to Book
           </a>
           <a
             href={getWhatsAppLink("Hi Orvex, I'd like to discuss my event requirements")}

@@ -18,13 +18,6 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getServiceDetail, type ServiceDetail } from "../data"
 import { PHOTO_DELIVERY_DAYS } from "@/lib/constants"
 
-function buildBookingUrl(serviceName: string, budget?: number, note?: string) {
-  const params = new URLSearchParams()
-  params.set("service", serviceName)
-  if (budget) params.set("budget", `₹${budget.toLocaleString("en-IN")}`)
-  if (note) params.set("message", note)
-  return `/book?${params.toString()}`
-}
 
 // ============ SERVICE HERO ============
 function ServiceHero({ service }: { service: ServiceDetail }) {
@@ -58,7 +51,7 @@ function ServiceHero({ service }: { service: ServiceDetail }) {
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href={buildBookingUrl(service.name)}
+            href="/pricing"
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
             <MessageCircle size={18} /> Start Booking
@@ -188,7 +181,7 @@ function PackagesSection({ service }: { service: ServiceDetail }) {
               </ul>
 
               <Link
-                href={buildBookingUrl(service.name, pkg.price, `Interested in the ${pkg.name} package for ${service.name}.`)}
+                href="/pricing"
                 className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
                   ? "bg-white text-amber-600 hover:bg-amber-50 shadow-lg"
                   : "bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20"
@@ -341,7 +334,7 @@ function ServiceCTA({ service }: { service: ServiceDetail }) {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={buildBookingUrl(service.name)}
+            href="/pricing"
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
             <MessageCircle size={20} /> Start Booking Request

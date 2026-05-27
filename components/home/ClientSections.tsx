@@ -199,7 +199,7 @@ export function CTABanner() {
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <a
-            href="/book"
+            href="/pricing"
             className="inline-flex items-center justify-center border-2 border-white/40 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
             Book Online — 2 Min Form

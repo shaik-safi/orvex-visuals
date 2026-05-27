@@ -146,9 +146,9 @@ export function computePackagePrice(pkg: (typeof PACKAGES)[number]): number {
   return total
 }
 
-// Lowest actual price across all services (for SEO meta)
-export const STARTING_PRICE = 500
-export const PRICE_RANGE = "₹500 - ₹1,50,000"
+// Half-day Traditional photography/Vidography price across all services (for SEO meta)
+export const STARTING_PRICE = 6000
+export const PRICE_RANGE = "₹6,000 - ₹1,50,000"
 
 // Local image paths
 export const IMAGES = {

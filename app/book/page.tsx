@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import {
   ArrowRight,
@@ -28,61 +28,15 @@ interface PlanData {
   customer?: { name: string; phone: string; email: string }
 }
 
-// ============ DATA ============
-const serviceOptions = [
-  "Wedding Photography",
-  "Candid Wedding Photography",
-  "Wedding Videography",
-  "Pre-Wedding Shoot",
-  "Post-Wedding Shoot",
-  "Engagement Photography",
-  "Birthday Photography",
-  "Baby Shower Photography",
-  "Naming Ceremony",
-  "Cradle Ceremony",
-  "Haldi & Mehendi",
-  "Sangeet",
-  "Housewarming (Gruhapravesham)",
-  "Upanayana / Thread Ceremony",
-  "Shastipurthi (60th Birthday)",
-  "Holy Communion / Baptism",
-  "Puberty Function",
-  "Anniversary Photoshoot",
-  "Baby Photoshoot",
-  "Maternity Photoshoot",
-  "Newborn Photography",
-  "Family Shoot",
-  "Portrait / Headshot",
-  "Portfolio Shoot",
-  "Fashion Photography",
-  "Product / E-Commerce Photography",
-  "Corporate Events",
-  "Corporate Video Production",
-  "Cinematic Videography",
-  "Drone Photography",
-  "Video Editing",
-  "Album Design & Printing",
-  "Photo Frames / Canvas Print",
-  "Photo Restoration",
-  "Other",
-]
-
-const budgetOptions = [
-  "Under ₹15,000",
-  "₹15,000 – ₹30,000",
-  "₹30,000 – ₹60,000",
-  "₹60,000 – ₹1,00,000",
-  "₹1,00,000+",
-  "Not sure — need guidance",
-]
-
 // ============ BOOKING FORM ============
 function BookingForm() {
   const { ref, isVisible } = useScrollReveal()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
   const [plan, setPlan] = useState<PlanData | null>(null)
+  const [planReady, setPlanReady] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [form, setForm] = useState({
     name: "",
@@ -96,22 +50,10 @@ function BookingForm() {
     source: "",
   })
 
-  // Parse plan from URL if coming from calculator
+  // Require a calculator plan before the booking form is used.
   useEffect(() => {
     const planParam = searchParams.get("plan")
-    const serviceParam = searchParams.get("service")
-    const budgetParam = searchParams.get("budget")
-    const messageParam = searchParams.get("message")
     let parsedPlan: unknown = null
-
-    if (serviceParam || budgetParam || messageParam) {
-      setForm((prev) => ({
-        ...prev,
-        service: serviceParam || prev.service,
-        budget: budgetParam || prev.budget,
-        message: messageParam || prev.message,
-      }))
-    }
 
     if (planParam) {
       try {
@@ -156,9 +98,14 @@ function BookingForm() {
           venue: parsed.venue || parsed.city || prev.venue,
           budget: autoBudget,
         }))
+        setPlanReady(true)
+        return
       } catch { }
     }
-  }, [searchParams])
+
+    setPlanReady(true)
+    router.replace("/pricing")
+  }, [router, searchParams])
 
   const updateField = (field: string, value: string) => setForm({ ...form, [field]: value })
 
@@ -255,6 +202,16 @@ function BookingForm() {
       setIsSubmitting(false)
     }
     setSubmitted(true)
+  }
+
+  if (!planReady || !plan) {
+    return (
+      <section className="pt-32 pb-20 bg-white dark:bg-slate-950">
+        <div className="max-w-lg mx-auto px-4 text-center text-slate-500 dark:text-slate-400">
+          Redirecting to pricing...
+        </div>
+      </section>
+    )
   }
 
   if (submitted) {
@@ -356,14 +313,7 @@ function BookingForm() {
               <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2"><Camera size={20} className="text-amber-500" /> Event Details</h3>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Service Needed *</label>
-                {plan ? (
-                  <input type="text" value={form.service} onChange={(e) => updateField("service", e.target.value)} placeholder="e.g. Wedding Photography" className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all" />
-                ) : (
-                  <select value={form.service} onChange={(e) => updateField("service", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all">
-                    <option value="">Select a service</option>
-                    {serviceOptions.map((s) => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                )}
+                <input type="text" value={form.service} onChange={(e) => updateField("service", e.target.value)} placeholder="e.g. Wedding Photography" className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Event Date</label>
@@ -390,10 +340,7 @@ function BookingForm() {
               <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2"><Calendar size={20} className="text-amber-500" /> Budget & Notes</h3>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Approx. Budget *</label>
-                <select value={form.budget} onChange={(e) => updateField("budget", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all">
-                  <option value="">Select budget range</option>
-                  {budgetOptions.map((b) => <option key={b} value={b}>{b}</option>)}
-                </select>
+                <input type="text" value={form.budget} onChange={(e) => updateField("budget", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Any specific requirements?</label>
@@ -414,8 +361,8 @@ function BookingForm() {
                 <button onClick={() => setStep(2)} className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 py-3.5 rounded-xl font-semibold transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
                   <ArrowLeft size={18} /> Back
                 </button>
-                <button onClick={handleSubmit} disabled={!form.budget} className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20">
-                  <MessageCircle size={18} /> Send via WhatsApp
+                <button onClick={handleSubmit} disabled={!form.budget || isSubmitting} className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20">
+                  <MessageCircle size={18} /> {isSubmitting ? "Sending…" : "Send via WhatsApp"}
                 </button>
               </div>
             </div>

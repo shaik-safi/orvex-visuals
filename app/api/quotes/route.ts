@@ -125,42 +125,12 @@ export async function POST(request: Request) {
     const quoteId = generateQuoteId()
     const accessToken = generateAccessToken()
 
-    // await adminDb.collection("quotes").doc(quoteId).set({
-    //   status: "new",
-    //   createdAt: new Date(),
-    //   accessTokenHash: hashAccessToken(accessToken),
-    //   encryptedPayload: encryptQuotePayload(payload),
-    // })
-
     await adminDb.collection("quotes").doc(quoteId).set({
-          status: "new",
-          createdAt: new Date(),
-
-          accessTokenHash: hashAccessToken(accessToken),
-
-          source: payload.source,
-
-          customerName: payload.customerName,
-          customerPhone: payload.customerPhone,
-          customerEmail: payload.customerEmail || "",
-
-          date: payload.date || "",
-          timeSlot: payload.timeSlot || "",
-
-          city: payload.city || "",
-          venue: payload.venue || "",
-
-          service: payload.service || "",
-          budget: payload.budget || "",
-
-          notes: payload.notes || "",
-          foundVia: payload.foundVia || "",
-
-          events: payload.events || [],
-          globalAddOns: payload.globalAddOns || [],
-
-          total: payload.total || 0,
-        })
+      status: "new",
+      createdAt: new Date(),
+      accessTokenHash: hashAccessToken(accessToken),
+      encryptedPayload: encryptQuotePayload(payload),
+    })
 
     return NextResponse.json({ quoteId, accessToken })
   } catch (error) {

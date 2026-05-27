@@ -5,19 +5,32 @@ import { getFirestore } from "firebase-admin/firestore"
 
 function getPrivateKey() {
   const value = process.env.FIREBASE_PRIVATE_KEY
-  if (!value) return undefined
+  if (!value) {
+    console.warn("⚠️ FIREBASE_PRIVATE_KEY environment variable is not set")
+    return undefined
+  }
 
   // Decode from Base64 if it doesn't look like a standard PEM header
   if (!value.startsWith("-----BEGIN PRIVATE KEY-----")) {
     try {
-      return Buffer.from(value, "base64").toString("utf8")
+      const decoded = Buffer.from(value, "base64").toString("utf8")
+      return decoded.trim().replace(/\\n/g, "\n")
     } catch (e) {
       console.error("Failed to decode Base64 private key:", e)
       return undefined
     }
   }
 
-  return value.trim().replace(/\\n/g, "\n")
+  // Handle escaped newlines in PEM format
+  let processedKey = value.trim().replace(/\\n/g, "\n")
+  
+  // Validate the key format
+  if (!processedKey.startsWith("-----BEGIN PRIVATE KEY-----") || !processedKey.endsWith("-----END PRIVATE KEY-----")) {
+    console.error("❌ Private key format is invalid. Expected PEM format with BEGIN/END markers")
+    return undefined
+  }
+  
+  return processedKey
 }
 
 const projectId = process.env.FIREBASE_PROJECT_ID

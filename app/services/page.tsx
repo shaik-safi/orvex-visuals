@@ -201,7 +201,7 @@ function ServicesCTA() {
             Build Custom Package
           </Link>
           <Link
-            href="/book"
+            href="/pricing"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
             Start Booking

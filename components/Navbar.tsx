@@ -11,7 +11,6 @@ import {
   MessageCircle,
 } from "lucide-react"
 import { useDarkMode } from "@/hooks/use-dark-mode"
-import { getWhatsAppLink, WA_MESSAGES } from "@/lib/constants"
 
 const homepageLinks = [
   { label: "Home", href: "#home" },
@@ -174,14 +173,13 @@ export default function Navbar() {
                 </Link>
               )
             )}
-            <a
-              href={getWhatsAppLink(WA_MESSAGES.booking)}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/pricing"
+              onClick={() => setIsOpen(false)}
               className="block mt-4 text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-3 rounded-xl font-semibold text-sm"
             >
               Book Now
-            </a>
+            </Link>
           </div>
         </div>
       </div>
