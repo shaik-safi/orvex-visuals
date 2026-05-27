@@ -1,6 +1,6 @@
 import "server-only"
 
-import { cert, getApps, initializeApp } from "firebase-admin/app"
+import { cert, getApps, initializeApp, type App } from "firebase-admin/app"
 import { getFirestore } from "firebase-admin/firestore"
 
 function getPrivateKey() {
@@ -43,7 +43,7 @@ const projectId = process.env.FIREBASE_PROJECT_ID
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
 const privateKey = getPrivateKey()
 
-let adminApp: any = getApps()[0]
+let adminApp: App | null = getApps()[0] ?? null
 
 if (!adminApp) {
   if (!projectId || !clientEmail || !privateKey) {

@@ -56,6 +56,20 @@ export const GLOBAL_ADDONS = {
   "album-40": { name: "Photo Album (40 sheets)", price: 8000 },
 } as const
 
+// Miscellaneous service starting prices (editing, portraits, products, prints)
+// Change here to update all service listing pages automatically
+export const MISC_SERVICE_RATES = {
+  videoEditing: 5000,
+  portrait: 5000,
+  portfolio: 8000,
+  productPhoto: 5000,
+  studioSession: 2000,
+  albumDesign: 5000,
+  photoFrame: 1500,
+  photoRestoration: 500,
+  personalizedGift: 500,
+} as const
+
 // Pre-built packages (pricing page + homepage CTA)
 // Price is COMPUTED from SERVICE_RATES + EVENT_ADDONS + GLOBAL_ADDONS via computePackagePrice()
 // Change a rate in one place → all package prices update automatically

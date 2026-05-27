@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   ArrowRight,
@@ -32,7 +32,6 @@ interface PlanData {
 function BookingForm() {
   const { ref, isVisible } = useScrollReveal()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
   const [plan, setPlan] = useState<PlanData | null>(null)
@@ -52,14 +51,9 @@ function BookingForm() {
 
   // Require a calculator plan before the booking form is used.
   useEffect(() => {
-    const planParam = searchParams.get("plan")
     let parsedPlan: unknown = null
 
-    if (planParam) {
-      try {
-        parsedPlan = JSON.parse(decodeURIComponent(planParam))
-      } catch { }
-    } else if (typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       const storedPlan = window.sessionStorage.getItem(BOOKING_PLAN_STORAGE_KEY)
       if (storedPlan) {
         try {
@@ -88,12 +82,7 @@ function BookingForm() {
         }
         setPlan(parsed)
         const serviceNames = parsed.services.map((serviceItem) => serviceItem.name).join(", ")
-        let autoBudget = ""
-        if (parsed.total < 15000) autoBudget = "Under \u20b915,000"
-        else if (parsed.total < 30000) autoBudget = "\u20b915,000 \u2013 \u20b930,000"
-        else if (parsed.total < 60000) autoBudget = "\u20b930,000 \u2013 \u20b960,000"
-        else if (parsed.total < 100000) autoBudget = "\u20b960,000 \u2013 \u20b91,00,000"
-        else autoBudget = "\u20b91,00,000+"
+        const autoBudget = `\u20b9${parsed.total.toLocaleString("en-IN")}`
         setForm((prev) => ({
           ...prev,
           service: serviceNames,
@@ -111,7 +100,7 @@ function BookingForm() {
 
     setPlanReady(true)
     router.replace("/pricing")
-  }, [router, searchParams])
+  }, [router])
 
   const updateField = (field: string, value: string) => setForm({ ...form, [field]: value })
 

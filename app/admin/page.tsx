@@ -433,13 +433,23 @@ function QuoteItem({ quote, adminKey, onStatusChange }: {
 
   async function updateStatus(status: string) {
     setUpdating(true)
-    await fetch("/api/admin/quotes", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
-      body: JSON.stringify({ id: quote.id, status }),
-    })
-    onStatusChange(quote.id, status)
-    setUpdating(false)
+    try {
+      const res = await fetch("/api/admin/quotes", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
+        body: JSON.stringify({ id: quote.id, status }),
+      })
+      if (res.ok) {
+        onStatusChange(quote.id, status)
+      } else {
+        alert("Failed to update status. Please try again.")
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Failed to update status. Please try again.")
+    } finally {
+      setUpdating(false)
+    }
   }
 
   return (

@@ -1,4 +1,4 @@
-import { PHOTO_DELIVERY_DAYS, VIDEO_DELIVERY_DAYS } from "@/lib/constants"
+import { EMAIL, PHONE_DISPLAY, PHOTO_DELIVERY_DAYS, VIDEO_DELIVERY_DAYS } from "@/lib/constants"
 
 export default function TermsPage() {
   return (
@@ -41,7 +41,7 @@ export default function TermsPage() {
             <p>Any disputes shall be resolved amicably through discussion. If unresolved, disputes are subject to the jurisdiction of courts in Bangalore, Karnataka, India.</p>
 
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-8">10. Contact</h2>
-            <p>For questions about these terms, email <strong>orvexvisuals@gmail.com</strong> or call +91 98453 32306.</p>
+            <p>For questions about these terms, email <strong>{EMAIL}</strong> or call {PHONE_DISPLAY}.</p>
           </div>
         </div>
       </section>

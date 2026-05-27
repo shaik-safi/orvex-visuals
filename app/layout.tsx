@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import WhatsAppFloat from "@/components/WhatsAppFloat"
-import { DOMAIN, PHOTO_DELIVERY_DAYS, PRICE_RANGE, SOCIAL_LINKS, STARTING_PRICE } from "@/lib/constants"
+import { DOMAIN, EMAIL, PHONE_DISPLAY, PHOTO_DELIVERY_DAYS, PRICE_RANGE, SOCIAL_LINKS, STARTING_PRICE } from "@/lib/constants"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" })
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
       `Professional photography & videography in Bangalore. Transparent pricing, ${PHOTO_DELIVERY_DAYS}-day photo delivery, 100% copyright yours. Starting ₹${STARTING_PRICE.toLocaleString("en-IN")}.`,
     images: [
       {
-        url: `${DOMAIN}/placeholder.webp`,
+        url: `${DOMAIN}/placeholder.jpg`,
         width: 1200,
         height: 630,
         alt: "Orvex Visuals",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     title: "Orvex Visuals — Premium Photography & Videography in Bangalore",
     description:
       `Professional photography & videography in Bangalore. Transparent pricing, ${PHOTO_DELIVERY_DAYS}-day photo delivery, 100% copyright yours.`,
-    images: [`${DOMAIN}/placeholder.webp`],
+    images: [`${DOMAIN}/placeholder.jpg`],
   },
   robots: {
     index: true,
@@ -87,9 +87,9 @@ export default function RootLayout({
     description:
       `Professional photography & videography studio in Bangalore. Wedding, pre-wedding, baby shoots, events & more. ${PHOTO_DELIVERY_DAYS}-day photo delivery, transparent pricing.`,
     url: DOMAIN,
-    telephone: "+91-9845332306",
-    email: "orvexvisuals@gmail.com",
-    image: `${DOMAIN}/placeholder.webp`,
+    telephone: PHONE_DISPLAY,
+    email: EMAIL,
+    image: `${DOMAIN}/placeholder.jpg`,
     logo: `${DOMAIN}/placeholder-logo.png`,
     priceRange: PRICE_RANGE,
     address: {
