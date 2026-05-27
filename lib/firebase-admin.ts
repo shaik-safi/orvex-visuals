@@ -6,8 +6,13 @@ import { getFirestore } from "firebase-admin/firestore"
 function getPrivateKey() {
   const value = process.env.FIREBASE_PRIVATE_KEY
   if (!value) return undefined
-  
-  // Clean up any rogue formatting or literal escaped newlines
+
+  // Check if it's base64 encoded (doesn't start with the standard PEM header)
+  if (!value.startsWith("-----BEGIN PRIVATE KEY-----")) {
+    return Buffer.from(value, "base64").toString("utf8")
+  }
+
+  // Fallback for standard string just in case
   return value.trim().replace(/\\n/g, "\n")
 }
 
