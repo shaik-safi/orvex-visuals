@@ -526,7 +526,6 @@ function PriceCalculator({ prefilledPackage }: { prefilledPackage?: string | nul
   }
 
   const buildBookingPlan = () => {
-    if (!hasConfiguredEvents) return "#"
     return {
       services: configuredEvents.map((event) => ({
         name: event.name,

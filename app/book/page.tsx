@@ -67,7 +67,9 @@ function BookingForm() {
         } catch {
           parsedPlan = null
         }
-        window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
+        if (parsedPlan) {
+          window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
+        }
       }
     }
 
@@ -79,7 +81,11 @@ function BookingForm() {
           !Array.isArray(parsed.services) ||
           !Array.isArray(parsed.addOns) ||
           typeof parsed.total !== "number"
-        ) return
+        ) {
+          setPlanReady(true)
+          router.replace("/pricing")
+          return
+        }
         setPlan(parsed)
         const serviceNames = parsed.services.map((serviceItem) => serviceItem.name).join(", ")
         let autoBudget = ""
