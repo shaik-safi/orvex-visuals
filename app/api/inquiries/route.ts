@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server"
+export const dynamic = "force-dynamic"
 
+import { NextResponse } from "next/server"
 import { adminDb } from "@/lib/firebase-admin"
 import { encryptQuotePayload } from "@/lib/quote-security"
 
@@ -72,5 +73,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ inquiryId })
   } catch {
     return NextResponse.json({ error: "Failed to save inquiry" }, { status: 500 })
+  }
+}
+
+export async function GET() {
+  if (!adminDb) {
+    return NextResponse.json({ error: "Database not initialized" }, { status: 500 })
+  }
+
+  try {
+    const snapshot = await adminDb.collection("inquiries").get()
+    // ... rest of your data fetching code ...
+    return NextResponse.json({ success: true }) 
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occured"
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
