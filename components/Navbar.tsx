@@ -144,13 +144,19 @@ export default function Navbar() {
               Book Now
             </Link>
 
-            <button onClick={() => setIsOpen(!isOpen)} className={mobileToggleClasses}>
+            <button
+              onClick={() => setIsOpen((prev) => !prev)}
+              className={mobileToggleClasses}
+              aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isOpen}
+              aria-controls="mobile-navigation"
+            >
               {isOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
-        <div className={`lg:hidden overflow-hidden transition-all duration-500 ease-out ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
+        <div id="mobile-navigation" className={`lg:hidden overflow-hidden transition-all duration-500 ease-out ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
           <div className="pb-6 pt-2 space-y-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl mt-2 p-4 shadow-xl">
             {links.map((link) =>
               link.href.startsWith("#") ? (

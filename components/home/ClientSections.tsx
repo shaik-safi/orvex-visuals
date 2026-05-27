@@ -21,6 +21,7 @@ function getUpcomingMonths() {
 export function Hero() {
   const [currentImage, setCurrentImage] = useState(0)
   const images = IMAGES.hero
+  const currentHeroImage = images[currentImage] ?? images[0]
   const { next } = getUpcomingMonths()
 
   useEffect(() => {
@@ -29,6 +30,20 @@ export function Hero() {
     }, 5000)
     return () => clearInterval(timer)
   }, [images.length])
+
+  useEffect(() => {
+    if (images.length <= 1) return
+
+    const preloadTimer = window.setTimeout(() => {
+      images.forEach((src, index) => {
+        if (index === 0) return
+        const image = new window.Image()
+        image.src = src
+      })
+    }, 2500)
+
+    return () => window.clearTimeout(preloadTimer)
+  }, [images])
 
   const stats = [
     { number: "500+", label: "Weddings Delivered" },
@@ -39,20 +54,18 @@ export function Hero() {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-12">
-      {images.map((img, i) => (
-        <Image
-          key={i}
-          src={img}
-          alt="Orvex Visuals Photography"
-          fill
-          className={`object-cover transition-opacity duration-1000 ${i === currentImage ? "opacity-100" : "opacity-0"}`}
-          sizes="100vw"
-          priority={i === 0}
-          quality={i === 0 ? 85 : 75}
-          placeholder="blur"
-          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiMxZTI5M2IiLz48L3N2Zz4="
-        />
-      ))}
+      <Image
+        key={currentHeroImage}
+        src={currentHeroImage}
+        alt="Orvex Visuals Photography"
+        fill
+        className="object-cover"
+        sizes="100vw"
+        priority={currentImage === 0}
+        quality={currentImage === 0 ? 85 : 75}
+        placeholder="blur"
+        blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiMxZTI5M2IiLz48L3N2Zz4="
+      />
 
       <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/50 to-slate-900/80" />
 
@@ -87,12 +100,12 @@ export function Hero() {
             Check Availability — It&apos;s Free
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </Link>
-          <a
+          <Link
             href="/pricing"
             className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:-translate-y-1"
           >
             See Transparent Pricing
-          </a>
+          </Link>
         </div>
 
         <div className="animate-fade-in-up animation-delay-800 mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
@@ -198,12 +211,12 @@ export function CTABanner() {
             Get Free Quote on WhatsApp
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </a>
-          <a
+          <Link
             href="/pricing"
             className="inline-flex items-center justify-center border-2 border-white/40 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
             Book Online — 2 Min Form
-          </a>
+          </Link>
         </div>
       </div>
     </section>

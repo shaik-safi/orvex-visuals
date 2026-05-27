@@ -1,5 +1,3 @@
-"use client"
-
 import Link from "next/link"
 import {
   Phone,
@@ -23,15 +21,15 @@ export default function Footer() {
               </div>
               <span className="text-xl font-bold text-white">Orvex Visuals</span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed mb-6">
+            <p className="text-sm text-slate-300 leading-relaxed mb-6">
               Premium photography & videography coordination in Bangalore.
               Your moments, beautifully captured.
             </p>
             <div className="flex gap-2">
-              <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+              <a aria-label="Visit Orvex Visuals on Instagram" href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                 <Instagram size={16} />
               </a>
-              <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+              <a aria-label="Visit Orvex Visuals on Facebook" href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                 <Facebook size={16} />
               </a>
             </div>
@@ -39,8 +37,8 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-white font-semibold mb-5">Services</h4>
-            <ul className="space-y-3 text-sm text-slate-400">
+            <h3 className="text-white font-semibold mb-5">Services</h3>
+            <ul className="space-y-3 text-sm text-slate-300">
               {[
                 ["Wedding Photography", "/services/wedding-photography"],
                 ["Pre-Wedding Shoot", "/services/pre-wedding-photoshoot"],
@@ -49,7 +47,7 @@ export default function Footer() {
                 ["Drone Photography", "/services/drone-photography"],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <Link href={href} className="hover:text-amber-400 transition-colors">{label}</Link>
+                  <Link href={href} className="hover:text-amber-300 transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -57,8 +55,8 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold mb-5">Quick Links</h4>
-            <ul className="space-y-3 text-sm text-slate-400">
+            <h3 className="text-white font-semibold mb-5">Quick Links</h3>
+            <ul className="space-y-3 text-sm text-slate-300">
               {[
                 ["Pricing", "/pricing"],
                 ["Gallery", "/gallery"],
@@ -67,7 +65,7 @@ export default function Footer() {
                 ["FAQs", "/#faq"],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <Link href={href} className="hover:text-amber-400 transition-colors">{label}</Link>
+                  <Link href={href} className="hover:text-amber-300 transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -75,8 +73,8 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold mb-5">Contact</h4>
-            <ul className="space-y-4 text-sm text-slate-400">
+            <h3 className="text-white font-semibold mb-5">Contact</h3>
+            <ul className="space-y-4 text-sm text-slate-300">
               <li className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
                   <Phone size={14} className="text-amber-400" />
@@ -100,11 +98,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
+        <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400">
           <p>&copy; 2026 Orvex Visuals. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/privacy-policy" className="hover:text-amber-400 transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-amber-400 transition-colors">Terms of Service</Link>
+            <Link href="/privacy-policy" className="text-slate-300 hover:text-amber-300 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="text-slate-300 hover:text-amber-300 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

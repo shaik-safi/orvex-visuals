@@ -128,7 +128,7 @@ function ServicesSection() {
                     </h3>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{service.desc}</p>
                     <div className="flex items-center justify-between mt-3">
-                      <span className="text-amber-600 dark:text-amber-400 font-bold text-sm">From {service.price}</span>
+                      <span className="text-amber-700 dark:text-amber-300 font-bold text-sm">From {service.price}</span>
                       <ArrowRight size={14} className="text-slate-300 dark:text-slate-600 group-hover:text-amber-500 group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
