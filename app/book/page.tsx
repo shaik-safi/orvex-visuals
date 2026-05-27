@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect,useRef, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -12,7 +12,6 @@ import {
   CheckCircle,
   MessageCircle,
 } from "lucide-react"
-import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { saveQuote } from "@/lib/save-quote"
 import { BOOKING_PLAN_STORAGE_KEY, PHONE_NUMBER } from "@/lib/constants"
 
@@ -30,8 +29,8 @@ interface PlanData {
 
 // ============ BOOKING FORM ============
 function BookingForm() {
-  const { ref, isVisible } = useScrollReveal()
   const router = useRouter()
+  const planLoadedRef = useRef(false)
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
   const [plan, setPlan] = useState<PlanData | null>(null)
@@ -51,6 +50,9 @@ function BookingForm() {
 
   // Require a calculator plan before the booking form is used.
   useEffect(() => {
+    if (planLoadedRef.current) return
+    planLoadedRef.current = true
+
     let parsedPlan: unknown = null
 
     if (typeof window !== "undefined") {
@@ -107,9 +109,11 @@ function BookingForm() {
   // Validation helpers
   const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone)
   const isValidEmail = (email: string) => !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  const todayStr = new Date().toISOString().split("T")[0]
+  const todayStr = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0] // Local date in YYYY-MM-DD format
+  const isDateInPast = (dateStr: string) => !!dateStr && new Date(dateStr) < new Date(todayStr)
 
-  const step1Valid = form.name.trim().length >= 2 && isValidPhone(form.phone) &&isValidEmail(form.email)
+  const step1Valid = form.name.trim().length >= 2 && isValidPhone(form.phone) && isValidEmail(form.email)
+  const step2Valid = !!form.service.trim() && !isDateInPast(form.eventDate)
   const step1Errors = {
     name: form.name.length > 0 && form.name.trim().length < 2,
     phone: form.phone.length > 0 && !isValidPhone(form.phone),
@@ -228,7 +232,7 @@ function BookingForm() {
 
   return (
     <section className="pt-32 pb-16 md:pt-40 md:pb-20 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
-      <div ref={ref} className={`max-w-2xl mx-auto px-4 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+      <div className="max-w-2xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">
           <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">Book in 2 Minutes</span>
@@ -312,7 +316,8 @@ function BookingForm() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Event Date</label>
-                <input type="date" min={todayStr} value={form.eventDate} onChange={(e) => updateField("eventDate", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all dark:[color-scheme:dark]" />
+                <input  type="date"  min={todayStr}  value={form.eventDate}  onChange={(e) => updateField("eventDate", e.target.value)}  className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border ${    isDateInPast(form.eventDate)      ? "border-red-400 dark:border-red-500"      : "border-slate-200 dark:border-slate-700"  } text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all dark:[color-scheme:dark]`}/>
+                {isDateInPast(form.eventDate) && <p className="text-red-500 text-xs mt-1">Please select a future date</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Venue / Location</label>
@@ -322,7 +327,7 @@ function BookingForm() {
                 <button onClick={() => setStep(1)} className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 py-3.5 rounded-xl font-semibold transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
                   <ArrowLeft size={18} /> Back
                 </button>
-                <button onClick={() => { if (form.service) setStep(3) }} disabled={!form.service} className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20">
+                <button onClick={() => { if (step2Valid) setStep(3) }} disabled={!step2Valid} className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20">
                   Next <ArrowRight size={18} />
                 </button>
               </div>
