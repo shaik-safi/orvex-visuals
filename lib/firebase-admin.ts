@@ -24,13 +24,12 @@ const projectId = process.env.FIREBASE_PROJECT_ID
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
 const privateKey = getPrivateKey()
 
-let adminApp = getApps()[0]
+let adminApp: any = getApps()[0]
 
 if (!adminApp) {
-  // If variables are missing during 'next build', log a warning instead of crashing
   if (!projectId || !clientEmail || !privateKey) {
     console.warn("⚠️ Firebase environment variables are missing. Skipping initialization during build.");
-    adminApp = null
+    adminApp = null // TypeScript will accept this now
   } else {
     try {
       adminApp = initializeApp({
@@ -43,5 +42,4 @@ if (!adminApp) {
   }
 }
 
-// Export adminDb safely. If adminApp is null, adminDb becomes null.
 export const adminDb = adminApp ? getFirestore(adminApp) : null
