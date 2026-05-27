@@ -1,13 +1,12 @@
 "use client"
 
-import Image from "next/image"
+import Link from "next/link"
 import {
   Camera,
   Heart,
   Award,
   MapPin,
   Calendar,
-  Star,
   Target,
   Zap,
   Shield,
@@ -16,6 +15,7 @@ import {
   MessageCircle,
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { PHOTO_DELIVERY_DAYS, VIDEO_DELIVERY_DAYS, getWhatsAppLink } from "@/lib/constants"
 
 // ============ HERO ============
 function AboutHero() {
@@ -45,40 +45,28 @@ function AboutHero() {
                 <Calendar size={16} className="text-amber-500" /> Since 2020
               </div>
               <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                <Camera size={16} className="text-amber-500" /> 500+ Events
+                <Camera size={16} className="text-amber-500" /> Booking-first workflow
               </div>
             </div>
           </div>
 
-          <div className="relative">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-3">
-                <div className="rounded-2xl overflow-hidden h-48">
-                  <Image src="https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=400&q=80" alt="Photographer at work" width={400} height={300} className="w-full h-full object-cover" sizes="(max-width: 640px) 50vw, 200px" loading="lazy" quality={75} />
-                </div>
-                <div className="rounded-2xl overflow-hidden h-32">
-                  <Image src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&q=80" alt="Camera equipment" width={400} height={200} className="w-full h-full object-cover" sizes="(max-width: 640px) 50vw, 200px" loading="lazy" quality={75} />
-                </div>
+          <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 p-8 shadow-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-600 dark:text-amber-400 mb-4">What we can stand behind</p>
+            <div className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
+              <div className="flex items-start gap-3">
+                <Clock size={18} className="text-amber-500 mt-0.5" />
+                <span>Edited photos in {PHOTO_DELIVERY_DAYS} working days. Videos in {VIDEO_DELIVERY_DAYS} working days.</span>
               </div>
-              <div className="space-y-3 pt-8">
-                <div className="rounded-2xl overflow-hidden h-32">
-                  <Image src="https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80" alt="Wedding shoot" width={400} height={200} className="w-full h-full object-cover" sizes="(max-width: 640px) 50vw, 200px" loading="lazy" quality={75} />
-                </div>
-                <div className="rounded-2xl overflow-hidden h-48">
-                  <Image src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=400&q=80" alt="Video production" width={400} height={300} className="w-full h-full object-cover" sizes="(max-width: 640px) 50vw, 200px" loading="lazy" quality={75} />
-                </div>
+              <div className="flex items-start gap-3">
+                <Shield size={18} className="text-amber-500 mt-0.5" />
+                <span>Transparent GST-inclusive pricing with a written booking summary.</span>
               </div>
-            </div>
-            {/* Floating badge */}
-            <div className="absolute -bottom-4 -left-4 bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-xl border border-slate-100 dark:border-slate-700">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-500/10 rounded-xl flex items-center justify-center">
-                  <Star size={20} className="text-amber-500" />
-                </div>
-                <div>
-                  <p className="font-bold text-slate-900 dark:text-white text-sm">4.9/5 Rating</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">200+ Happy Clients</p>
-                </div>
+              <div className="flex items-start gap-3">
+                <Award size={18} className="text-amber-500 mt-0.5" />
+                <span>Your delivered photos and videos remain yours with no surprise licensing restrictions.</span>
+              </div>
+              <div className="rounded-2xl bg-amber-50 dark:bg-amber-500/10 p-4 text-slate-700 dark:text-slate-200">
+                We removed unverified review counts and stock team imagery so this page reflects only claims we can support in production.
               </div>
             </div>
           </div>
@@ -109,7 +97,7 @@ function OurStory() {
               Orvex Visuals started with a simple belief — every moment deserves to be captured beautifully, and professional photography shouldn&apos;t cost a fortune. Founded in Bangalore in 2020, we set out to make world-class photography accessible to everyone.
             </p>
             <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed mb-4">
-              What began as a one-person passion project has grown into a team of dedicated visual storytellers. We&apos;ve covered 500+ events across weddings, corporate functions, baby shoots, and more — each one approached with the same enthusiasm as our first.
+              What began as a one-person passion project has grown into a booking-first studio experience focused on transparent planning, fast delivery, and clean communication from inquiry to final handoff.
             </p>
             <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed">
               Our philosophy is simple: combine artistic vision with technical excellence, keep pricing transparent (all GST-inclusive, no surprises), and treat every client like family. We&apos;re not just photographers — we&apos;re visual storytellers who happen to have cameras.
@@ -125,10 +113,10 @@ function OurStory() {
 function StatsSection() {
   const { ref, isVisible } = useScrollReveal()
   const stats = [
-    { number: "500+", label: "Events Covered", icon: Camera },
-    { number: "200+", label: "Happy Clients", icon: Heart },
-    { number: "50K+", label: "Photos Delivered", icon: Award },
-    { number: "4.9", label: "Google Rating", icon: Star },
+    { number: `${PHOTO_DELIVERY_DAYS} Days`, label: "Photo Delivery", icon: Clock },
+    { number: `${VIDEO_DELIVERY_DAYS} Days`, label: "Video Delivery", icon: Award },
+    { number: "30%", label: "Advance To Confirm", icon: Shield },
+    { number: "100%", label: "Copyright Yours", icon: Camera },
   ]
 
   return (
@@ -159,7 +147,7 @@ function WhyChooseUs() {
   const reasons = [
     { icon: Target, title: "Detail-Oriented", description: "We obsess over every frame, every angle, every edit to ensure perfection." },
     { icon: Shield, title: "Transparent Pricing", description: "All prices are GST-inclusive. What we quote is what you pay. No surprises." },
-    { icon: Zap, title: "Quick Turnaround", description: "48-hour previews and 7-15 day full delivery. We respect your excitement." },
+    { icon: Zap, title: "Quick Turnaround", description: `Photos in ${PHOTO_DELIVERY_DAYS} working days. Videos in ${VIDEO_DELIVERY_DAYS} working days.` },
     { icon: Heart, title: "Client-First Approach", description: "Your vision drives our work. We listen, plan, and execute to your expectations." },
     { icon: Camera, title: "Pro Equipment", description: "Top-tier Sony & Canon gear with full backup sets on every shoot." },
     { icon: Clock, title: "Always On Time", description: "We arrive early, set up in advance, and never miss a moment." },
@@ -200,9 +188,9 @@ function WhyChooseUs() {
 function TeamSection() {
   const { ref, isVisible } = useScrollReveal()
   const team = [
-    { name: "Orvex Team", role: "Lead Photographer", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80", speciality: "Weddings & Candid" },
-    { name: "Creative Team", role: "Videographer", image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&q=80", speciality: "Cinematic Films" },
-    { name: "Support Team", role: "Editor & Colorist", image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80", speciality: "Post-Production" },
+    { name: "Planning & Coordination", role: "Pre-event alignment", speciality: "Timelines, deliverables, and coverage planning before shoot day." },
+    { name: "Capture Team", role: "Shoot execution", speciality: "Photography and videography teams matched to the event format." },
+    { name: "Editing & Delivery", role: "Post-production", speciality: "Clean edits, organized delivery, and final handoff on schedule." },
   ]
 
   return (
@@ -216,20 +204,17 @@ function TeamSection() {
             The People Behind the Lens
           </h2>
           <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-            A dedicated crew of visual storytellers passionate about capturing your moments.
+            We show the workflow clearly instead of using stock headshots for people you haven&apos;t actually met.
           </p>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-5">
           {team.map((member, i) => (
             <div key={i} className="group bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-all duration-300 hover:-translate-y-1" style={{ transitionDelay: `${i * 100}ms` }}>
-              <div className="h-52 overflow-hidden">
-                <Image src={member.image} alt={member.name} width={400} height={300} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, 33vw" loading="lazy" />
-              </div>
-              <div className="p-5 text-center">
+              <div className="p-8 text-center">
                 <h3 className="font-bold text-slate-900 dark:text-white">{member.name}</h3>
                 <p className="text-amber-600 dark:text-amber-400 text-sm font-medium">{member.role}</p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{member.speciality}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-3 leading-relaxed">{member.speciality}</p>
               </div>
             </div>
           ))}
@@ -256,19 +241,19 @@ function AboutCTA() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="https://wa.me/919845332306?text=Hi%20Orvex,%20I'd%20like%20to%20discuss%20a%20project"
+            href={getWhatsAppLink("Hi Orvex, I'd like to discuss a project")}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
             <MessageCircle size={20} /> Get in Touch
           </a>
-          <a
-            href="/gallery"
+          <Link
+            href="/services"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            View Gallery <ArrowRight size={18} />
-          </a>
+            View Services <ArrowRight size={18} />
+          </Link>
         </div>
       </div>
     </section>

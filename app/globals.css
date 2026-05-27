@@ -210,3 +210,266 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: oklch(0.5 0 0);
 }
+
+/* =========================================
+   PRINT / PDF STYLES — luxury editorial
+   Orvex Visuals · Wedding Proposal
+========================================= */
+
+@page {
+  size: A4;
+  margin: 13mm 15mm 12mm 15mm;
+}
+
+@media print {
+
+  /* ── Page chrome reset ── */
+  html,
+  body {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ── Isolate the document ── */
+  body > * {
+    visibility: hidden;
+  }
+
+  #quote-pdf,
+  #quote-pdf * {
+    visibility: visible;
+  }
+
+  #quote-pdf {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* ── Strip backgrounds — no tinted sections in print ── */
+  #quote-pdf * {
+    background-color: transparent !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ── Card shell ── */
+  .print-card {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  .print-section {
+    background: white !important;
+    background-color: white !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* ── Page breaks ── */
+  .avoid-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* ── Base document typography ── */
+  #quote-pdf {
+    font-size: 12px;
+    line-height: 1.55;
+    color: #1e293b;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  #quote-pdf a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  /* ════════════════════════════════════════
+     DESIGN TOKEN CLASSES
+     Used throughout page.tsx for print-only
+     styling without Tailwind's JIT limitations
+  ════════════════════════════════════════ */
+
+  /* Amber — darkened for paper legibility */
+  #quote-pdf [class*="text-amber"] {
+    color: #92400e !important;
+  }
+
+  /* Discipline label above brand name */
+  .print-discipline {
+    font-size: 8.5px !important;
+    letter-spacing: 0.28em !important;
+    text-transform: uppercase !important;
+    color: #94a3b8 !important;  /* slate-400 */
+    display: block !important;
+    margin-bottom: 4px !important;
+    font-weight: 400 !important;
+  }
+
+  /* Booking reference number */
+  .print-booking-id {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.06em !important;
+    color: #92400e !important;  /* amber-800 — reads on paper */
+    display: block !important;
+  }
+
+  /* Section heading labels — e.g. "Prepared for", "Coverage Plan" */
+  .print-section-label {
+    font-size: 8.5px !important;
+    letter-spacing: 0.28em !important;
+    text-transform: uppercase !important;
+    color: #64748b !important;  /* slate-500 — readable, not invisible */
+    display: block !important;
+    font-weight: 500 !important;
+  }
+
+  /* Small field labels — e.g. "Name", "Phone" */
+  .print-field-label {
+    font-size: 8.5px !important;
+    letter-spacing: 0.18em !important;
+    text-transform: uppercase !important;
+    color: #94a3b8 !important;
+    display: block !important;
+    margin-bottom: 2px !important;
+    font-weight: 400 !important;
+  }
+
+  /* Field values — customer name, phone, etc. */
+  .print-field-value {
+    font-size: 12px !important;
+    color: #0f172a !important;  /* near-black */
+    font-weight: 500 !important;
+    display: block !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Metadata — dates, sub-labels */
+  .print-meta {
+    font-size: 10px !important;
+    color: #64748b !important;
+    display: block !important;
+    line-height: 1.5 !important;
+  }
+
+  /* ── Event hierarchy ── */
+
+  /* Event title — e.g. "Muhurtham (Wedding)" — confident, clear */
+  .print-event-title,
+  span.print\:event-title {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  /*
+    Workaround: Tailwind's print: prefix on arbitrary class names
+    doesn't work for custom class application in JSX.
+    We target by the screen class that's always present instead.
+  */
+
+  /* Event duration badge — e.g. "HALF DAY" */
+  #quote-pdf .print-section > div > div > div > div > span:nth-child(2),
+  span.print\:event-duration {
+    font-size: 9px !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: #94a3b8 !important;
+    font-weight: 400 !important;
+  }
+
+  /* Event total price — right-aligned, readable */
+  span.print\:event-price {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+  }
+
+  /*
+    Deliverable name — "Candid Photography", "Traditional Videography"
+    These are the curated items. Slightly smaller than event title.
+    They describe what's included — not a ledger row.
+  */
+  span.print\:deliverable-name {
+    font-size: 11px !important;
+    color: #475569 !important;   /* slate-600 — visible but secondary */
+    font-weight: 400 !important;
+    letter-spacing: 0 !important;
+  }
+
+  /*
+    Deliverable price — the KEY luxury change.
+    Make it much quieter than the event total.
+    It's reference info, not the headline.
+    Client sees: "Muhurtham — ₹58,000" (big)
+    Not: every sub-item fighting for attention.
+  */
+  span.print\:deliverable-price {
+    font-size: 10.5px !important;
+    color: #94a3b8 !important;   /* slate-400 — very quiet */
+    font-weight: 400 !important;
+  }
+
+  /* Total amount — the visual climax of the document */
+  span.print\:print-total-amount {
+    font-size: 28px !important;
+    font-weight: 600 !important;
+    color: #92400e !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1 !important;
+  }
+
+  /* ── Terms ── */
+
+  /* Number — 01, 02 ... */
+  .print-term-num {
+    font-size: 9px !important;
+    color: #cbd5e1 !important;   /* slate-300 — barely there, structural only */
+    font-weight: 500 !important;
+    letter-spacing: 0.05em !important;
+    display: block !important;
+    line-height: 1.65 !important;
+    min-width: 16px !important;
+  }
+
+  /* Term text — the actual clause */
+  .print-term-text {
+    font-size: 10.5px !important;
+    color: #475569 !important;   /* slate-600 — readable, not black */
+    line-height: 1.65 !important;  /* generous — no cramping */
+    font-weight: 400 !important;
+  }
+
+  /* ── Footer ── */
+  .print-footer-text {
+    font-size: 8.5px !important;
+    color: #94a3b8 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    display: block !important;
+  }
+
+  /* ── Explicit border color fixes ── */
+  #quote-pdf .print\:border-slate-900  { border-color: #0f172a !important; }
+  #quote-pdf .print\:border-slate-200  { border-color: #e2e8f0 !important; }
+  #quote-pdf .print\:border-slate-100  { border-color: #f1f5f9 !important; }
+  #quote-pdf .print\:border-b-2        { border-bottom-width: 2px !important; }
+  #quote-pdf .print\:border-t-\[1\.5px\] { border-top-width: 1.5px !important; }
+  #quote-pdf .print\:border-b-\[1\.5px\] { border-bottom-width: 1.5px !important; }
+}

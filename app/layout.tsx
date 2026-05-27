@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import WhatsAppFloat from "@/components/WhatsAppFloat"
+import { DOMAIN, PHOTO_DELIVERY_DAYS, PRICE_RANGE, SOCIAL_LINKS, STARTING_PRICE } from "@/lib/constants"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" })
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     template: "%s | Orvex Visuals",
   },
   description:
-    "Professional photography & videography in Bangalore. Transparent pricing, 5-day delivery, 100% copyright yours. Wedding, pre-wedding, baby shoots, events & more. Starting ₹7,999.",
+    `Professional photography & videography in Bangalore. Transparent pricing, ${PHOTO_DELIVERY_DAYS}-day photo delivery, 100% copyright yours. Wedding, pre-wedding, baby shoots, events & more. Starting ₹${STARTING_PRICE.toLocaleString("en-IN")}.`,
   keywords: [
     "photography in Bangalore",
     "wedding photographer Bangalore",
@@ -32,24 +33,24 @@ export const metadata: Metadata = {
   authors: [{ name: "Orvex Visuals" }],
   creator: "Orvex Visuals",
   publisher: "Orvex Visuals",
-  metadataBase: new URL("https://orvexvisuals.com"),
+  metadataBase: new URL(DOMAIN),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://orvexvisuals.com",
+    url: DOMAIN,
     siteName: "Orvex Visuals",
     title: "Orvex Visuals — Premium Photography & Videography in Bangalore",
     description:
-      "Professional photography & videography in Bangalore. Transparent pricing, 5-day delivery, 100% copyright yours. Starting ₹7,999.",
+      `Professional photography & videography in Bangalore. Transparent pricing, ${PHOTO_DELIVERY_DAYS}-day photo delivery, 100% copyright yours. Starting ₹${STARTING_PRICE.toLocaleString("en-IN")}.`,
     images: [
       {
-        url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&h=630&q=80",
+        url: `${DOMAIN}/placeholder.webp`,
         width: 1200,
         height: 630,
-        alt: "Orvex Visuals — Wedding Photography in Bangalore",
+        alt: "Orvex Visuals",
       },
     ],
   },
@@ -57,8 +58,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Orvex Visuals — Premium Photography & Videography in Bangalore",
     description:
-      "Professional photography & videography in Bangalore. Transparent pricing, 5-day delivery, 100% copyright yours.",
-    images: ["https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&h=630&q=80"],
+      `Professional photography & videography in Bangalore. Transparent pricing, ${PHOTO_DELIVERY_DAYS}-day photo delivery, 100% copyright yours.`,
+    images: [`${DOMAIN}/placeholder.webp`],
   },
   robots: {
     index: true,
@@ -84,13 +85,13 @@ export default function RootLayout({
     "@id": "https://orvexvisuals.com/#business",
     name: "Orvex Visuals",
     description:
-      "Professional photography & videography studio in Bangalore. Wedding, pre-wedding, baby shoots, events & more. 5-day delivery, transparent pricing.",
-    url: "https://orvexvisuals.com",
+      `Professional photography & videography studio in Bangalore. Wedding, pre-wedding, baby shoots, events & more. ${PHOTO_DELIVERY_DAYS}-day photo delivery, transparent pricing.`,
+    url: DOMAIN,
     telephone: "+91-9845332306",
     email: "orvexvisuals@gmail.com",
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&h=630&q=80",
-    logo: "https://orvexvisuals.com/logo.png",
-    priceRange: "₹7,999 - ₹1,50,000",
+    image: `${DOMAIN}/placeholder.webp`,
+    logo: `${DOMAIN}/placeholder-logo.png`,
+    priceRange: PRICE_RANGE,
     address: {
       "@type": "PostalAddress",
       streetAddress: "Koramangala",
@@ -114,15 +115,9 @@ export default function RootLayout({
       opens: "08:00",
       closes: "21:00",
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      reviewCount: "500",
-      bestRating: "5",
-    },
     sameAs: [
-      "https://www.instagram.com/orvexvisuals",
-      "https://www.facebook.com/orvexvisuals",
+      SOCIAL_LINKS.instagram,
+      SOCIAL_LINKS.facebook,
     ],
   }
 

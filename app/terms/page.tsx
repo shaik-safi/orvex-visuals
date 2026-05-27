@@ -1,4 +1,4 @@
-"use client"
+import { PHOTO_DELIVERY_DAYS, VIDEO_DELIVERY_DAYS } from "@/lib/constants"
 
 export default function TermsPage() {
   return (
@@ -23,7 +23,7 @@ export default function TermsPage() {
             </ul>
 
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-8">4. Delivery</h2>
-            <p>Edited photos are delivered within 7-15 working days via online gallery. Highlight reels within 48 hours. Wedding films within 3-4 weeks. Rush delivery available at additional cost. One round of revisions is included.</p>
+            <p>Edited photos are delivered within {PHOTO_DELIVERY_DAYS} working days via online gallery. Videos are delivered within {VIDEO_DELIVERY_DAYS} working days. Rush delivery may be available for specific packages. One round of revisions is included where applicable.</p>
 
             <h2 className="text-xl font-bold text-slate-900 dark:text-white mt-8">5. Copyright & Usage</h2>
             <p>You receive full personal usage rights to all delivered photos and videos. Orvex Visuals retains the right to use select images for portfolio, marketing, and social media purposes unless you opt out in writing before the event. Commercial usage by the client requires separate written agreement.</p>

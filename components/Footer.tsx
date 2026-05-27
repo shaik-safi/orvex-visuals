@@ -1,14 +1,14 @@
 "use client"
 
+import Link from "next/link"
 import {
   Phone,
   Mail,
   MapPin,
   Instagram,
   Facebook,
-  Linkedin,
 } from "lucide-react"
-import { PHONE_DISPLAY, EMAIL } from "@/lib/constants"
+import { EMAIL, PHONE_DISPLAY, SOCIAL_LINKS } from "@/lib/constants"
 
 export default function Footer() {
   return (
@@ -28,11 +28,12 @@ export default function Footer() {
               Your moments, beautifully captured.
             </p>
             <div className="flex gap-2">
-              {[Instagram, Facebook, Linkedin].map((Icon, i) => (
-                <a key={i} href="#" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
-                  <Icon size={16} />
-                </a>
-              ))}
+              <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                <Instagram size={16} />
+              </a>
+              <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                <Facebook size={16} />
+              </a>
             </div>
           </div>
 
@@ -48,7 +49,7 @@ export default function Footer() {
                 ["Drone Photography", "/services/drone-photography"],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <a href={href} className="hover:text-amber-400 transition-colors">{label}</a>
+                  <Link href={href} className="hover:text-amber-400 transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -66,7 +67,7 @@ export default function Footer() {
                 ["FAQs", "/#faq"],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <a href={href} className="hover:text-amber-400 transition-colors">{label}</a>
+                  <Link href={href} className="hover:text-amber-400 transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -102,8 +103,8 @@ export default function Footer() {
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
           <p>&copy; 2026 Orvex Visuals. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="/privacy-policy" className="hover:text-amber-400 transition-colors">Privacy Policy</a>
-            <a href="/terms" className="hover:text-amber-400 transition-colors">Terms of Service</a>
+            <Link href="/privacy-policy" className="hover:text-amber-400 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-amber-400 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

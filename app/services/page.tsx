@@ -20,7 +20,7 @@ function ServicesHero() {
       <div className="absolute top-20 left-1/4 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
       <div ref={ref} className={`max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-          23+ Photography Services
+          {services.length}+ Photography Services
         </span>
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white leading-[0.95] mb-6">
           Every Moment{" "}
@@ -193,22 +193,20 @@ function ServicesCTA() {
           We cover all types of events. Tell us your requirement and we&apos;ll create a custom package.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="https://wa.me/919845332306?text=Hi%20Orvex,%20I%20need%20a%20custom%20photography%20package"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/pricing#calculator"
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
             <MessageCircle size={20} />
-            Custom Package
-          </a>
-          <a
-            href="/pricing"
+            Build Custom Package
+          </Link>
+          <Link
+            href="/book"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            View Pricing
+            Start Booking
             <ArrowRight size={18} />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

@@ -1,533 +1,1225 @@
-# Orvex Visuals — Complete Customization Guide
+# Orvex Visuals - Website Customization Guide
 
-> **Both repos must stay in sync.**
-> After every change in `orvex-visuals`, run:
-> ```powershell
-> Copy-Item "c:\Shaik Safi\ORVEX_VISUALS\orvex-visuals\<changed-file>" "c:\Shaik Safi\ORVEX_VISUALS\client-directive-error\<same-path>" -Force
-> ```
+This file is the single editing guide for the website.
+
+Use it when you want to change prices, services, contact info, text, images, booking flow, or other content without searching the full codebase.
 
 ---
 
-## Quick Reference Table
+## 0. Important First Notes
+
+### This guide is for one repo only
+
+Use this repo only:
+
+```powershell
+c:\Shaik Safi\ORVEX_VISUALS\orvex-visuals
+```
+
+If you are working on your personal laptop, you only need this repository.
+
+Ignore any old notes about syncing a sandbox copy unless you intentionally want to keep a second manual backup repo.
+
+### Mostly configuration-based setup
+
+Most important things in this project are already wiring-based and configuration-based.
+
+That means once the environment variables are correct, most major features already work without extra code changes:
+
+- local development
+- Vercel deployment
+- custom domain usage
+- Firebase client setup
+- Firebase Admin setup for server routes
+- booking quote creation
+- inquiry saving
+- WhatsApp flows
+
+In practice, most setup work is just:
+
+1. install dependencies
+2. add env variables
+3. connect Firebase
+4. deploy to Vercel
+5. attach domain
+
+### Pricing now uses a single source of truth
+
+This is the most important architecture rule in the site now.
+
+Do not hardcode the same price in multiple files.
+
+Main pricing source:
+
+```ts
+lib/constants.ts
+```
+
+Inside that file:
+
+- `SERVICE_RATES`
+- `EVENT_ADDONS`
+- `GLOBAL_ADDONS`
+- `PACKAGES`
+- `computePackagePrice()`
+
+If you want to change photography, videography, drone, album, LED wall, or same-day-edit pricing, change it there first.
+
+### Service pages also compute from the same rates
+
+`app/services/data.ts` now imports rates from `lib/constants.ts`.
+
+That means:
+
+- service listing starting prices are derived from constants
+- many service detail package prices are derived from constants
+- pricing page package cards are derived from constants
+- pricing page builder totals are derived from constants
+
+So in most cases, changing one value in `lib/constants.ts` updates multiple pages automatically.
+
+---
+
+## 1. Quick Reference - Where To Edit What
 
 | What you want to change | File |
 |---|---|
-| Phone number, email, WhatsApp messages | `lib/constants.ts` |
+| Phone number, email, social links, brand, delivery days | `lib/constants.ts` |
+| All pricing rates and add-ons | `lib/constants.ts` |
+| Starter / Signature / Grand package contents | `lib/constants.ts` |
+| Pricing page layout, labels, builder UI, WhatsApp estimate flow | `app/pricing/page.tsx` |
+| Service cards, service descriptions, service detail content | `app/services/data.ts` |
+| Booking form flow and WhatsApp booking message | `app/book/page.tsx` |
+| Homepage sections | `components/home/ClientSections.tsx` |
 | Navbar links | `components/Navbar.tsx` |
-| Footer links, social media URLs | `components/Footer.tsx` |
-| Site SEO title, description, og:image | `app/layout.tsx` |
-| Homepage — hero carousel, FAQ, CTA banner | `components/home/ClientSections.tsx` |
-| Pricing — all prices, descriptions, hours | `app/pricing/page.tsx` |
-| Services list — all service cards | `app/services/data.ts` |
-| Service detail pages — packages, process, FAQs | `app/services/data.ts` |
-| Gallery photos | `app/gallery/page.tsx` |
-| About page — story, stats, team | `app/about/page.tsx` |
-| Contact — address, hours, social links | `app/contact/page.tsx` |
-| Booking form — steps, WhatsApp message | `app/book/page.tsx` |
-| Blog posts | `app/blog/` |
-| Portfolio images (public folder) | `public/images/portfolio/` |
+| Footer links and social icons | `components/Footer.tsx` |
+| Site-wide SEO and metadata | `app/layout.tsx` |
+| About page story, stats, team | `app/about/page.tsx` |
+| Contact page address, hours, links | `app/contact/page.tsx` |
+| Gallery images and layout | `app/gallery/page.tsx` |
+| Blog listing and blog posts | `app/blog/` |
+| Portfolio image files | `public/images/portfolio/` |
 | Logo | `public/images/logo.png` |
+| Local environment variables | `.env.local` |
+| Firebase client connection | `lib/firebase.ts` |
+| Firebase Admin / server DB connection | `lib/firebase-admin.ts` |
+| Quote encryption secret usage | `lib/quote-security.ts` |
+| Firestore rules | `firestore.rules` |
+| Build scripts | `package.json` |
+| Next.js image config | `next.config.mjs` |
 
 ---
 
-## 1. Global Constants — `lib/constants.ts`
+## 2. Local Setup On Personal Laptop
 
-**This is the most important file. Changes here affect the entire site.**
+### Requirements
 
-```ts
-export const PHONE_NUMBER = "919845332306"       // WhatsApp number (no +, no spaces)
-export const PHONE_DISPLAY = "+91 98453 32306"   // How it appears on screen
-export const EMAIL = "orvexvisuals@gmail.com"    // Contact email
-export const BRAND_NAME = "Orvex Visuals"        // Brand name everywhere
-export const DOMAIN = "https://orvexvisuals.com" // Your live domain
+Install these first:
+
+- Node.js 20 or newer recommended
+- npm
+- Git
+
+### Open the project
+
+```powershell
+cd "c:\Shaik Safi\ORVEX_VISUALS\orvex-visuals"
 ```
 
-**WhatsApp pre-fill messages** — these open WhatsApp with text already typed:
+### Install dependencies
+
+```powershell
+npm install
+```
+
+### Start local development server
+
+```powershell
+npm run dev
+```
+
+Then open:
+
+```text
+http://localhost:3000
+```
+
+### Production build test on laptop
+
+Use these commands before deployment if you want to verify production behavior locally:
+
+```powershell
+npm run build
+npm run start
+```
+
+### Available scripts
+
+From `package.json`:
+
+```json
+{
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "eslint ."
+}
+```
+
+---
+
+## 3. Environment Variables - `.env.local`
+
+This project uses environment variables for Firebase and secure quote storage.
+
+The repo already expects `.env.local` locally.
+
+`.gitignore` already excludes `.env*`, so these secrets are not meant to be committed.
+
+### Current local env template
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=paste-your-apiKey-here
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+```
+
+### Full set of env vars you should use
+
+For complete local + deployed setup, use these:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+
+FIREBASE_PROJECT_ID=
+FIREBASE_CLIENT_EMAIL=
+FIREBASE_PRIVATE_KEY=
+
+QUOTE_ACCESS_SECRET=
+```
+
+### Ready-to-copy `.env.local` example
+
+You can copy this directly into your local `.env.local` and then replace the placeholder values:
+
+```env
+# PUBLIC FIREBASE (Browser-side)
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+
+# FIREBASE ADMIN (Server-side)
+FIREBASE_PROJECT_ID=your-project-id
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_HERE\n-----END PRIVATE KEY-----\n"
+
+# QUOTE SECURITY
+QUOTE_ACCESS_SECRET=put-a-long-random-secret-here
+```
+
+### What each one does
+
+Public client Firebase values:
+
+- `NEXT_PUBLIC_FIREBASE_API_KEY`
+- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+
+These are used by `lib/firebase.ts` for browser-side Firebase setup.
+
+Server-side Firebase Admin values:
+
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_CLIENT_EMAIL`
+- `FIREBASE_PRIVATE_KEY`
+
+These are used by `lib/firebase-admin.ts` for API routes and Firestore writes.
+
+Security value:
+
+- `QUOTE_ACCESS_SECRET`
+
+This is used by `lib/quote-security.ts` to encrypt saved quote payloads and to generate secure access token hashes.
+
+### Important note for private key format
+
+For `FIREBASE_PRIVATE_KEY`, use the raw private key value but keep newline characters escaped as `\n` in env variables.
+
+The code already converts `\n` back to real new lines automatically.
+
+---
+
+## 4. Global Settings - `lib/constants.ts`
+
+This is the most important file in the whole site.
+
+### Contact and brand info
+
+Edit these when phone, email, brand, or domain changes:
+
+```ts
+export const PHONE_NUMBER = "919845332306"
+export const PHONE_DISPLAY = "+91 98453 32306"
+export const EMAIL = "orvexvisuals@gmail.com"
+export const BRAND_NAME = "Orvex Visuals"
+export const DOMAIN = "https://orvexvisuals.com"
+```
+
+### General business settings
+
+These values are reused in multiple places:
+
+```ts
+export const PHOTO_DELIVERY_DAYS = 5
+export const VIDEO_DELIVERY_DAYS = 15
+export const RESPONSE_TIME_PROMISE = "within 2 hours"
+```
+
+### Social links
+
+```ts
+export const SOCIAL_LINKS = {
+  instagram: "https://www.instagram.com/orvexvisuals",
+  facebook: "https://www.facebook.com/orvexvisuals",
+}
+```
+
+### WhatsApp helper and pre-filled messages
+
+If you want to change the wording of generic WhatsApp messages, edit:
+
 ```ts
 export const WA_MESSAGES = {
   general: "Hi Orvex Visuals, I have a question",
   booking: "Hi Orvex, I'd like to check availability for my event",
   quote: "Hi Orvex, I'd like to check availability and get a quote",
-  pricing: (pkg, price) => `Hi Orvex, I'm interested in the ${pkg} package (₹${price})`,
-  service: (name) => `Hi Orvex, I'm interested in ${name}`,
+  pricing: (pkg: string, price: string) =>
+    `Hi Orvex, I'm interested in the ${pkg} package (₹${price})`,
+  service: (name: string) => `Hi Orvex, I'm interested in ${name}`,
+  customPlan: (details: string) => `Hi Orvex! I built a custom plan:\n\n${details}\n\nPlease confirm availability!`,
 }
 ```
 
-**Portfolio image paths** used in the homepage hero carousel:
+### Images used across the site
+
 ```ts
 export const IMAGES = {
   hero: [
-    "/images/portfolio/hero-1.jpg",   // Replace with your actual photos
-    "/images/portfolio/hero-2.jpg",
-    "/images/portfolio/hero-3.jpg",
+    "/images/portfolio/hero-1.webp",
+    "/images/portfolio/hero-2.webp",
+    "/images/portfolio/hero-3.webp",
   ],
   about: [
-    "/images/portfolio/about-1.jpg",  // Used on About page photo grid
-    "/images/portfolio/about-2.jpg",
-    "/images/portfolio/about-3.jpg",
-    "/images/portfolio/about-4.jpg",
+    "/images/portfolio/about-1.webp",
+    "/images/portfolio/about-2.webp",
+    "/images/portfolio/about-3.webp",
+    "/images/portfolio/about-4.webp",
   ],
   logo: "/images/logo.png",
-  ogImage: "/images/og-cover.jpg",    // Social share preview image
+  ogImage: "/images/og-cover.webp",
 }
 ```
 
-> ⚠️ **NOTE:** The pricing page (`app/pricing/page.tsx`) has the WhatsApp number hardcoded as `919845332306`. If you change the number, update it there too.
+---
+
+## 5. Firebase And Database Setup
+
+This project uses Firebase in two ways.
+
+### Client Firebase
+
+File:
+
+```ts
+lib/firebase.ts
+```
+
+Used for browser-side Firebase initialization.
+
+It reads:
+
+- `NEXT_PUBLIC_FIREBASE_API_KEY`
+- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+
+If `projectId` is missing, Firebase client does not initialize.
+
+That is intentional and keeps local development safe even before Firebase is configured.
+
+### Admin Firebase
+
+File:
+
+```ts
+lib/firebase-admin.ts
+```
+
+Used for secure server-side Firestore access from API routes.
+
+It reads:
+
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_CLIENT_EMAIL`
+- `FIREBASE_PRIVATE_KEY`
+
+If these are missing, `adminDb` becomes `null` and database-backed API routes return a configuration error.
+
+### What gets stored in Firestore
+
+Collections currently used by the app:
+
+- `quotes`
+- `inquiries`
+
+These are written by:
+
+- `app/api/quotes/route.ts`
+- `app/api/inquiries/route.ts`
+
+### Important storage behavior
+
+The app stores booking and inquiry payloads encrypted on the server.
+
+That encryption is handled by:
+
+```ts
+lib/quote-security.ts
+```
+
+It uses AES-256-GCM and depends on:
+
+```env
+QUOTE_ACCESS_SECRET
+```
+
+If this secret is missing, quote creation will fail.
+
+### Firebase Console setup steps
+
+1. Go to Firebase Console
+2. Create a project
+3. Enable Firestore Database
+4. Add a Web App inside the Firebase project
+5. Copy the web config values into `.env.local`
+6. Go to Project Settings -> Service Accounts
+7. Generate a service account key
+8. Copy `project_id`, `client_email`, and `private_key` into env vars
+
+### Firestore rules
+
+Current file:
+
+```ts
+firestore.rules
+```
+
+Current rule style is locked down:
+
+- direct client reads/writes are denied
+- server-side Admin SDK is expected to do writes
+
+This is good and should usually stay that way.
+
+### Important note
+
+If Firebase is not configured:
+
+- pricing page still works
+- website still renders
+- WhatsApp flows still work
+- database save APIs do not work
+- booking falls back to WhatsApp-only flow where supported
 
 ---
 
-## 2. Site-wide SEO — `app/layout.tsx`
+## 6. Deployment To Vercel
 
-Change these to update how the site appears in Google and when shared on social media:
+This project is already suitable for Vercel deployment.
 
-```ts
-title: "Orvex Visuals — Premium Photography & Videography in Bangalore"
-description: "Professional photography & videography in Bangalore. Transparent pricing, 5-day delivery, 100% copyright yours. Wedding, pre-wedding, baby shoots, events & more. Starting ₹7,999."
-keywords: ["photography in Bangalore", "wedding photographer Bangalore", ...]
+Why:
+
+- it is a Next.js app
+- `package.json` already has standard Next scripts
+- `@vercel/analytics` is already installed and used
+
+### Deploy using Vercel dashboard
+
+1. Push this repo to GitHub
+2. Go to Vercel
+3. Click `Add New Project`
+4. Import the GitHub repo
+5. Framework should be auto-detected as Next.js
+6. Add all required environment variables in Vercel Project Settings
+7. Deploy
+
+### Environment variables to add in Vercel
+
+Add these in Vercel project settings:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+NEXT_PUBLIC_FIREBASE_PROJECT_ID
+FIREBASE_PROJECT_ID
+FIREBASE_CLIENT_EMAIL
+FIREBASE_PRIVATE_KEY
+QUOTE_ACCESS_SECRET
 ```
 
-**Open Graph image** (shown when link is shared on WhatsApp, Instagram, etc.):
-```ts
-url: "https://images.unsplash.com/..."  // Replace with your own hosted image URL
+### Build command
+
+Vercel can use default Next.js build settings.
+
+Equivalent build command:
+
+```powershell
+npm run build
 ```
 
-**Business schema** (structured data for Google):
-```ts
-telephone: "+91-9845332306"
-email: "orvexvisuals@gmail.com"
-streetAddress: "Koramangala"
-addressLocality: "Bangalore"
-postalCode: "560034"
-priceRange: "₹7,999 - ₹1,50,000"
+### Start command
+
+For self-hosting or testing after build:
+
+```powershell
+npm run start
 ```
+
+### Important deployment note
+
+If public Firebase vars are added but admin vars are missing:
+
+- frontend may appear fine
+- quote/inquiry storage APIs will fail
+
+If `QUOTE_ACCESS_SECRET` is missing:
+
+- quote creation and secure quote access will fail
 
 ---
 
-## 3. Navbar — `components/Navbar.tsx`
+## 7. Custom Domain Setup
 
-Two separate link sets — one for homepage, one for all other pages:
+Main domain value in code:
 
 ```ts
-// Links shown only on the homepage (scroll anchors)
-const homepageLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "Why Us", href: "#why-us" },
-  { label: "Gallery", href: "/gallery" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contact", href: "#contact" },
-]
-
-// Links shown on all other pages
-const siteLinks = [
-  { label: "Home", href: "/" },
-  { label: "Services", href: "/services" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Gallery", href: "/gallery" },
-  { label: "Blog", href: "/blog" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
-]
+lib/constants.ts
 ```
+
+Current value:
+
+```ts
+export const DOMAIN = "https://orvexvisuals.com"
+```
+
+### When changing domain
+
+If you move to a new domain, update:
+
+1. `DOMAIN` in `lib/constants.ts`
+2. Vercel Project -> Domains
+3. DNS records at your domain provider
+
+### Vercel domain connection steps
+
+1. Open your Vercel project
+2. Go to `Settings -> Domains`
+3. Add your custom domain
+4. Follow the DNS instructions Vercel gives
+5. Wait for verification
+6. Once active, update `DOMAIN` in `lib/constants.ts` if needed
+
+### Why `DOMAIN` matters
+
+It is used in metadata and share URLs through `app/layout.tsx`.
+
+If `DOMAIN` is wrong, metadata and shared links can point to the wrong place.
 
 ---
 
-## 4. Footer — `components/Footer.tsx`
+## 8. What Is Already Configuration-Driven
 
-**Social media links** (currently `href="#"` — needs your real URLs):
-```tsx
-{[Instagram, Facebook, Linkedin].map((Icon, i) => (
-  <a key={i} href="#">   // ← Replace # with your Instagram/Facebook/LinkedIn URLs
-```
+These things are mostly already configured and only need values changed, not code redesign:
 
-**Footer services list** (quick links in footer column):
-```ts
-["Wedding Photography", "/services/wedding-photography"],
-["Pre-Wedding Shoot", "/services/pre-wedding-photoshoot"],
-["Baby Photoshoot", "/services/baby-photoshoot"],
-["Event Photography", "/services"],
-["Drone Photography", "/services/drone-photography"],
-```
+- phone number and email
+- social links
+- brand/domain values
+- delivery day promises
+- pricing rates
+- package totals
+- service starting prices
+- auto-generated service package prices
+- Firebase initialization
+- Firestore Admin initialization
+- quote encryption behavior
+- Vercel hosting compatibility
+- WhatsApp launch behavior
 
-**Footer contact info** pulls from `lib/constants.ts` (PHONE_DISPLAY and EMAIL) automatically.
+This means most changes are content or config changes, not engineering changes.
 
 ---
 
-## 5. Homepage — `components/home/ClientSections.tsx`
+## 9. Pricing System - Single Source Of Truth
 
-### Hero Section
-- **Carousel images**: Replace `IMAGES.hero` paths in `lib/constants.ts` → put your actual photos in `public/images/portfolio/`
-- **Top padding**: Currently `pt-28 pb-12` (clears 80px navbar with breathing room)
-- **Urgency badge** (the "Book now — only X weekends left" text):
-```tsx
-function getUpcomingMonths() {
-  // This auto-generates month names for urgency badge
-  // Edit the badge text below in the JSX
+### File
+
+```ts
+lib/constants.ts
+```
+
+### The real pricing source
+
+The website now uses these objects as the base price source:
+
+```ts
+export const SERVICE_RATES = {
+  "traditional-photo": { name: "Traditional Photography", ratePerDay: 10000, ratePerHalfDay: 6000 },
+  "candid-photo": { name: "Candid Photography", ratePerDay: 18000, ratePerHalfDay: 12000 },
+  "traditional-video": { name: "Traditional Videography", ratePerDay: 10000, ratePerHalfDay: 6000 },
+  "cinematic-video": { name: "Cinematic Videography", ratePerDay: 15000, ratePerHalfDay: 10000 },
+}
+
+export const EVENT_ADDONS = {
+  drone: { name: "Drone Coverage", price: 5000 },
+  "led-wall": { name: "LED Wall Setup", price: 10000 },
+  "same-day-edit": { name: "Same-Day Edit", price: 7000 },
+  "live-stream": { name: "Live Streaming", price: 5000 },
+}
+
+export const GLOBAL_ADDONS = {
+  "album-25": { name: "Photo Album (25 sheets)", price: 5000 },
+  "album-40": { name: "Photo Album (40 sheets)", price: 8000 },
 }
 ```
 
-### FAQ Section
-Find the `faqs` array in `ClientSections.tsx`:
+### What updates automatically when you change these values
+
+If you edit the rates above, these parts update automatically:
+
+- pricing builder totals
+- pricing page package card prices
+- prebuilt package totals through `computePackagePrice()`
+- service listing starting prices in many cases
+- service detail generated package prices in many cases
+
+### Prebuilt website packages
+
+The 3 package cards on pricing page come from:
+
 ```ts
-const faqs = [
-  {
-    question: "How far in advance should I book?",
-    answer: "For weddings, we recommend booking 3-6 months in advance...",
-  },
-  // Add, remove, or edit any question/answer here
+export const PACKAGES = [
+  { name: "Starter", ... },
+  { name: "Signature", ... },
+  { name: "Grand", ... },
 ]
 ```
 
-### CTA Banner (bottom of homepage)
-- Section has `id="contact"` — needed for the navbar Contact link
-- Edit the heading, subtext, and button labels directly in the JSX
+Each package contains:
+
+- visible feature list
+- `notIncluded`
+- `builderPreset`
+
+Important:
+
+- package prices are not hardcoded anymore
+- package prices are computed from `builderPreset`
+- the builder uses the same preset data
+
+So if you want to change what a package includes, edit `builderPreset` and the matching visible `features` text.
+
+### Current package logic
+
+At the time this guide was updated, package totals are effectively:
+
+- Starter: half-day candid photographer
+- Signature: full day traditional + candid + cinematic + drone + 25-sheet album
+- Grand: full day traditional + candid + traditional video + cinematic video + drone + same-day-edit + LED wall + 40-sheet album
+
+### Important rule
+
+If you change package contents, always update both:
+
+1. the `builderPreset`
+2. the visible `features` text
+
+Otherwise card text and actual pricing will stop matching.
 
 ---
 
-## 6. Pricing Page — `app/pricing/page.tsx`
+## 10. Pricing Page - `app/pricing/page.tsx`
 
-**This is the most detailed file to edit. All data is at the top of the file.**
+This file controls the pricing page UI and the custom package builder.
 
-### Quick-Start Packages (Essential / Premium / Luxury)
+### What this file controls
+
+- package card layout and labels
+- pricing page hero text
+- package builder UI
+- event rows, service selectors, add-on selectors
+- estimate summary display
+- `Send Estimate` WhatsApp action
+- `Proceed to Book` action
+
+### What this file does not control anymore
+
+It does not own the actual core rate values.
+
+Those now live in `lib/constants.ts`.
+
+### Package card prices on pricing page
+
+The pricing page maps packages like this:
+
 ```ts
-const packages = [
-  {
-    name: "Essential",
-    subtitle: "Perfect for intimate events",
-    price: 20000,                          // ← Change price here
-    features: [
-      "1 Professional Photographer",
-      "5 hours coverage",
-      "Unlimited soft copies",
-      "50 edited highlights",
-      "Digital delivery in 5 days",        // ← Change delivery days here
-      "Pre-event planning call",
-    ],
-    notIncluded: ["Video", "Drone", "Album", "Makeup"],
-  },
-  // ... Premium and Luxury follow same structure
-]
+const packages = PACKAGES.map((pkg) => ({
+  ...pkg,
+  price: computePackagePrice(pkg),
+}))
 ```
 
-### Calculator Services
-Each service has: name, description (shown below name), coverage options with hours and price:
+So do not try to hardcode a package price directly in this file.
+
+### Send Estimate behavior
+
+`Send Estimate`:
+
+- does not save to database
+- does not save to session storage
+- opens WhatsApp to the owner number with a pre-filled estimate
+
+This is for sharing estimate details with Orvex on WhatsApp.
+
+### Proceed to Book behavior
+
+`Proceed to Book`:
+
+- builds the customer plan object
+- stores it in `sessionStorage`
+- key used: `BOOKING_PLAN_STORAGE_KEY`
+- then redirects to `/book`
+
+So if a user builds a custom plan and goes to booking, the booking page can reuse that plan.
+
+### If you want to change estimate message format
+
+Edit the message-building logic in:
+
 ```ts
-{
-  id: "wedding-candid",
-  name: "Wedding Photography — Candid",
-  description: "Natural, unposed moments — real emotions as they happen",  // ← Edit description
-  coverageOptions: [
-    {
-      type: "Half Day",
-      hours: "4–5 hrs",       // ← Edit hours shown in pill
-      price: 20000,           // ← Edit price
-      includes: [             // ← Edit what's listed in "What's Included" box
-        "1 Photographer",
-        "50+ edited photos",
-        "Candid + posed shots",
-      ],
-    },
-    {
-      type: "Full Day",
-      hours: "8–10 hrs",
-      price: 35000,
-      includes: [
-        "1 Photographer",
-        "100+ edited photos",
-        "Candid + posed shots",
-        "Pre-event planning call",
-      ],
-    },
-  ],
-},
+app/pricing/page.tsx
 ```
 
-### Add-ons
-```ts
-const addOns = [
-  { id: "drone", name: "Drone Coverage", price: 5000, description: "Aerial photos + video (1 session)", maxQty: 3 },
-  { id: "extra-photographer", name: "Extra Photographer", price: 8000, description: "Additional coverage angles", maxQty: 3 },
-  { id: "album-25", name: "Photo Album (25 sheets)", price: 5000, description: "Premium printed album", maxQty: 5 },
-  { id: "album-40", name: "Photo Album (40 sheets)", price: 8000, description: "Deluxe large album", maxQty: 5 },
-  { id: "same-day-edit", name: "Same-Day Edit", price: 7000, description: "Highlight reel ready same day", maxQty: 1 },
-  { id: "extra-location", name: "Extra Location", price: 3000, description: "Additional shoot location", maxQty: 5 },
-  { id: "led-wall", name: "LED Wall Setup", price: 10000, description: "Digital backdrop for events", maxQty: 2 },
-]
-```
+Look for:
 
-### Comparison Table (Orvex vs Others)
-```ts
-const comparisons = [
-  { feature: "Pricing Transparency", orvex: "All prices on website", competitor: "\"Call for quote\"" },
-  { feature: "GST", orvex: "Included in price", competitor: "+18% surprise" },
-  { feature: "Photo Delivery", orvex: "5 days", competitor: "30-45 days" },  // ← Update if delivery time changes
-  { feature: "Video Delivery", orvex: "15 days", competitor: "45-60 days" },
-  // ...
-]
-```
+- `generateWhatsAppMessage()`
+- `handleSendEstimate()`
+
+### Important note about WhatsApp opening
+
+The site now uses `window.open(..., '_blank')` for WhatsApp links instead of `window.location.href`.
+
+That was changed to avoid browser blocking issues like "content is blocked".
 
 ---
 
-## 7. Services — `app/services/data.ts`
+## 11. Services - `app/services/data.ts`
 
-**This file is the single source of truth for all service cards and detail pages.**
+This file controls both:
 
-### Service Cards (listing page `/services`)
-Each card object:
-```ts
-{
-  slug: "wedding-photography",          // URL: /services/wedding-photography
-  name: "Wedding Photography",
-  category: "wedding",                  // Filter category
-  description: "Candid + Traditional coverage...",  // 1-2 sentence description on card
-  startingPrice: 20000,                 // "Starting from ₹20,000" on card
-  image: "https://...",                 // Card thumbnail (replace with your photos)
-  popular: true,                        // Shows "Popular" badge on card
-},
-```
+- `/services`
+- `/services/[slug]`
 
-**Image tip**: Replace all `images.unsplash.com` URLs with your own actual portfolio photos hosted in `/public/images/` or on a CDN.
+### Service card listing
 
-### Service Detail Pages (`/services/[slug]`)
-Further down in `data.ts`, the `serviceDetails` array has detailed info for each service's individual page. Each entry has:
+At the top of the file, `services` controls the cards shown on the services listing page.
+
+Each object contains:
 
 ```ts
 {
   slug: "wedding-photography",
   name: "Wedding Photography",
-  tagline: "Short catchy line for the hero",
-  description: "1-line description",
-  longDescription: "2-3 paragraph description shown on the page",
-  heroImage: "https://...",             // Full-width hero image on detail page
-  gallery: ["https://...", ...],        // Photo grid on detail page (6 images)
-  packages: [                           // Pricing table on detail page
-    {
-      name: "Basic",
-      price: 20000,
-      duration: "4 hours",
-      features: ["1 Photographer", "50 edited photos", "..."],
-      popular: false,
-    },
-  ],
-  includes: [                           // "What's Included" checklist
-    "Pre-shoot planning call",
-    "Backup equipment on site",
-    "Online gallery delivery",
-  ],
-  process: [                            // How it works — step by step
-    { step: "Consultation", description: "We discuss your vision..." },
-    { step: "Planning", description: "..." },
-  ],
-  faqs: [                               // FAQs specific to this service
-    { q: "How many photos will I receive?", a: "..." },
-  ],
-  relatedSlugs: ["pre-wedding-photoshoot", "candid-wedding-photography"],
+  category: "wedding",
+  description: "...",
+  startingPrice: PHOTO_STARTING,
+  icon: Camera,
+  image: "https://...",
+  popular: true,
 }
 ```
 
----
+### Important pricing note for services
 
-## 8. About Page — `app/about/page.tsx`
+Many `startingPrice` values are now computed from constants:
 
-### Stats (the 4 numbers section)
 ```ts
-const stats = [
-  { number: "500+", label: "Events Covered" },   // ← Update as business grows
-  { number: "200+", label: "Happy Clients" },
-  { number: "50K+", label: "Photos Delivered" },
-  { number: "4.9", label: "Google Rating" },
-]
+const PHOTO_STARTING = SERVICE_RATES["candid-photo"].ratePerHalfDay
+const VIDEO_STARTING = SERVICE_RATES["cinematic-video"].ratePerHalfDay
+const DRONE_STARTING = EVENT_ADDONS.drone.price
 ```
 
-### Our Story text
-In the `OurStory` component, edit the `<p>` paragraphs directly.
+So if you increase the candid half-day rate in `lib/constants.ts`, many service cards automatically change.
 
-### Team Members
+### Detailed service pages
+
+Further down, `serviceDetails` contains manually written detailed pages for some important services.
+
+You can edit:
+
+- `tagline`
+- `description`
+- `longDescription`
+- `heroImage`
+- `gallery`
+- `packages`
+- `includes`
+- `process`
+- `faqs`
+- `relatedSlugs`
+
+### Auto-generated service pages
+
+If a service does not have an explicit entry in `serviceDetails`, the page is generated by:
+
 ```ts
-const team = [
-  {
-    name: "Orvex Team",                          // ← Replace with actual names
-    role: "Lead Photographer",
-    image: "https://...",                         // ← Replace with actual team photos
-    speciality: "Weddings & Candid",
-  },
-  // ...
-]
+getServiceDetail(slug)
 ```
 
-### Why Choose Us (6 cards)
+That function now computes package prices using:
+
 ```ts
-const reasons = [
-  { icon: Target, title: "Detail-Oriented", description: "We obsess over every frame..." },
-  { icon: Shield, title: "Transparent Pricing", description: "All prices are GST-inclusive..." },
-  { icon: Zap, title: "Quick Turnaround", description: "48-hour previews and 7-15 day full delivery..." },  // ← Update delivery time if it changes
-  // ...
-]
+function computeServicePackagePrices(category: Category)
 ```
 
-### About page hero stats (inline, under the heading)
-```tsx
-<div>Since 2020</div>              // ← Year founded
-<div>500+ Events</div>             // ← Event count
-<div>Bangalore, India</div>
-```
+### Current auto-generated package logic
 
-### About page hero images (4-image grid)
-```tsx
-<Image src="https://images.unsplash.com/..." .../>  // ← Replace all 4 with your photos
-```
+For photography categories:
 
----
+- Essential = candid half day
+- Premium = candid full day + traditional full day + album-25
+- Luxury = candid full day + traditional full day + drone + same-day-edit + album-40
 
-## 9. Contact Page — `app/contact/page.tsx`
+For videography category:
 
-### Phone, Email
-These auto-pull from `lib/constants.ts`. Change them there.
+- Essential = cinematic half day
+- Premium = cinematic full day + traditional video full day + album-25
+- Luxury = cinematic full day + traditional video full day + drone + same-day-edit + album-40
 
-### Working Hours
-```tsx
-<p>Mon — Sat: 9 AM - 8 PM</p>       // ← Edit hours
-<p>Sunday: By Appointment</p>
-```
+For products category:
 
-### Location
-```tsx
-<p>Bangalore, Karnataka, India</p>   // ← Edit address
-<p>Available PAN India for travel</p>
-```
+- pricing is still derived from that card's own `startingPrice`
+- it uses simple multipliers for Basic / Premium / Luxury
 
-### Social Media Icons
-```tsx
-<a href="#">   // ← Replace # with real Instagram URL
-<a href="#">   // ← Replace # with real YouTube URL
-```
+### When to edit `data.ts` directly
 
----
+Edit this file directly when you want to change:
 
-## 10. Gallery Page — `app/gallery/page.tsx`
-
-Replace the image URLs with your own portfolio photos. Images are currently pulled from Unsplash. Put real photos in `public/images/gallery/` and update the paths.
+- service names
+- categories
+- descriptions
+- service images
+- detailed service FAQs
+- process steps
+- package feature text on specific service pages
+- manually written package price formulas for key services
 
 ---
 
-## 11. Booking Form — `app/book/page.tsx`
+## 12. Booking Flow - `app/book/page.tsx`
 
-### Service options in the dropdown
+This file controls the booking page and booking submission flow.
+
+### What it does
+
+- reads plan data from `sessionStorage` when user comes from pricing page
+- shows booking form
+- sends booking details to WhatsApp
+- if Firebase quote saving works, it includes a secure quote link
+- if Firebase is unavailable, it falls back to a plain WhatsApp message
+
+### Main behavior
+
+Pricing page:
+
+- `Send Estimate` -> WhatsApp only
+- `Proceed to Book` -> save plan to session storage and go to booking page
+
+Booking page:
+
+- combines form fields + stored plan
+- opens WhatsApp to owner number
+
+### If you want to edit booking WhatsApp content
+
+Edit:
+
 ```ts
-const serviceOptions = [
-  "Wedding Photography",
-  "Pre-Wedding Photoshoot",
-  "Baby Photoshoot",
-  // Add or remove services here
-]
+app/book/page.tsx
 ```
 
-### WhatsApp message format
-The final WhatsApp message sent when form is submitted:
-```ts
-const msg = `Hi Orvex! I'm ${name}.\n\nService: ${service}\nDate: ${date}\nMessage: ${message}\n\nPhone: ${phone}\nEmail: ${email}`
-```
-Edit the message template here.
+Look around the message arrays used before `window.open(...)`.
 
-### 30% advance amount
-```tsx
-<p>30% advance to confirm booking</p>  // ← Shown on the booking page
-```
+### If you want to change booking form text
+
+Edit:
+
+- labels
+- headings
+- helper text
+- advance payment text
+- success message
+
+all inside `app/book/page.tsx`.
 
 ---
 
-## 12. Images — Where to Put Your Photos
+## 13. Homepage - `components/home/ClientSections.tsx`
 
-```
+Use this file to change homepage content.
+
+### Common things here
+
+- hero section text
+- urgency badge
+- homepage FAQ
+- CTA sections
+- some homepage messaging
+
+### Images for hero and about areas
+
+These usually come from `IMAGES` in `lib/constants.ts`.
+
+---
+
+## 14. Navbar - `components/Navbar.tsx`
+
+Edit this file for:
+
+- menu items
+- homepage anchor links
+- site-wide navigation links
+- mobile menu labels
+- CTA button text in navbar
+
+---
+
+## 15. Footer - `components/Footer.tsx`
+
+Edit this file for:
+
+- footer link groups
+- social icons and URLs
+- service quick links
+- copyright text
+- footer descriptions
+
+Some contact info may still be pulled from `lib/constants.ts`.
+
+---
+
+## 16. About Page - `app/about/page.tsx`
+
+Edit this file for:
+
+- business story
+- team members
+- stats
+- why choose us cards
+- about-page images
+- trust and brand messaging
+
+Typical changes:
+
+- events covered count
+- happy clients count
+- Google rating
+- founding year
+- team names and roles
+
+---
+
+## 17. Contact Page - `app/contact/page.tsx`
+
+Edit this file for:
+
+- address
+- working hours
+- service area
+- embedded map or location content
+- page-specific contact wording
+
+Phone and email are usually sourced from `lib/constants.ts`.
+
+---
+
+## 18. Gallery - `app/gallery/page.tsx`
+
+Edit this file when you want to:
+
+- change gallery images
+- reorder gallery categories
+- update gallery captions
+- change gallery page layout or headings
+
+---
+
+## 19. SEO And Metadata - `app/layout.tsx`
+
+Edit this file for:
+
+- site title
+- default description
+- keywords
+- Open Graph settings
+- business schema / structured data
+- default social share image
+
+If prices or delivery promises change a lot, review this file too.
+
+---
+
+## 20. Images - Where To Put Them
+
+Use the public folder for local images:
+
+```text
 public/
   images/
-    logo.png                  ← Your logo (referenced in lib/constants.ts)
-    og-cover.jpg              ← Social share image (1200×630px)
+    logo.png
+    og-cover.webp
     portfolio/
-      hero-1.jpg              ← Homepage hero carousel slide 1
-      hero-2.jpg              ← Homepage hero carousel slide 2
-      hero-3.jpg              ← Homepage hero carousel slide 3
-      about-1.jpg             ← About page photo grid image 1
-      about-2.jpg             ← About page photo grid image 2
-      about-3.jpg             ← About page photo grid image 3
-      about-4.jpg             ← About page photo grid image 4
+      hero-1.webp
+      hero-2.webp
+      hero-3.webp
+      about-1.webp
+      about-2.webp
+      about-3.webp
+      about-4.webp
     gallery/
-      (your gallery photos)   ← Gallery page
 ```
 
----
+If you replace remote Unsplash images with local files, update the paths in:
 
-## 13. Blog — `app/blog/`
-
-Each blog post is a folder under `app/blog/[slug]/page.tsx`.  
-To add a new post, create a new folder with a `page.tsx` inside it.  
-Blog listing is at `app/blog/page.tsx`.
-
----
-
-## 14. Post-Processing / Delivery Details — Where Each Value Lives
-
-| Detail | File | Where exactly |
-|---|---|---|
-| "5 days delivery" (pricing page) | `app/pricing/page.tsx` | `packages[].features` array + comparison table |
-| "5 days delivery" (about page) | `app/about/page.tsx` | `WhyChooseUs` → `reasons` array (`Zap` card) |
-| "5 days delivery" (services page) | `app/services/data.ts` | `serviceDetails[].includes` array per service |
-| "100+ edited photos" | `app/pricing/page.tsx` | `coverageOptions[].includes` inside each service |
-| "50+ edited photos" | `app/services/data.ts` | `serviceDetails[].packages[].features` |
-| "48-hour preview" | `app/about/page.tsx` | `WhyChooseUs` reasons description |
-| "30% advance" | `app/book/page.tsx` | Booking CTA text |
-| GST included notice | `app/pricing/page.tsx` | Hero badge + total display |
+- `lib/constants.ts`
+- `app/services/data.ts`
+- `app/about/page.tsx`
+- `app/gallery/page.tsx`
 
 ---
 
-## 15. Prices That Appear in Multiple Places
+## 21. Most Common Tasks
 
-If you change a price, update it in **both** these files:
+### Change phone number or email
 
-| Price | `app/pricing/page.tsx` | `app/services/data.ts` |
-|---|---|---|
-| Wedding Photography | `serviceOptions` → `wedding-candid` / `wedding-traditional` | `services` → `startingPrice` |
-| Pre-Wedding | `serviceOptions` → `pre-wedding-photo` | `services` → `startingPrice` |
-| Baby Photoshoot | `serviceOptions` → `baby-photo` | `services` → `startingPrice` |
-| Cinematic Video | `serviceOptions` → `videography-cinematic` | `services` → `startingPrice` |
-| Drone | `addOns` → `drone` | `services` → `startingPrice` (drone-photography) |
+Edit:
+
+```ts
+lib/constants.ts
+```
+
+Change:
+
+- `PHONE_NUMBER`
+- `PHONE_DISPLAY`
+- `EMAIL`
+
+### Change Instagram or Facebook links
+
+Edit:
+
+```ts
+lib/constants.ts
+```
+
+Change:
+
+- `SOCIAL_LINKS.instagram`
+- `SOCIAL_LINKS.facebook`
+
+Then also check if any page has hardcoded social links.
+
+### Set up project on a new personal laptop
+
+1. Install Node.js
+2. Clone the repo
+3. Run `npm install`
+4. Create `.env.local`
+5. Add all Firebase and quote secret values
+6. Run `npm run dev`
+
+### Connect Firebase database
+
+1. Create Firebase project
+2. Enable Firestore
+3. Add Web App config to `.env.local`
+4. Add Service Account values to `.env.local`
+5. Add `QUOTE_ACCESS_SECRET`
+6. Test booking/inquiry flow locally
+
+### Deploy to Vercel
+
+1. Push repo to GitHub
+2. Import project into Vercel
+3. Add env vars in Vercel settings
+4. Deploy
+5. Test booking, quote, and contact flows on live site
+
+### Connect custom domain
+
+1. Add domain inside Vercel project
+2. Update DNS at domain provider
+3. Wait for verification
+4. Update `DOMAIN` in `lib/constants.ts` if needed
+5. Redeploy if required
+
+### Change one service rate and update website everywhere
+
+Edit:
+
+```ts
+lib/constants.ts
+```
+
+Then update one of these:
+
+- `SERVICE_RATES`
+- `EVENT_ADDONS`
+- `GLOBAL_ADDONS`
+
+This is the correct place for most pricing changes.
+
+### Change package contents on pricing page
+
+Edit:
+
+```ts
+lib/constants.ts
+```
+
+Update the package inside `PACKAGES`:
+
+- `features`
+- `notIncluded`
+- `builderPreset`
+
+### Change only pricing page text or UI
+
+Edit:
+
+```ts
+app/pricing/page.tsx
+```
+
+Examples:
+
+- headings
+- helper labels
+- badge text
+- CTA button text
+- summary wording
+
+### Change service descriptions or service page content
+
+Edit:
+
+```ts
+app/services/data.ts
+```
+
+### Change booking form or booking WhatsApp message
+
+Edit:
+
+```ts
+app/book/page.tsx
+```
+
+### Change homepage FAQ
+
+Edit:
+
+```ts
+components/home/ClientSections.tsx
+```
+
+### Change About page team or stats
+
+Edit:
+
+```ts
+app/about/page.tsx
+```
+
+### Change working hours or address
+
+Edit:
+
+```ts
+app/contact/page.tsx
+```
+
+### Replace portfolio images
+
+1. Put images in `public/images/...`
+2. Update references in the relevant file
+3. Keep image names simple and consistent
 
 ---
 
-## 16. Most Common Tasks — Step by Step
+## 22. Editing Rules To Remember
 
-### Change a price
-1. Open `app/pricing/page.tsx` → find the service in `serviceOptions` → change `price` in `coverageOptions`
-2. Open `app/services/data.ts` → find the same service → change `startingPrice`
+### For pricing changes
 
-### Add a new team member
-Open `app/about/page.tsx` → find `const team = [...]` → add a new object with `name`, `role`, `image`, `speciality`
+Use this order:
 
-### Change working hours
-Open `app/contact/page.tsx` → find "Mon — Sat: 9 AM - 8 PM" → edit
+1. `lib/constants.ts`
+2. `app/services/data.ts` only if feature text or special service logic must change
+3. `app/pricing/page.tsx` only if UI text or flow must change
 
-### Add Instagram / YouTube links
-1. `app/contact/page.tsx` → find `<a href="#">` with `<Instagram />` and `<Youtube />` → replace `#`
-2. `components/Footer.tsx` → find social icon links → replace `href="#"` with your URLs
+### Do not do this
 
-### Change delivery time (e.g. from 5 days to 3 days)
-Update in all these places:
-- `app/pricing/page.tsx` → packages features + comparison table
-- `app/about/page.tsx` → WhyChooseUs Zap card description
-- `app/services/data.ts` → each service's `includes` array
-- `app/layout.tsx` → site description meta tag
+- do not hardcode the same price in multiple files
+- do not update card text without updating actual package preset
+- do not change only pricing page text if service pages still show old numbers
+- do not forget to update env vars in Vercel when secrets or project IDs change
 
-### Replace placeholder portfolio images
-1. Put your actual `.jpg` files in `public/images/portfolio/`
-2. Update `IMAGES.hero` and `IMAGES.about` paths in `lib/constants.ts`
-3. For service cards and detail pages: update `image:` and `gallery:` fields in `app/services/data.ts`
-4. For about page grid: update the `<Image src="...">` tags in `app/about/page.tsx`
+### For service pages
 
-### Update business address / location
-1. `app/contact/page.tsx` → location card
-2. `app/layout.tsx` → JSON-LD schema (`streetAddress`, `postalCode`)
+If the change is only pricing, check whether constants already drive it before editing `data.ts` manually.
+
+### For WhatsApp flows
+
+- pricing page estimate goes to owner WhatsApp
+- booking page final inquiry also goes to owner WhatsApp
+- estimate is not stored permanently
+- booking plan is stored in `sessionStorage` before moving to `/book`
 
 ---
 
-*Last updated: May 2026*
+## 23. Recommended Edit Checklist
+
+Whenever you change anything important, check these:
+
+1. Did you edit the correct source file?
+2. If price changed, did you change it in `lib/constants.ts` first?
+3. If package content changed, does visible text still match actual computed preset?
+4. If service detail text changed, does the listing card also still make sense?
+5. If deployment-related config changed, did you update Vercel env vars too?
+6. Did you test the affected flow?
+
+---
+
+## 24. Quick Summary
+
+If you remember only 5 things, remember these:
+
+1. Most pricing changes start in `lib/constants.ts`
+2. Service page content lives in `app/services/data.ts`
+3. Pricing page UI lives in `app/pricing/page.tsx`
+4. Booking flow lives in `app/book/page.tsx`
+5. Local, Firebase, and Vercel setup depend mostly on correct env values
+
+---
+
+Last updated: May 2026

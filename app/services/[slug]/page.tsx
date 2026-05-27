@@ -16,6 +16,15 @@ import {
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getServiceDetail, type ServiceDetail } from "../data"
+import { PHOTO_DELIVERY_DAYS } from "@/lib/constants"
+
+function buildBookingUrl(serviceName: string, budget?: number, note?: string) {
+  const params = new URLSearchParams()
+  params.set("service", serviceName)
+  if (budget) params.set("budget", `₹${budget.toLocaleString("en-IN")}`)
+  if (note) params.set("message", note)
+  return `/book?${params.toString()}`
+}
 
 // ============ SERVICE HERO ============
 function ServiceHero({ service }: { service: ServiceDetail }) {
@@ -30,9 +39,9 @@ function ServiceHero({ service }: { service: ServiceDetail }) {
 
       <div ref={ref} className={`relative max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <div className="flex items-center justify-center gap-2 text-sm text-white/60 mb-6">
-          <a href="/" className="hover:text-white transition-colors">Home</a>
+          <Link href="/" className="hover:text-white transition-colors">Home</Link>
           <span>/</span>
-          <a href="/services" className="hover:text-white transition-colors">Services</a>
+          <Link href="/services" className="hover:text-white transition-colors">Services</Link>
           <span>/</span>
           <span className="text-amber-400">{service.name}</span>
         </div>
@@ -48,14 +57,12 @@ function ServiceHero({ service }: { service: ServiceDetail }) {
         <p className="text-slate-300 max-w-2xl mx-auto text-base md:text-lg">{service.description}</p>
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          <a
-            href={`https://wa.me/919845332306?text=Hi%20Orvex,%20I'm%20interested%20in%20${encodeURIComponent(service.name)}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={buildBookingUrl(service.name)}
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            <MessageCircle size={18} /> Get Quote
-          </a>
+            <MessageCircle size={18} /> Start Booking
+          </Link>
           <a
             href="#packages"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-1"
@@ -66,9 +73,9 @@ function ServiceHero({ service }: { service: ServiceDetail }) {
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm text-white/70">
           <span className="flex items-center gap-1.5"><Shield size={14} className="text-green-400" /> GST Inclusive</span>
-          <span className="flex items-center gap-1.5"><Clock size={14} className="text-blue-400" /> Quick Delivery</span>
+          <span className="flex items-center gap-1.5"><Clock size={14} className="text-blue-400" /> {PHOTO_DELIVERY_DAYS}-Day Photo Delivery</span>
           <span className="flex items-center gap-1.5"><MapPin size={14} className="text-amber-400" /> Bangalore & Beyond</span>
-          <span className="flex items-center gap-1.5"><Star size={14} className="text-yellow-400" /> 4.9/5 Rating</span>
+          <span className="flex items-center gap-1.5"><Star size={14} className="text-yellow-400" /> Booking Summary Included</span>
         </div>
       </div>
     </section>
@@ -106,6 +113,9 @@ function OverviewSection({ service }: { service: ServiceDetail }) {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2 rounded-2xl border border-amber-200/60 dark:border-amber-500/20 bg-amber-50/70 dark:bg-amber-500/5 p-4 text-sm text-slate-600 dark:text-slate-300">
+              Representative visual references while the verified client portfolio is being refreshed.
+            </div>
             {service.gallery.map((img, i) => (
               <div key={i} className={`rounded-2xl overflow-hidden ${i === 0 ? "col-span-2 h-48" : "h-32"}`}>
                 <Image src={img} alt={`${service.name} gallery ${i + 1}`} width={i === 0 ? 600 : 300} height={i === 0 ? 400 : 200} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, 50vw" loading="lazy" quality={75} />
@@ -126,13 +136,13 @@ function PackagesSection({ service }: { service: ServiceDetail }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            Pricing
+            {service.name} Pricing
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">
-            Choose Your Package
+            {service.name} Packages
           </h2>
           <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-            All prices are GST-inclusive. No hidden charges. Custom packages available.
+            For this service only. All prices GST-inclusive, no hidden charges.
           </p>
         </div>
 
@@ -177,19 +187,28 @@ function PackagesSection({ service }: { service: ServiceDetail }) {
                 ))}
               </ul>
 
-              <a
-                href={`https://wa.me/919845332306?text=Hi%20Orvex,%20I'm%20interested%20in%20the%20${encodeURIComponent(pkg.name)}%20package%20for%20${encodeURIComponent(service.name)}%20(â‚¹${pkg.price.toLocaleString("en-IN")})`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href={buildBookingUrl(service.name, pkg.price, `Interested in the ${pkg.name} package for ${service.name}.`)}
                 className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
                   ? "bg-white text-amber-600 hover:bg-amber-50 shadow-lg"
                   : "bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20"
                   }`}
               >
                 Book {pkg.name}
-              </a>
+              </Link>
             </div>
           ))}
+        </div>
+
+        {/* Customize CTA */}
+        <div className="text-center mt-10 pt-8 border-t border-slate-200 dark:border-slate-800">
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">Need something different? Mix & match services for your event.</p>
+          <Link
+            href="/pricing#calculator"
+            className="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-sm hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+          >
+            Build a Custom Package <ArrowRight size={15} />
+          </Link>
         </div>
       </div>
     </section>
@@ -318,23 +337,21 @@ function ServiceCTA({ service }: { service: ServiceDetail }) {
           Ready to Book Your {service.name}?
         </h2>
         <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
-          Let&apos;s discuss your vision and create something beautiful together.
+          Start your booking request and we&apos;ll confirm the right coverage for your event.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href={`https://wa.me/919845332306?text=Hi%20Orvex,%20I'd%20like%20to%20book%20${encodeURIComponent(service.name)}`}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={buildBookingUrl(service.name)}
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            <MessageCircle size={20} /> Book on WhatsApp
-          </a>
-          <a
-            href="/services"
+            <MessageCircle size={20} /> Start Booking Request
+          </Link>
+          <Link
+            href="/pricing#calculator"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            <ArrowLeft size={18} /> All Services
-          </a>
+            <ArrowLeft size={18} /> Build Custom Package
+          </Link>
         </div>
       </div>
     </section>

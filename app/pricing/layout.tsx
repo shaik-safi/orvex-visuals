@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     description: "Transparent GST-inclusive pricing. Wedding, pre-wedding, baby & event photography packages.",
     url: "https://orvexvisuals.com/pricing",
     type: "website",
-    images: [{ url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&h=630&q=80", width: 1200, height: 630 }],
+    images: [{ url: "/og-default.webp", width: 1200, height: 630 }],
   },
 }
 

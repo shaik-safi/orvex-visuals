@@ -1,16 +1,4 @@
 import {
-  Camera,
-  Video,
-  Heart,
-  Calendar,
-  Cake,
-  Baby,
-  Flower2,
-  Sparkles,
-  Music,
-  Gift,
-  PartyPopper,
-  Plane,
   Clock,
   Shield,
   Receipt,
@@ -20,51 +8,59 @@ import {
   Users,
   Award,
 } from "lucide-react"
+import Link from "next/link"
 import { Hero, FAQSection, CTABanner } from "@/components/home/ClientSections"
-import { getWhatsAppLink, WA_MESSAGES } from "@/lib/constants"
+import { PHOTO_DELIVERY_DAYS, RESPONSE_TIME_PROMISE } from "@/lib/constants"
+import { services as allServices } from "@/app/services/data"
 
 // ============ DATA ============
-const services = [
-  { name: "Wedding Photography", icon: Camera, price: "₹20,000", desc: "Candid + Traditional coverage for your big day", slug: "wedding-photography" },
-  { name: "Wedding Videography", icon: Video, price: "₹25,000", desc: "Cinematic films that tell your love story", slug: "wedding-videography" },
-  { name: "Pre-Wedding Shoot", icon: Heart, price: "₹15,000", desc: "Beautiful couple shoots at stunning locations", slug: "pre-wedding-photoshoot" },
-  { name: "Engagement", icon: Calendar, price: "₹12,000", desc: "Capture the moment you said yes", slug: "engagement-photography" },
-  { name: "Birthday Photography", icon: Cake, price: "₹8,000", desc: "From kids parties to milestone celebrations", slug: "birthday-photography" },
-  { name: "Baby Shower", icon: Baby, price: "₹8,000", desc: "Joyful moments with your little one on the way", slug: "baby-shower-photography" },
-  { name: "Haldi & Mehendi", icon: Flower2, price: "₹10,000", desc: "Vibrant colors and celebrations captured", slug: "haldi-mehendi-photography" },
-  { name: "Sangeet", icon: Music, price: "₹12,000", desc: "Dance, music, and unforgettable energy", slug: "sangeet-photography" },
-  { name: "Naming Ceremony", icon: Gift, price: "₹8,000", desc: "Your baby's special day documented beautifully", slug: "naming-ceremony-photography" },
-  { name: "Anniversary", icon: PartyPopper, price: "₹10,000", desc: "Celebrate your journey together", slug: "anniversary-photoshoot" },
-  { name: "Corporate Events", icon: Sparkles, price: "₹15,000", desc: "Professional coverage for business events", slug: "corporate-photography" },
-  { name: "Drone Photography", icon: Plane, price: "₹5,000", desc: "Stunning aerial shots for any event", slug: "drone-photography" },
+// Homepage shows a curated subset — prices pulled from services/data.ts (single source of truth)
+const homepageSlugs = [
+  "wedding-photography",
+  "wedding-videography",
+  "pre-wedding-photoshoot",
+  "engagement-photography",
+  "birthday-photography",
+  "baby-shower-photography",
+  "haldi-mehendi-photography",
+  "sangeet-photography",
+  "naming-ceremony-photography",
+  "anniversary-photoshoot",
+  "corporate-photography",
+  "drone-photography",
 ]
 
-const testimonials = [
+const services = homepageSlugs.map((slug) => {
+  const svc = allServices.find((s) => s.slug === slug)!
+  return {
+    name: svc.name,
+    icon: svc.icon,
+    price: `₹${svc.startingPrice.toLocaleString("en-IN")}`,
+    desc: svc.description,
+    slug: svc.slug,
+  }
+})
+
+const expectations = [
   {
-    name: "Priya & Arjun",
-    event: "Wedding Photography",
-    text: "Orvex made our wedding day unforgettable. Every candid moment was captured perfectly. Photos delivered in just 4 days!",
-    rating: 5,
+    title: "Fast, clear communication",
+    text: `You get a structured response ${RESPONSE_TIME_PROMISE}, with your next step clearly explained.`,
   },
   {
-    name: "Sneha Sharma",
-    event: "Pre-Wedding Shoot",
-    text: "Our pre-wedding shoot at Nandi Hills turned out even better than Pinterest inspiration. Highly recommend!",
-    rating: 5,
+    title: "Transparent booking flow",
+    text: "Estimate first, booking second. No hidden add-ons and no ambiguous package promises.",
   },
   {
-    name: "Rahul & Divya",
-    event: "Engagement",
-    text: "They made us feel so comfortable and the photos are breathtaking. Worth every rupee.",
-    rating: 5,
+    title: "Clear delivery promises",
+    text: `Edited photos are promised in ${PHOTO_DELIVERY_DAYS} working days with ownership staying with you.`,
   },
 ]
 
 const features = [
-  { icon: Clock, title: "5-Day Delivery", desc: "While other studios take 30-45 days, we deliver your professionally edited gallery in just 5 working days.", stat: "5x faster" },
+  { icon: Clock, title: `${PHOTO_DELIVERY_DAYS}-Day Photo Delivery`, desc: `Edited photos are delivered in ${PHOTO_DELIVERY_DAYS} working days with a clear turnaround promise.`, stat: `${PHOTO_DELIVERY_DAYS} days` },
   { icon: Shield, title: "You Own Everything", desc: "Every photo, every frame, every video — 100% copyright yours from day one. No watermarks, no restrictions, no annual fees.", stat: "100% yours" },
   { icon: Receipt, title: "Honest, Final Pricing", desc: "The price you see is the price you pay. GST included, no surprise add-ons. We despise hidden charges as much as you do.", stat: "Zero hidden fees" },
-  { icon: Smartphone, title: "Book in 2 Minutes", desc: "No awkward phone calls or studio visits required. WhatsApp us or fill our form — get a quote within 2 hours, guaranteed.", stat: "< 2hr response" },
+  { icon: Smartphone, title: "Book Online", desc: `Build an estimate, move to booking, and get a secure booking link ${RESPONSE_TIME_PROMISE}.`, stat: RESPONSE_TIME_PROMISE },
 ]
 
 // ============ SERVER COMPONENTS ============
@@ -75,15 +71,15 @@ function TrustBar() {
       <div className="max-w-7xl mx-auto px-4 flex flex-wrap justify-center items-center gap-6 md:gap-12 text-sm">
         <div className="flex items-center gap-2 text-white/70">
           <Users size={16} className="text-amber-400" />
-          <span><strong className="text-white">500+</strong> Events Covered</span>
+          <span><strong className="text-white">Tailored</strong> Event Coverage</span>
         </div>
         <div className="flex items-center gap-2 text-white/70">
-          <Star size={16} className="text-amber-400 fill-amber-400" />
-          <span><strong className="text-white">4.9</strong> Google Rating</span>
+          <Receipt size={16} className="text-amber-400" />
+          <span><strong className="text-white">Clear</strong> Pricing</span>
         </div>
         <div className="flex items-center gap-2 text-white/70">
           <Clock size={16} className="text-amber-400" />
-          <span><strong className="text-white">5-Day</strong> Delivery</span>
+          <span><strong className="text-white">{PHOTO_DELIVERY_DAYS}-Day</strong> Photo Delivery</span>
         </div>
         <div className="flex items-center gap-2 text-white/70">
           <Award size={16} className="text-amber-400" />
@@ -107,7 +103,7 @@ function ServicesSection() {
             <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Every Milestone</span>
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-4 max-w-xl mx-auto text-lg">
-            Weddings, baby shoots, corporates — 40+ services under one roof, all with the same uncompromising quality.
+            Weddings, baby shoots, corporates — {allServices.length}+ services under one roof, all with the same uncompromising quality.
           </p>
         </div>
 
@@ -115,7 +111,7 @@ function ServicesSection() {
           {services.map((service, i) => {
             const Icon = service.icon
             return (
-              <a
+              <Link
                 href={`/services/${service.slug}`}
                 key={i}
                 className="group relative bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10"
@@ -137,15 +133,15 @@ function ServicesSection() {
                     </div>
                   </div>
                 </div>
-              </a>
+              </Link>
             )
           })}
         </div>
 
         <div className="text-center mt-10">
-          <a href="/services" className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5">
-            View All 40+ Services <ArrowRight size={16} />
-          </a>
+          <Link href="/services" className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5">
+            View All {allServices.length}+ Services <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
     </section>
@@ -160,7 +156,7 @@ function WhyOrvex() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-16">
           <span className="inline-block bg-amber-500/10 text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            Why 500+ Couples Choose Us
+            Why Clients Choose Us
           </span>
           <h2 className="text-3xl md:text-5xl font-bold text-white">
             The Orvex{" "}
@@ -202,10 +198,10 @@ function WhyOrvex() {
 
 function HowItWorks() {
   const steps = [
-    { step: "01", title: "Tell Us Your Vision", desc: "Share your event details via WhatsApp or our 2-min form. We respond with a personalized quote within 2 hours." },
+    { step: "01", title: "Tell Us Your Vision", desc: `Share your event details via our builder or booking form. We respond ${RESPONSE_TIME_PROMISE} with the next step.` },
     { step: "02", title: "We Handle Everything", desc: "Our team matches you with the ideal photographer, plans the shot list, and coordinates logistics. You relax." },
     { step: "03", title: "Enjoy Your Day", desc: "Professional capture with backup equipment and a second shooter for peace of mind. You celebrate, we create art." },
-    { step: "04", title: "Gallery in 5 Days", desc: "Professionally edited photos + cinematic highlight reel delivered digitally. Full copyright is yours forever." },
+    { step: "04", title: `Gallery in ${PHOTO_DELIVERY_DAYS} Days`, desc: `Professionally edited photos delivered digitally in ${PHOTO_DELIVERY_DAYS} working days. Full copyright is yours forever.` },
   ]
 
   return (
@@ -247,34 +243,21 @@ function TestimonialsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            Trusted by 500+ Families
+            Booking Standards
           </span>
           <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white">
-            Real Couples,{" "}<span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Real Words</span>
+            What You Can <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Expect</span>
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
+          {expectations.map((item, i) => (
             <div
               key={i}
               className="group bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 hover:shadow-2xl hover:shadow-amber-500/5 hover:-translate-y-1 transition-all duration-500"
             >
-              <div className="flex gap-1 mb-5">
-                {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star key={j} size={16} className="fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed mb-6">&ldquo;{t.text}&rdquo;</p>
-              <div className="flex items-center gap-3 pt-5 border-t border-slate-100 dark:border-slate-800">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  {t.name.charAt(0)}
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-900 dark:text-white text-sm">{t.name}</p>
-                  <p className="text-xs text-amber-600 dark:text-amber-400">{t.event}</p>
-                </div>
-              </div>
+              <p className="text-lg font-semibold text-slate-900 dark:text-white mb-4">{item.title}</p>
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{item.text}</p>
             </div>
           ))}
         </div>

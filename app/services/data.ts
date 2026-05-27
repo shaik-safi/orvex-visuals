@@ -31,6 +31,13 @@ import {
   Shirt,
   Building,
 } from "lucide-react"
+import { SERVICE_RATES, EVENT_ADDONS, GLOBAL_ADDONS } from "@/lib/constants"
+
+// ============ COMPUTED STARTING PRICES (from global rates) ============
+// Change rates in lib/constants.ts → these update automatically
+const PHOTO_STARTING = SERVICE_RATES["candid-photo"].ratePerHalfDay
+const VIDEO_STARTING = SERVICE_RATES["cinematic-video"].ratePerHalfDay
+const DRONE_STARTING = EVENT_ADDONS.drone.price
 
 // ============ TYPES ============
 export type Category = "all" | "wedding" | "pre-wedding" | "events" | "baby-kids" | "videography" | "corporate" | "products"
@@ -95,7 +102,7 @@ export const services: ServiceCard[] = [
     name: "Wedding Photography",
     category: "wedding",
     description: "Candid + Traditional coverage to capture every emotion of your big day. Multiple photographers available.",
-    startingPrice: 20000,
+    startingPrice: PHOTO_STARTING,
     icon: Camera,
     image: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80",
     popular: true,
@@ -105,7 +112,7 @@ export const services: ServiceCard[] = [
     name: "Candid Wedding Photography",
     category: "wedding",
     description: "Documentary-style storytelling that captures raw emotions, laughter, tears, and joy naturally.",
-    startingPrice: 35000,
+    startingPrice: PHOTO_STARTING,
     icon: Camera,
     image: "https://images.unsplash.com/photo-1606216794074-735e91aa2c92?w=600&q=80",
     popular: true,
@@ -115,7 +122,7 @@ export const services: ServiceCard[] = [
     name: "Christian Wedding Photography",
     category: "wedding",
     description: "Specialized coverage for church ceremonies, traditions, and receptions with cultural sensitivity.",
-    startingPrice: 20000,
+    startingPrice: PHOTO_STARTING,
     icon: Church,
     image: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
   },
@@ -124,7 +131,7 @@ export const services: ServiceCard[] = [
     name: "Muslim Wedding Photography",
     category: "wedding",
     description: "Professional coverage for Nikah, Walima, Mehendi, and all wedding ceremonies.",
-    startingPrice: 20000,
+    startingPrice: PHOTO_STARTING,
     icon: Crown,
     image: "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=600&q=80",
   },
@@ -135,7 +142,7 @@ export const services: ServiceCard[] = [
     name: "Pre-Wedding Photoshoot",
     category: "pre-wedding",
     description: "Beautiful couple shoots at Bangalore's best locations. Includes outfit changes and location scouting.",
-    startingPrice: 15000,
+    startingPrice: PHOTO_STARTING,
     icon: Heart,
     image: "https://images.unsplash.com/photo-1529634597503-139d3726fed5?w=600&q=80",
     popular: true,
@@ -145,7 +152,7 @@ export const services: ServiceCard[] = [
     name: "Post-Wedding Photoshoot",
     category: "pre-wedding",
     description: "Celebrate your new journey with stunning couple portraits at picturesque locations.",
-    startingPrice: 15000,
+    startingPrice: PHOTO_STARTING,
     icon: Heart,
     image: "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80",
   },
@@ -154,7 +161,7 @@ export const services: ServiceCard[] = [
     name: "Engagement Photography",
     category: "pre-wedding",
     description: "Capture the moment you said yes. Ring ceremony and engagement party coverage.",
-    startingPrice: 10000,
+    startingPrice: PHOTO_STARTING,
     icon: Calendar,
     image: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=600&q=80",
   },
@@ -163,7 +170,7 @@ export const services: ServiceCard[] = [
     name: "Anniversary Photoshoot",
     category: "pre-wedding",
     description: "Celebrate your journey together with a beautiful couple shoot at any milestone.",
-    startingPrice: 10000,
+    startingPrice: PHOTO_STARTING,
     icon: PartyPopper,
     image: "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=600&q=80",
   },
@@ -174,7 +181,7 @@ export const services: ServiceCard[] = [
     name: "Birthday Photography",
     category: "events",
     description: "From 1st birthdays to milestone celebrations. Candid and traditional coverage.",
-    startingPrice: 10000,
+    startingPrice: PHOTO_STARTING,
     icon: Cake,
     image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=80",
   },
@@ -183,7 +190,7 @@ export const services: ServiceCard[] = [
     name: "Baby Shower Photography",
     category: "events",
     description: "Document the joy and excitement as you celebrate the upcoming arrival.",
-    startingPrice: 10000,
+    startingPrice: PHOTO_STARTING,
     icon: Baby,
     image: "https://images.unsplash.com/photo-1544126592-807ade215a0b?w=600&q=80",
   },
@@ -192,7 +199,7 @@ export const services: ServiceCard[] = [
     name: "Haldi & Mehendi Photography",
     category: "events",
     description: "Vibrant colors, dancing, and intimate moments captured beautifully.",
-    startingPrice: 10000,
+    startingPrice: PHOTO_STARTING,
     icon: Flower2,
     image: "https://images.unsplash.com/photo-1604604557904-d661e0b3c02d?w=600&q=80",
   },
@@ -201,7 +208,7 @@ export const services: ServiceCard[] = [
     name: "Sangeet Photography",
     category: "events",
     description: "Dance performances, energy, and unforgettable party moments documented.",
-    startingPrice: 12000,
+    startingPrice: PHOTO_STARTING,
     icon: Music,
     image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80",
   },
@@ -210,7 +217,7 @@ export const services: ServiceCard[] = [
     name: "Naming Ceremony Photography",
     category: "events",
     description: "Your baby's special naming day captured with care and attention to every detail.",
-    startingPrice: 8000,
+    startingPrice: PHOTO_STARTING,
     icon: Gift,
     image: "https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=600&q=80",
   },
@@ -219,7 +226,7 @@ export const services: ServiceCard[] = [
     name: "Cradle Ceremony Photography",
     category: "events",
     description: "Beautiful coverage of your baby's cradle ceremony (Tottilu) with all rituals documented.",
-    startingPrice: 8000,
+    startingPrice: PHOTO_STARTING,
     icon: Baby,
     image: "https://images.unsplash.com/photo-1491013516836-7db643ee125a?w=600&q=80",
   },
@@ -228,7 +235,7 @@ export const services: ServiceCard[] = [
     name: "Housewarming Photography",
     category: "events",
     description: "Document your Gruhapravesham or housewarming ceremony beautifully.",
-    startingPrice: 8000,
+    startingPrice: PHOTO_STARTING,
     icon: HomeIcon,
     image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=80",
   },
@@ -237,7 +244,7 @@ export const services: ServiceCard[] = [
     name: "Upanayana / Thread Ceremony Photography",
     category: "events",
     description: "Sacred thread ceremony (Janeu) documentation with respect for traditions and rituals.",
-    startingPrice: 10000,
+    startingPrice: PHOTO_STARTING,
     icon: Sparkles,
     image: "https://images.unsplash.com/photo-1532712938310-34cb3982ef74?w=600&q=80",
   },
@@ -246,7 +253,7 @@ export const services: ServiceCard[] = [
     name: "Shastipurthi Photography",
     category: "events",
     description: "60th birthday celebration photography — a milestone event captured with grandeur.",
-    startingPrice: 12000,
+    startingPrice: PHOTO_STARTING,
     icon: Crown,
     image: "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=600&q=80",
   },
@@ -255,7 +262,7 @@ export const services: ServiceCard[] = [
     name: "Puberty Function Photography",
     category: "events",
     description: "Respectful, professional coverage of coming-of-age ceremonies and celebrations.",
-    startingPrice: 8000,
+    startingPrice: PHOTO_STARTING,
     icon: Sparkles,
     image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80",
   },
@@ -264,7 +271,7 @@ export const services: ServiceCard[] = [
     name: "Holy Communion & Baptism Photography",
     category: "events",
     description: "Professional coverage of First Holy Communion, Baptism, and Confirmation ceremonies.",
-    startingPrice: 10000,
+    startingPrice: PHOTO_STARTING,
     icon: Church,
     image: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
   },
@@ -273,7 +280,7 @@ export const services: ServiceCard[] = [
     name: "Events Photography",
     category: "events",
     description: "General event coverage — college fests, exhibitions, social gatherings, and more.",
-    startingPrice: 10000,
+    startingPrice: PHOTO_STARTING,
     icon: PartyPopper,
     image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80",
   },
@@ -284,7 +291,7 @@ export const services: ServiceCard[] = [
     name: "Baby Photoshoot",
     category: "baby-kids",
     description: "Themed baby photography with props, costumes, and professional setups.",
-    startingPrice: 8000,
+    startingPrice: PHOTO_STARTING,
     icon: Baby,
     image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&q=80",
     popular: true,
@@ -294,7 +301,7 @@ export const services: ServiceCard[] = [
     name: "Newborn Photography",
     category: "baby-kids",
     description: "Delicate, artistic portraits of your newest family member within the first 14 days.",
-    startingPrice: 12000,
+    startingPrice: PHOTO_STARTING,
     icon: Baby,
     image: "https://images.unsplash.com/photo-1544126592-807ade215a0b?w=600&q=80",
   },
@@ -303,7 +310,7 @@ export const services: ServiceCard[] = [
     name: "Maternity Photography",
     category: "baby-kids",
     description: "Celebrate your pregnancy with elegant indoor/outdoor maternity portraits.",
-    startingPrice: 8000,
+    startingPrice: PHOTO_STARTING,
     icon: Heart,
     image: "https://images.unsplash.com/photo-1493894473891-10fc1e5dbd22?w=600&q=80",
   },
@@ -312,7 +319,7 @@ export const services: ServiceCard[] = [
     name: "Indoor Maternity Photoshoot",
     category: "baby-kids",
     description: "Studio maternity portraits with flowing fabrics, dramatic lighting, and silhouette shots.",
-    startingPrice: 8000,
+    startingPrice: PHOTO_STARTING,
     icon: Heart,
     image: "https://images.unsplash.com/photo-1493894473891-10fc1e5dbd22?w=600&q=80",
   },
@@ -321,7 +328,7 @@ export const services: ServiceCard[] = [
     name: "Family Photoshoot",
     category: "baby-kids",
     description: "Beautiful family portraits in studio or outdoor settings. All ages welcome.",
-    startingPrice: 8000,
+    startingPrice: PHOTO_STARTING,
     icon: Users,
     image: "https://images.unsplash.com/photo-1511895426328-dc8714191300?w=600&q=80",
   },
@@ -332,7 +339,7 @@ export const services: ServiceCard[] = [
     name: "Wedding Videography",
     category: "videography",
     description: "Complete wedding day video coverage — traditional and cinematic options.",
-    startingPrice: 20000,
+    startingPrice: VIDEO_STARTING,
     icon: Video,
     image: "https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=600&q=80",
     popular: true,
@@ -342,7 +349,7 @@ export const services: ServiceCard[] = [
     name: "Cinematic Videography",
     category: "videography",
     description: "Film-quality wedding and event videography with professional color grading.",
-    startingPrice: 25000,
+    startingPrice: VIDEO_STARTING,
     icon: Video,
     image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80",
   },
@@ -351,7 +358,7 @@ export const services: ServiceCard[] = [
     name: "Candid Videography",
     category: "videography",
     description: "Natural, documentary-style video that captures real moments without direction.",
-    startingPrice: 20000,
+    startingPrice: VIDEO_STARTING,
     icon: Film,
     image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&q=80",
   },
@@ -360,7 +367,7 @@ export const services: ServiceCard[] = [
     name: "Drone Photography & Video",
     category: "videography",
     description: "Stunning aerial shots and videos for weddings, events, and venues.",
-    startingPrice: 5000,
+    startingPrice: DRONE_STARTING,
     icon: Plane,
     image: "https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=600&q=80",
   },
@@ -378,7 +385,7 @@ export const services: ServiceCard[] = [
     name: "Corporate Video Production",
     category: "videography",
     description: "Company profiles, product demos, testimonial videos, and event recap films.",
-    startingPrice: 25000,
+    startingPrice: VIDEO_STARTING,
     icon: Film,
     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80",
   },
@@ -389,7 +396,7 @@ export const services: ServiceCard[] = [
     name: "Corporate Event Photography",
     category: "corporate",
     description: "Professional coverage for conferences, team events, product launches, and seminars.",
-    startingPrice: 15000,
+    startingPrice: PHOTO_STARTING,
     icon: Briefcase,
     image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80",
   },
@@ -416,7 +423,7 @@ export const services: ServiceCard[] = [
     name: "Fashion Photography",
     category: "corporate",
     description: "Editorial fashion shoots, lookbooks, and catalog photography for brands and designers.",
-    startingPrice: 15000,
+    startingPrice: PHOTO_STARTING,
     icon: Shirt,
     image: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80",
   },
@@ -497,22 +504,22 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     packages: [
       {
         name: "Essential",
-        price: 20000,
-        duration: "4-6 hours",
-        features: ["1 Photographer", "Traditional Photography", "200+ Edited Photos", "Online Gallery", "Photo Delivery in 15 Days"],
+        price: SERVICE_RATES["candid-photo"].ratePerHalfDay,
+        duration: "Half Day (5 hrs)",
+        features: ["1 Photographer", "Traditional Photography", "200+ Edited Photos", "Online Gallery", "Photo Delivery in 5 Days"],
       },
       {
         name: "Premium",
-        price: 55000,
+        price: SERVICE_RATES["candid-photo"].ratePerDay + SERVICE_RATES["traditional-photo"].ratePerDay + GLOBAL_ADDONS["album-25"].price,
         duration: "Full Day (10 hrs)",
-        features: ["2 Photographers", "Candid + Traditional", "500+ Edited Photos", "Online Gallery", "Pre-Wedding Consultation", "Same-Day Teaser", "Photo Album (40 pages)"],
+        features: ["2 Photographers", "Candid + Traditional", "500+ Edited Photos", "Online Gallery", "Pre-Wedding Consultation", "Same-Day Teaser", "25-sheet Photo Album"],
         popular: true,
       },
       {
         name: "Luxury",
-        price: 95000,
-        duration: "2 Days",
-        features: ["3 Photographers", "Candid + Traditional + Drone", "1000+ Edited Photos", "Online Gallery", "Pre-Wedding Photoshoot", "Same-Day Teaser Video", "Premium Album (60 pages)", "Canvas Print (20x30)", "All Functions Covered"],
+        price: SERVICE_RATES["candid-photo"].ratePerDay + SERVICE_RATES["traditional-photo"].ratePerDay + EVENT_ADDONS.drone.price + EVENT_ADDONS["same-day-edit"].price + GLOBAL_ADDONS["album-40"].price,
+        duration: "Full Day (10 hrs)",
+        features: ["2+ Photographers", "Candid + Traditional + Drone", "1000+ Edited Photos", "Online Gallery", "Pre-Wedding Photoshoot", "Same-Day Teaser Video", "40-sheet Premium Album", "Canvas Print (20x30)", "All Functions Covered"],
       },
     ],
     includes: [
@@ -527,7 +534,7 @@ export const serviceDetails: Record<string, ServiceDetail> = {
       { step: "Consultation", description: "We discuss your wedding schedule, style preferences, and must-have shots over a call or in person." },
       { step: "Planning", description: "Our team scouts the venue (if needed), plans the timeline, and coordinates with other vendors." },
       { step: "Shoot Day", description: "Our photographers arrive early, set up, and capture every moment from morning prep to the final send-off." },
-      { step: "Delivery", description: "Photos are professionally edited and delivered via a private online gallery within 15 days." },
+      { step: "Delivery", description: "Photos are professionally edited and delivered via a private online gallery within 5 days. Videos within 15 days." },
     ],
     faqs: [
       { q: "How many photos will we receive?", a: "Depending on the package, you'll receive 200-1000+ professionally edited photos." },
@@ -556,20 +563,20 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     packages: [
       {
         name: "Silver",
-        price: 15000,
+        price: SERVICE_RATES["candid-photo"].ratePerHalfDay,
         duration: "3 hours",
         features: ["1 Location", "2 Outfit Changes", "50+ Edited Photos", "1 Photographer", "Online Gallery", "Delivery in 7 Days"],
       },
       {
         name: "Gold",
-        price: 25000,
+        price: SERVICE_RATES["candid-photo"].ratePerDay + GLOBAL_ADDONS["album-25"].price,
         duration: "5 hours",
         features: ["2 Locations", "4 Outfit Changes", "100+ Edited Photos", "1 Photographer + Assistant", "Online Gallery", "Location Scouting", "Styling Guide"],
         popular: true,
       },
       {
         name: "Platinum",
-        price: 45000,
+        price: SERVICE_RATES["candid-photo"].ratePerDay + SERVICE_RATES["cinematic-video"].ratePerDay + EVENT_ADDONS.drone.price + GLOBAL_ADDONS["album-40"].price,
         duration: "8 hours",
         features: ["3 Locations", "6 Outfit Changes", "200+ Edited Photos", "2 Photographers", "Cinematic Video (3 min)", "Drone Shots", "Props & Styling", "Same-Day Sneak Peek"],
       },
@@ -614,21 +621,21 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     packages: [
       {
         name: "Basic",
-        price: 8000,
-        duration: "1 hour",
+        price: SERVICE_RATES["candid-photo"].ratePerHalfDay,
+        duration: "1-2 hours",
         features: ["1 Theme Setup", "10+ Edited Photos", "Home Visit", "Basic Props", "Digital Delivery"],
       },
       {
         name: "Standard",
-        price: 12000,
-        duration: "2 hours",
+        price: SERVICE_RATES["candid-photo"].ratePerDay,
+        duration: "2-3 hours",
         features: ["2 Theme Setups", "25+ Edited Photos", "Home/Studio", "Premium Props & Costumes", "Online Gallery", "Family Portraits Included"],
         popular: true,
       },
       {
         name: "Premium",
-        price: 20000,
-        duration: "3 hours",
+        price: SERVICE_RATES["candid-photo"].ratePerDay + GLOBAL_ADDONS["album-25"].price,
+        duration: "3+ hours",
         features: ["3+ Theme Setups", "50+ Edited Photos", "Studio Session", "All Props & Costumes", "Family Portraits", "Canvas Print (12x18)", "Same-Week Delivery"],
       },
     ],
@@ -658,13 +665,33 @@ export const serviceDetails: Record<string, ServiceDetail> = {
 }
 
 // ============ HELPER ============
+
+// Compute service-page package prices from global rates
+// Essential = half-day primary | Premium = full-day primary + secondary + album | Luxury = full-day all + extras
+function computeServicePackagePrices(category: Category): { essential: number; premium: number; luxury: number } {
+  if (category === "videography") {
+    return {
+      essential: SERVICE_RATES["cinematic-video"].ratePerHalfDay,
+      premium: SERVICE_RATES["cinematic-video"].ratePerDay + SERVICE_RATES["traditional-video"].ratePerDay + GLOBAL_ADDONS["album-25"].price,
+      luxury: SERVICE_RATES["cinematic-video"].ratePerDay + SERVICE_RATES["traditional-video"].ratePerDay + EVENT_ADDONS.drone.price + EVENT_ADDONS["same-day-edit"].price + GLOBAL_ADDONS["album-40"].price,
+    }
+  }
+  // Photography (wedding, events, pre-wedding, baby-kids, corporate)
+  return {
+    essential: SERVICE_RATES["candid-photo"].ratePerHalfDay,
+    premium: SERVICE_RATES["candid-photo"].ratePerDay + SERVICE_RATES["traditional-photo"].ratePerDay + GLOBAL_ADDONS["album-25"].price,
+    luxury: SERVICE_RATES["candid-photo"].ratePerDay + SERVICE_RATES["traditional-photo"].ratePerDay + EVENT_ADDONS.drone.price + EVENT_ADDONS["same-day-edit"].price + GLOBAL_ADDONS["album-40"].price,
+  }
+}
+
 export function getServiceDetail(slug: string): ServiceDetail {
   if (serviceDetails[slug]) return serviceDetails[slug]
 
   // Auto-generate from the listing card data + defaults
   const card = services.find((s) => s.slug === slug)
   const name = card?.name || slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
-  const startPrice = card?.startingPrice || 10000
+  const category = card?.category || "events"
+  const prices = computeServicePackagePrices(category)
 
   return {
     slug,
@@ -680,27 +707,33 @@ export function getServiceDetail(slug: string): ServiceDetail {
       "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80",
       "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=600&q=80",
     ],
-    packages: [
-      {
-        name: "Essential",
-        price: startPrice,
-        duration: "2-3 hours",
-        features: ["1 Photographer", "Professional Coverage", "100+ Edited Photos", "Online Gallery", "Delivery in 10 Days"],
-      },
-      {
-        name: "Premium",
-        price: Math.round(startPrice * 2.5),
-        duration: "Full Day",
-        features: ["2 Photographers", "Candid + Traditional", "300+ Edited Photos", "Online Gallery", "Same-Day Previews", "Photo Album (30 pages)"],
-        popular: true,
-      },
-      {
-        name: "Luxury",
-        price: startPrice * 5,
-        duration: "Full Day+",
-        features: ["2 Photographers + Videographer", "Complete Coverage", "500+ Edited Photos", "Highlight Video", "Premium Album (50 pages)", "Canvas Print", "Drone Coverage"],
-      },
-    ],
+    packages: category === "products"
+      ? [
+          { name: "Basic", price: card?.startingPrice || 500, duration: "Standard", features: ["Standard Quality", "Digital Delivery", "1 Revision"] },
+          { name: "Premium", price: (card?.startingPrice || 500) * 3, duration: "Premium", features: ["Premium Quality", "Digital + Physical Delivery", "3 Revisions", "Express Processing"], popular: true },
+          { name: "Luxury", price: (card?.startingPrice || 500) * 6, duration: "Luxury", features: ["Luxury Quality", "Digital + Physical Delivery", "Unlimited Revisions", "Priority Processing", "Custom Design"] },
+        ]
+      : [
+          {
+            name: "Essential",
+            price: prices.essential,
+            duration: "Half Day (5 hrs)",
+            features: ["1 Professional", "Professional Coverage", "100+ Edited Photos", "Online Gallery", "Delivery in 5 Days"],
+          },
+          {
+            name: "Premium",
+            price: prices.premium,
+            duration: "Full Day (10 hrs)",
+            features: ["2 Professionals", "Candid + Traditional", "300+ Edited Photos", "Online Gallery", "25-sheet Album", "Same-Day Previews"],
+            popular: true,
+          },
+          {
+            name: "Luxury",
+            price: prices.luxury,
+            duration: "Full Day (10 hrs)",
+            features: ["2+ Professionals", "Complete Coverage", "500+ Edited Photos", "Drone Coverage", "Same-Day Edit", "40-sheet Premium Album", "Priority Delivery"],
+          },
+        ],
     includes: [
       "Professional color-corrected photos",
       "High-resolution digital delivery",

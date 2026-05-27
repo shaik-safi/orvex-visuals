@@ -1,6 +1,9 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
+// saveQuote is only called from /book — pricing page sends estimates only
+import { BOOKING_PLAN_STORAGE_KEY, PACKAGES, SERVICE_RATES, EVENT_ADDONS, GLOBAL_ADDONS, getWhatsAppLink, WA_MESSAGES, PHONE_NUMBER, computePackagePrice } from "@/lib/constants"
 import {
   Camera,
   Video,
@@ -24,72 +27,17 @@ import {
   BookOpen,
   MapPin,
   Calendar,
-  User,
-  Phone,
-  Mail,
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 
 // ============ DATA ============
 
-const packages = [
-  {
-    name: "Essential",
-    subtitle: "Perfect for intimate events",
-    price: 20000,
-    icon: Star,
-    popular: false,
-    features: [
-      "1 Professional Photographer",
-      "5 hours coverage",
-      "Unlimited soft copies",
-      "50 edited highlights",
-      "Digital delivery in 5 days",
-      "Pre-event planning call",
-    ],
-    notIncluded: ["Video", "Drone", "Album", "Makeup"],
-  },
-  {
-    name: "Premium",
-    subtitle: "Most popular for weddings",
-    price: 55000,
-    icon: Crown,
-    popular: true,
-    features: [
-      "2 Professional Photographers",
-      "Full day coverage (10 hrs)",
-      "Unlimited soft copies",
-      "150+ edited highlights",
-      "1 Cinematic highlight reel (5 min)",
-      "Drone aerial coverage",
-      "25-sheet premium album",
-      "Digital delivery in 5 days",
-      "Dedicated coordinator",
-    ],
-    notIncluded: ["Makeup", "LED Wall"],
-  },
-  {
-    name: "Luxury",
-    subtitle: "The complete experience",
-    price: 95000,
-    icon: Gift,
-    popular: false,
-    features: [
-      "3 Photographers + 1 Videographer",
-      "Multi-day coverage",
-      "Unlimited soft copies",
-      "300+ edited highlights",
-      "Cinematic film (10-15 min)",
-      "Same-day edit highlight",
-      "Drone aerial coverage",
-      "2x 40-sheet premium albums",
-      "LED Wall backdrop",
-      "Dedicated coordinator",
-      "Priority 3-day delivery",
-    ],
-    notIncluded: [],
-  },
-]
+const packages = PACKAGES.map((pkg) => ({
+  ...pkg,
+  price: computePackagePrice(pkg),
+  icon: pkg.name === "Starter" ? Star : pkg.name === "Signature" ? Crown : Gift,
+  popular: pkg.name === "Signature",
+}))
 
 // ============ HERO ============
 function PricingHero() {
@@ -130,19 +78,19 @@ function PricingHero() {
 }
 
 // ============ PACKAGES SECTION ============
-function PackagesSection() {
+function PackagesSection({ onCustomize }: { onCustomize?: (packageName: string) => void }) {
   const { ref, isVisible } = useScrollReveal()
 
   return (
     <section className="py-24 md:py-32 bg-white dark:bg-slate-950 transition-colors">
       <div ref={ref} className="max-w-6xl mx-auto px-6">
         <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">Quick Start</p>
+          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">Full Event Coverage</p>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Choose Your Package
+            Event Packages
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-4 max-w-md mx-auto">
-            Pre-built packages for common needs. Or scroll down to build a custom plan.
+            Starter presets for your event. Pick one to begin &mdash; customize services, add video, drone, or extras in the builder below.
           </p>
         </div>
 
@@ -195,17 +143,18 @@ function PackagesSection() {
                     ))}
                   </ul>
 
-                  <a
-                    href={`https://wa.me/919845332306?text=Hi%20Orvex,%20I'm%20interested%20in%20the%20${pkg.name}%20package%20(%E2%82%B9${pkg.price.toLocaleString("en-IN")})`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
-                        ? "bg-amber-500 text-white dark:text-slate-900 hover:bg-amber-400"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
-                      }`}
-                  >
-                    Get Started
-                  </a>
+                  <div className="space-y-2.5">
+                    <button
+                      onClick={() => onCustomize?.(pkg.name)}
+                      className={`block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
+                          ? "bg-amber-500 text-white dark:text-slate-900 hover:bg-amber-400"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
+                        }`}
+                    >
+                      Start with {pkg.name} →
+                    </button>
+                    <p className="text-[11px] text-center text-slate-400 dark:text-slate-500">Pre-fills the builder below — customize anything</p>
+                  </div>
                 </div>
               </div>
             )
@@ -249,38 +198,87 @@ interface EventBlock {
 }
 
 const serviceRates: ServiceRate[] = [
-  { id: "traditional-photo", name: "Traditional Photography", description: "Posed shots, group photos, ritual & stage coverage", icon: Camera, ratePerDay: 10000, ratePerHalfDay: 6000, maxQty: 3 },
-  { id: "candid-photo", name: "Candid Photography", description: "Unposed, natural moments — storytelling style", icon: Camera, ratePerDay: 18000, ratePerHalfDay: 12000, maxQty: 3 },
-  { id: "traditional-video", name: "Traditional Videography", description: "Full event recording — every ritual documented", icon: Video, ratePerDay: 10000, ratePerHalfDay: 6000, maxQty: 3 },
-  { id: "cinematic-video", name: "Cinematic Videography", description: "Film-style highlight reel with color grading & music", icon: Film, ratePerDay: 15000, ratePerHalfDay: 10000, maxQty: 2, premium: true },
+  { id: "traditional-photo", name: SERVICE_RATES["traditional-photo"].name, description: "Posed shots, group photos, ritual & stage coverage", icon: Camera, ratePerDay: SERVICE_RATES["traditional-photo"].ratePerDay, ratePerHalfDay: SERVICE_RATES["traditional-photo"].ratePerHalfDay, maxQty: 3 },
+  { id: "candid-photo", name: SERVICE_RATES["candid-photo"].name, description: "Unposed, natural moments — storytelling style", icon: Camera, ratePerDay: SERVICE_RATES["candid-photo"].ratePerDay, ratePerHalfDay: SERVICE_RATES["candid-photo"].ratePerHalfDay, maxQty: 3 },
+  { id: "traditional-video", name: SERVICE_RATES["traditional-video"].name, description: "Full event recording — every ritual documented", icon: Video, ratePerDay: SERVICE_RATES["traditional-video"].ratePerDay, ratePerHalfDay: SERVICE_RATES["traditional-video"].ratePerHalfDay, maxQty: 3 },
+  { id: "cinematic-video", name: SERVICE_RATES["cinematic-video"].name, description: "Film-style highlight reel with color grading & music", icon: Film, ratePerDay: SERVICE_RATES["cinematic-video"].ratePerDay, ratePerHalfDay: SERVICE_RATES["cinematic-video"].ratePerHalfDay, maxQty: 2, premium: true },
 ]
 
 const eventAddOns: EventAddOn[] = [
-  { id: "drone", name: "Drone Coverage", price: 5000, description: "Aerial photos + video for this event", icon: Plane, perEvent: true, maxQty: 1, premium: true },
-  { id: "led-wall", name: "LED Wall Setup", price: 10000, description: "Digital backdrop for this event", icon: Sparkles, perEvent: true, maxQty: 2 },
-  { id: "same-day-edit", name: "Same-Day Edit", price: 7000, description: "Highlight reel delivered same day", icon: Zap, perEvent: true, maxQty: 1, premium: true },
-  { id: "live-stream", name: "Live Streaming", price: 5000, description: "YouTube/Zoom live for remote guests", icon: Video, perEvent: true, maxQty: 1 },
+  { id: "drone", name: EVENT_ADDONS.drone.name, price: EVENT_ADDONS.drone.price, description: "Aerial photos + video for this event", icon: Plane, perEvent: true, maxQty: 1, premium: true },
+  { id: "led-wall", name: EVENT_ADDONS["led-wall"].name, price: EVENT_ADDONS["led-wall"].price, description: "Digital backdrop for this event", icon: Sparkles, perEvent: true, maxQty: 2 },
+  { id: "same-day-edit", name: EVENT_ADDONS["same-day-edit"].name, price: EVENT_ADDONS["same-day-edit"].price, description: "Highlight reel delivered same day", icon: Zap, perEvent: true, maxQty: 1, premium: true },
+  { id: "live-stream", name: EVENT_ADDONS["live-stream"].name, price: EVENT_ADDONS["live-stream"].price, description: "YouTube/Zoom live for remote guests", icon: Video, perEvent: true, maxQty: 1 },
 ]
 
 const globalAddOns: EventAddOn[] = [
-  { id: "album-25", name: "Photo Album (25 sheets)", price: 5000, description: "Premium printed album", icon: BookOpen, perEvent: false, maxQty: 5 },
-  { id: "album-40", name: "Photo Album (40 sheets)", price: 8000, description: "Deluxe large album", icon: BookOpen, perEvent: false, maxQty: 5 },
-  { id: "makeup-artist", name: "Makeup Artist (Bride)", price: 10000, description: "Professional bridal makeup", icon: Sparkles, perEvent: false, maxQty: 1, premium: true },
+  { id: "album-25", name: GLOBAL_ADDONS["album-25"].name, price: GLOBAL_ADDONS["album-25"].price, description: "Premium printed album", icon: BookOpen, perEvent: false, maxQty: 5 },
+  { id: "album-40", name: GLOBAL_ADDONS["album-40"].name, price: GLOBAL_ADDONS["album-40"].price, description: "Deluxe large album", icon: BookOpen, perEvent: false, maxQty: 5 },
 ]
 
-const eventTemplates: Record<string, string[]> = {
-  "Hindu (South Indian)": ["Pellikuthuru / Nalangu", "Haldi / Pasupu", "Sangeeth", "Muhurtham (Wedding)", "Reception"],
-  "Hindu (North Indian)": ["Roka", "Haldi", "Mehendi", "Sangeet", "Baraat & Wedding", "Reception"],
-  "Muslim Wedding": ["Haldi / Ubtan", "Mehendi", "Nikah", "Walima / Reception"],
-  "Christian Wedding": ["Engagement", "Church Ceremony", "Reception / Party"],
-  "Sikh Wedding": ["Mehendi", "Anand Karaj (Gurudwara)", "Reception"],
-  "Engagement": ["Ring Ceremony", "Cocktail / After Party"],
-  "Pre-Wedding Shoot": ["Pre-Wedding Photoshoot"],
-  "Baby / Maternity": ["Photoshoot Session"],
-  "Birthday / Event": ["Event Coverage"],
-  "Housewarming": ["Griha Pravesh / Housewarming"],
-  "Corporate Event": ["Conference / Seminar", "Award Ceremony"],
+// Pre-fill recommendations per event — services: Record<serviceId, qty>, addOns: Record<addonId, qty>
+interface EventPreset {
+  name: string
+  duration: "Half Day" | "Full Day"
+  services: Record<string, number>
+  addOns: Record<string, number>
 }
+
+const eventTemplates: Record<string, EventPreset[]> = {
+  "Hindu (South Indian)": [
+    { name: "Pellikuthuru / Nalangu", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+    { name: "Haldi / Pasupu", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+    { name: "Sangeeth", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+    { name: "Muhurtham (Wedding)", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+    { name: "Reception", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+  ],
+  "Hindu (North Indian)": [
+    { name: "Roka", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+    { name: "Haldi", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+    { name: "Mehendi", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+    { name: "Sangeet", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+    { name: "Baraat & Wedding", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+    { name: "Reception", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+  ],
+  "Muslim Wedding": [
+    { name: "Haldi / Ubtan", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+    { name: "Mehendi", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+    { name: "Nikah", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+    { name: "Walima / Reception", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+  ],
+  "Christian Wedding": [
+    { name: "Engagement", duration: "Half Day", services: { "candid-photo": 1, "traditional-photo": 1 }, addOns: {} },
+    { name: "Church Ceremony", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+    { name: "Reception / Party", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+  ],
+  "Sikh Wedding": [
+    { name: "Mehendi", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+    { name: "Anand Karaj (Gurudwara)", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+    { name: "Reception", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+  ],
+  "Engagement": [
+    { name: "Ring Ceremony", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+    { name: "Cocktail / After Party", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+  ],
+  "Pre-Wedding Shoot": [
+    { name: "Pre-Wedding Photoshoot", duration: "Half Day", services: { "candid-photo": 1 }, addOns: { drone: 1 } },
+  ],
+  "Baby / Maternity": [
+    { name: "Photoshoot Session", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+  ],
+  "Birthday / Event": [
+    { name: "Event Coverage", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+  ],
+  "Housewarming": [
+    { name: "Griha Pravesh / Housewarming", duration: "Half Day", services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} },
+  ],
+  "Corporate Event": [
+    { name: "Conference / Seminar", duration: "Full Day", services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} },
+    { name: "Award Ceremony", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+  ],
+}
+
+// Package-to-builder presets are now sourced from PACKAGES[].builderPreset in constants.ts
 
 const timeSlots = ["Morning", "Afternoon", "Evening", "Full Day"] as const
 type TimeSlot = (typeof timeSlots)[number]
@@ -290,12 +288,15 @@ function generateEventId() {
 }
 
 // ============ INTERACTIVE PRICE CALCULATOR ============
-function PriceCalculator() {
+function PriceCalculator({ prefilledPackage }: { prefilledPackage?: string | null }) {
   const { ref, isVisible } = useScrollReveal()
+  const router = useRouter()
   const [events, setEvents] = useState<EventBlock[]>([])
   const [globalAddOnQty, setGlobalAddOnQty] = useState<Record<string, number>>({})
-  const [showTemplates, setShowTemplates] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(true)
   const [expandedEvents, setExpandedEvents] = useState<string[]>([])
+  // Track active package — when set, we show the package's fixed price
+  const [activePackage, setActivePackage] = useState<string | null>(null)
 
   // Event metadata
   const [eventDate, setEventDate] = useState("")
@@ -304,16 +305,36 @@ function PriceCalculator() {
   const [venueName, setVenueName] = useState("")
 
   // Customer info
-  const [customerName, setCustomerName] = useState("")
-  const [customerPhone, setCustomerPhone] = useState("")
-  const [customerEmail, setCustomerEmail] = useState("")
-  const [showContactForm, setShowContactForm] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const todayStr = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
   .toISOString()
   .split("T")[0]
   
+  const calculatorRef = useRef<HTMLDivElement>(null)
   const summaryRef = useRef<HTMLDivElement>(null)
+
+  // Pre-fill from package when clicked — reads preset from PACKAGES constant
+  useEffect(() => {
+    if (!prefilledPackage) return
+    const pkg = PACKAGES.find((p) => p.name === prefilledPackage)
+    if (!pkg || !pkg.builderPreset) return
+
+    const presets = pkg.builderPreset.events
+    const newEvents = presets.map((preset) => ({
+      id: generateEventId(),
+      name: preset.name,
+      duration: preset.duration as "Half Day" | "Full Day",
+      services: { ...preset.services } as Record<string, number>,
+      addOns: { ...preset.addOns } as Record<string, number>,
+    }))
+    setEvents(newEvents)
+    setExpandedEvents(newEvents.map((e) => e.id))
+    setGlobalAddOnQty({ ...pkg.builderPreset.globalAddOns } as Record<string, number>)
+    setActivePackage(prefilledPackage)
+    setShowTemplates(false)
+    setTimeout(() => calculatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100)
+  }, [prefilledPackage])
 
   const addEvent = (name: string) => {
     const newEvent: EventBlock = {
@@ -326,26 +347,30 @@ function PriceCalculator() {
     setEvents((prev) => [...prev, newEvent])
     setExpandedEvents((prev) => [...prev, newEvent.id])
     setShowTemplates(false)
+    setActivePackage(null)
   }
 
   const addFromTemplate = (templateName: string) => {
-    const templateEvents = eventTemplates[templateName]
-    if (!templateEvents) return
-    const newEvents = templateEvents.map((name) => ({
+    const presets = eventTemplates[templateName]
+    if (!presets) return
+    const newEvents = presets.map((preset) => ({
       id: generateEventId(),
-      name,
-      duration: "Full Day" as const,
-      services: {},
-      addOns: {},
+      name: preset.name,
+      duration: preset.duration,
+      services: { ...preset.services },
+      addOns: { ...preset.addOns },
     }))
-    setEvents((prev) => [...prev, ...newEvents])
-    setExpandedEvents((prev) => [...prev, ...newEvents.map((e) => e.id)])
+    // Replace existing events (not append) — avoids accidental inflation
+    setEvents(newEvents)
+    setExpandedEvents(newEvents.map((e) => e.id))
     setShowTemplates(false)
+    setActivePackage(null)
   }
 
   const removeEvent = (id: string) => {
     setEvents((prev) => prev.filter((e) => e.id !== id))
     setExpandedEvents((prev) => prev.filter((eid) => eid !== id))
+    setActivePackage(null)
   }
 
   const updateEventName = (id: string, name: string) => {
@@ -354,6 +379,7 @@ function PriceCalculator() {
 
   const updateEventDuration = (id: string, duration: "Half Day" | "Full Day") => {
     setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, duration } : e)))
+    setActivePackage(null)
   }
 
   const updateEventService = (eventId: string, serviceId: string, delta: number) => {
@@ -370,6 +396,7 @@ function PriceCalculator() {
         return { ...e, services: newServices }
       })
     )
+    setActivePackage(null)
   }
 
   const updateEventAddOn = (eventId: string, addOnId: string, delta: number) => {
@@ -386,6 +413,7 @@ function PriceCalculator() {
         return { ...e, addOns: newAddOns }
       })
     )
+    setActivePackage(null)
   }
 
   const updateGlobalAddOn = (id: string, delta: number) => {
@@ -400,6 +428,7 @@ function PriceCalculator() {
       }
       return { ...prev, [id]: next }
     })
+    setActivePackage(null)
   }
 
   const toggleExpandEvent = (id: string) => {
@@ -428,6 +457,9 @@ function PriceCalculator() {
     return sum + (addon?.price || 0) * qty
   }, 0)
   const totalPrice = eventsTotal + globalAddOnTotal
+
+  // Active package data (for badge display — price is always computed from rates)
+  const activePackageData = activePackage ? PACKAGES.find((p) => p.name === activePackage) : null
   const hasContent = events.length > 0
 
   const configuredEvents = events.filter((e) => Object.keys(e.services).length > 0)
@@ -445,7 +477,11 @@ function PriceCalculator() {
     const lines: string[] = []
     lines.push("Hello Orvex Visuals,")
     lines.push("")
-    lines.push("I'd like a quotation for the following events:")
+    if (activePackage) {
+      lines.push(`I'd like to book the *${activePackage} Package* (₹${totalPrice.toLocaleString("en-IN")}).`)
+    } else {
+      lines.push("I'd like an estimate for the following events:")
+    }
     lines.push("")
 
     if (eventDate) lines.push(`Date: ${formatDate(eventDate)}`)
@@ -484,23 +520,36 @@ function PriceCalculator() {
     lines.push(`Estimated Total: Rs.${totalPrice.toLocaleString("en-IN")}`)
     lines.push("")
 
-    if (customerName) lines.push(`Name: ${customerName}`)
-    if (customerPhone) lines.push(`Phone: ${customerPhone}`)
-    if (customerEmail) lines.push(`Email: ${customerEmail}`)
-    if (customerName || customerPhone) lines.push("")
-
-    lines.push("Please confirm availability. Thank you.")
+    lines.push("Please share availability. Thank you.")
 
     return encodeURIComponent(lines.join("\n"))
   }
 
-  const generateBookingUrl = () => {
+  const buildBookingPlan = () => {
     if (!hasConfiguredEvents) return "#"
-    const plan = {
+    return {
       services: configuredEvents.map((event) => ({
         name: event.name,
         coverage: event.duration,
         price: getEventPrice(event),
+        selections: [
+          ...Object.entries(event.services)
+            .filter(([, qty]) => qty > 0)
+            .map(([id, qty]) => {
+              const s = serviceRates.find((item) => item.id === id)
+              if (!s) return null
+              const unitPrice = event.duration === "Full Day" ? s.ratePerDay : s.ratePerHalfDay
+              return { name: s.name, qty, unitPrice }
+            })
+            .filter(Boolean),
+          ...Object.entries(event.addOns)
+            .filter(([, qty]) => qty > 0)
+            .map(([id, qty]) => {
+              const a = eventAddOns.find((item) => item.id === id)
+              return a ? { name: a.name, qty, unitPrice: a.price } : null
+            })
+            .filter(Boolean),
+        ],
       })),
       addOns: Object.entries(globalAddOnQty)
         .filter(([, qty]) => qty > 0)
@@ -509,26 +558,33 @@ function PriceCalculator() {
           return { name: addon?.name, qty, price: (addon?.price || 0) * qty }
         }),
       total: totalPrice,
+      packageName: activePackage || undefined,
       date: eventDate,
+      timeSlot,
       city: eventCity,
       venue: venueName,
-      customer: { name: customerName, phone: customerPhone, email: customerEmail },
     }
-    return `/book?plan=${encodeURIComponent(JSON.stringify(plan))}`
   }
 
-  const handleGetQuote = () => {
+  const handleProceedToBook = () => {
     if (!hasConfiguredEvents) return
-    if (!customerName.trim() || !customerPhone.trim()) {
-      setShowContactForm(true)
-      return
+
+    const plan = buildBookingPlan()
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(BOOKING_PLAN_STORAGE_KEY, JSON.stringify(plan))
     }
-    const url = `https://wa.me/919845332306?text=${generateWhatsAppMessage()}`
-    window.open(url, "_blank", "noopener,noreferrer")
+    router.push("/book")
+  }
+
+  const handleSendEstimate = () => {
+    if (!hasConfiguredEvents) return
+    setIsSubmitting(true)
+    window.open(`https://wa.me/${PHONE_NUMBER}?text=${generateWhatsAppMessage()}`, '_blank')
+    setTimeout(() => setIsSubmitting(false), 2000)
   }
 
   return (
-    <section id="calculator" className="py-24 md:py-32 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 relative overflow-hidden">
+    <section id="calculator" ref={calculatorRef} className="py-24 md:py-32 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-amber-500/[0.02] rounded-full blur-3xl pointer-events-none" />
 
       <div ref={ref} className="max-w-6xl mx-auto px-6 relative">
@@ -538,7 +594,7 @@ function PriceCalculator() {
             Build Your Package
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-4 max-w-lg mx-auto">
-            Step 1: Pick a template or add events. Step 2: Choose your team & extras. Step 3: Get instant quote.
+            Pick your event type below — we&apos;ll suggest the right team. Add or remove anything you want.
           </p>
         </div>
 
@@ -613,19 +669,23 @@ function PriceCalculator() {
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 hover:border-amber-400 dark:hover:border-amber-500/30 hover:text-amber-600 dark:hover:text-amber-400 transition-all"
                 >
                   <Sparkles size={14} />
-                  Quick Templates
+                  {events.length > 0 ? "Change Event Type" : "Pick Your Event Type"}
                   <ChevronDown size={12} className={`transition-transform ${showTemplates ? "rotate-180" : ""}`} />
                 </button>
+                {events.length > 0 && (
+                  <span className="ml-3 text-[11px] text-slate-400 dark:text-slate-500">Replaces current selection</span>
+                )}
 
                 {showTemplates && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {Object.keys(eventTemplates).map((template) => (
+                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {Object.entries(eventTemplates).map(([template, presets]) => (
                       <button
                         key={template}
                         onClick={() => addFromTemplate(template)}
-                        className="px-3.5 py-2 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 hover:border-amber-400 dark:hover:border-amber-500/30 hover:text-amber-600 dark:hover:text-amber-400 transition-all"
+                        className="px-3.5 py-2.5 rounded-lg text-left bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 hover:border-amber-400 dark:hover:border-amber-500/30 hover:text-amber-600 dark:hover:text-amber-400 transition-all"
                       >
-                        {template}
+                        <span className="text-xs font-medium block">{template}</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">{presets.length} event{presets.length > 1 ? "s" : ""} · pre-filled</span>
                       </button>
                     ))}
                   </div>
@@ -708,7 +768,8 @@ function PriceCalculator() {
 
                           {/* Services */}
                           <div>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Team</p>
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Photography & Video Team</p>
+                            <p className="text-[11px] text-slate-400 dark:text-slate-500 mb-3">Add or remove — we&apos;ve suggested what works best</p>
                             <div className="space-y-2">
                               {serviceRates.map((service) => {
                                 const Icon = service.icon
@@ -730,8 +791,10 @@ function PriceCalculator() {
                                       <span className={`text-sm font-medium block ${qty > 0 ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}>
                                         {service.name}
                                         {service.premium && <span className="ml-1.5 text-[10px] text-amber-500 dark:text-amber-400/70 font-normal">Premium</span>}
+                                        {qty > 0 && <span className="ml-1.5 text-[10px] text-emerald-500 dark:text-emerald-400/80 font-normal">✓ Added</span>}
                                       </span>
-                                      <span className="text-[11px] text-slate-400 dark:text-slate-500">{service.description} · ₹{(rate / 1000).toFixed(0)}K</span>
+                                      <span className="text-[11px] text-slate-400 dark:text-slate-500 block">{service.description}</span>
+                                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">₹{rate.toLocaleString("en-IN")} / {event.duration === "Full Day" ? "day" : "half day"}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <button
@@ -899,8 +962,17 @@ function PriceCalculator() {
 
                     {/* Total */}
                     <div className="border-t border-slate-100 dark:border-slate-800 pt-5 mb-6">
+                      {activePackageData && (
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-[11px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-lg">
+                            {activePackageData.name} Package
+                          </span>
+                        </div>
+                      )}
                       <div className="flex justify-between items-end">
-                        <span className="text-slate-500 dark:text-slate-400 text-sm">Estimated Total</span>
+                        <span className="text-slate-500 dark:text-slate-400 text-sm">
+                          {activePackageData ? "Package Total" : "Estimated Total"}
+                        </span>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-slate-900 dark:text-white">
                             &#8377;{totalPrice.toLocaleString("en-IN")}
@@ -908,74 +980,44 @@ function PriceCalculator() {
                           <span className="text-emerald-500 dark:text-emerald-400/70 text-[11px]">GST inclusive</span>
                         </div>
                       </div>
+                      {activePackageData && (
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2">
+                          Computed from rates — modify services to customize
+                        </p>
+                      )}
                     </div>
 
-                    {/* Contact Form (shown when needed) */}
-                    {showContactForm && (
-                      <div className="space-y-3 mb-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50">
-                        <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">We'll send the quote to you</p>
-                        <p className="text-[10px] text-slate-400 dark:text-slate-600">Fields marked * are required</p>
-                        <div className="relative">
-                          <User size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-                          <input
-                            type="text"
-                            value={customerName}
-                            onChange={(e) => setCustomerName(e.target.value)}
-                            className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-amber-500/40 focus:outline-none"
-                            placeholder="e.g. Rahul Sharma *"
-                          />
-                        </div>
-                        <div className="relative">
-                          <Phone size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-                          <input
-                            type="tel"
-                            value={customerPhone}
-                            onChange={(e) => setCustomerPhone(e.target.value)}
-                            className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-amber-500/40 focus:outline-none"
-                            placeholder="e.g. 98456 XXXXX *"
-                            maxLength={10}
-                          />
-                        </div>
-                        <div className="relative">
-                          <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-                          <input
-                            type="email"
-                            value={customerEmail}
-                            onChange={(e) => setCustomerEmail(e.target.value)}
-                            className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/50 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-amber-500/40 focus:outline-none"
-                            placeholder="e.g. you@email.com"
-                          />
-                        </div>
-                      </div>
-                    )}
+
 
                     {/* CTA Buttons */}
                     {!hasConfiguredEvents && (
-                      <p className="text-center text-slate-400 dark:text-slate-600 text-xs mb-4">Add services to at least one event to get a quote</p>
+                      <p className="text-center text-slate-400 dark:text-slate-600 text-xs mb-4">Add services to at least one event to get started</p>
                     )}
                     <div className="space-y-3">
                       <button
-                        onClick={handleGetQuote}
-                        disabled={!hasConfiguredEvents}
+                        type="button"
+                        onClick={handleProceedToBook}
                         className={`flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 ${hasConfiguredEvents
                             ? "bg-amber-500 text-white dark:text-slate-900 hover:bg-amber-400 active:scale-[0.98]"
                             : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed"
                           }`}
+                        disabled={!hasConfiguredEvents}
                       >
-                        <MessageCircle size={15} />
-                        Get Quote on WhatsApp
+                        Proceed to Book
+                        <ArrowRight size={13} />
                       </button>
-                      <a
-                        href={hasConfiguredEvents ? generateBookingUrl() : undefined}
-                        onClick={(e) => { if (!hasConfiguredEvents) e.preventDefault() }}
+                      <button
+                        onClick={handleSendEstimate}
+                        disabled={!hasConfiguredEvents || isSubmitting}
                         className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm transition-all duration-300 ${hasConfiguredEvents
                             ? "border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-900 dark:hover:text-white"
                             : "border border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-700 cursor-not-allowed"
                           }`}
                       >
-                        Fill Booking Form
-                        <ArrowRight size={13} />
-                      </a>
+                        <MessageCircle size={14} />
+                        {isSubmitting ? "Opening WhatsApp..." : "Send Estimate on WhatsApp"}
+                      </button>
+                      <p className="text-center text-slate-400 dark:text-slate-600 text-[10px]">Estimate is for sharing / discussion only. Book when you&apos;re ready.</p>
                     </div>
 
                     {/* Trust signals */}
@@ -1074,23 +1116,23 @@ function PricingCTA() {
           Lock In Your Date
         </h2>
         <p className="text-amber-100/80 text-lg mb-10 max-w-md mx-auto">
-          Get a personalized quote in 2 hours. No pressure, no follow-up calls &mdash; just honest pricing.
+          Build your package above, then book when you&apos;re ready. No pressure, no follow-up calls.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="https://wa.me/919845332306?text=Hi%20Orvex,%20I'd%20like%20a%20custom%20quote%20for%20my%20event"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/book"
             className="inline-flex items-center justify-center gap-2 bg-white text-amber-700 hover:bg-slate-900 hover:text-white px-8 py-4 rounded-xl font-bold transition-all duration-300"
           >
-            <MessageCircle size={18} />
-            Get My Custom Quote
+            Book Now &mdash; 30% Advance Only
           </a>
           <a
-            href="/book"
+            href={getWhatsAppLink("Hi Orvex, I'd like to discuss my event requirements")}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center border-2 border-white/30 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-xl font-bold transition-all duration-300"
           >
-            Book Now &mdash; 30% Advance Only
+            <MessageCircle size={18} />
+            Chat With Us
           </a>
         </div>
       </div>
@@ -1100,11 +1142,13 @@ function PricingCTA() {
 
 // ============ MAIN ============
 export default function PricingPage() {
+  const [selectedPackage, setSelectedPackage] = useState<string | null>(null)
+
   return (
     <main>
       <PricingHero />
-      <PackagesSection />
-      <PriceCalculator />
+      <PackagesSection onCustomize={(pkg) => setSelectedPackage(pkg)} />
+      <PriceCalculator prefilledPackage={selectedPackage} />
       <ComparisonSection />
       <PricingCTA />
     </main>

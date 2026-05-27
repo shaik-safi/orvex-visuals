@@ -9,10 +9,11 @@ import {
   Clock,
   Send,
   Instagram,
-  Youtube,
+  Facebook,
   CheckCircle,
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getWhatsAppLink, PHONE_NUMBER, SOCIAL_LINKS } from "@/lib/constants"
 
 // ============ HERO ============
 function ContactHero() {
@@ -48,13 +49,52 @@ function ContactSection() {
     message: "",
   })
   const [submitted, setSubmitted] = useState(false)
+  const [whatsAppUrl, setWhatsAppUrl] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const msg = `Hi Orvex! I'm ${formState.name}.%0A%0AService: ${formState.service}%0ADate: ${formState.date}%0AMessage: ${formState.message}%0A%0APhone: ${formState.phone}%0AEmail: ${formState.email}`
-    window.open(`https://wa.me/919845332306?text=${msg}`, "_blank")
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 5000)
+    const message = [
+      `Hi Orvex! I'm ${formState.name}.`,
+      "",
+      `Service: ${formState.service}`,
+      formState.date ? `Date: ${formState.date}` : null,
+      formState.message ? `Message: ${formState.message}` : null,
+      "",
+      `Phone: ${formState.phone}`,
+      formState.email ? `Email: ${formState.email}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n")
+    const nextWhatsAppUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch("/api/inquiries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formState.name,
+          phone: formState.phone,
+          email: formState.email,
+          service: formState.service,
+          date: formState.date,
+          message: formState.message,
+        }),
+      })
+
+      if (!response.ok) {
+        window.open(nextWhatsAppUrl, "_blank", "noopener,noreferrer")
+      }
+    } catch {
+      window.open(nextWhatsAppUrl, "_blank", "noopener,noreferrer")
+    } finally {
+      setWhatsAppUrl(nextWhatsAppUrl)
+      setSubmitted(true)
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -69,7 +109,7 @@ function ContactSection() {
             </div>
 
             <div className="space-y-4">
-              <a href="https://wa.me/919845332306" target="_blank" rel="noopener noreferrer" className="group flex items-start gap-4 bg-green-50 dark:bg-green-500/5 rounded-2xl p-4 border border-green-100 dark:border-green-500/10 hover:border-green-300 dark:hover:border-green-500/30 transition-all">
+              <a href={getWhatsAppLink()} target="_blank" rel="noopener noreferrer" className="group flex items-start gap-4 bg-green-50 dark:bg-green-500/5 rounded-2xl p-4 border border-green-100 dark:border-green-500/10 hover:border-green-300 dark:hover:border-green-500/30 transition-all">
                 <div className="w-10 h-10 bg-green-100 dark:bg-green-500/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                   <MessageCircle size={18} className="text-green-600 dark:text-green-400" />
                 </div>
@@ -128,29 +168,49 @@ function ContactSection() {
             <div>
               <p className="text-sm font-medium text-slate-900 dark:text-white mb-3">Follow Us</p>
               <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-500/10 transition-all">
+                <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-500/10 transition-all">
                   <Instagram size={18} />
                 </a>
-                <a href="#" className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all">
-                  <Youtube size={18} />
+                <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all">
+                  <Facebook size={18} />
                 </a>
               </div>
             </div>
           </div>
 
-          {/* Contact Form */}
+          <p className="text-slate-500 dark:text-slate-400 text-sm">WhatsApp opened with your inquiry pre-filled.</p>
           <div className="lg:col-span-3">
             <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Send an Inquiry</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Fill in the form and it&apos;ll open WhatsApp with your details pre-filled.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Submit here to save your inquiry first. WhatsApp stays optional for faster follow-up.</p>
 
               {submitted ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-green-100 dark:bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <CheckCircle size={32} className="text-green-500" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Message Sent!</h4>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm">We&apos;ll get back to you within 30 minutes.</p>
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Inquiry Saved</h4>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">Your inquiry was recorded. We&apos;ll follow up using the details you shared.</p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a
+                      href={whatsAppUrl || getWhatsAppLink()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300"
+                    >
+                      <MessageCircle size={16} /> Continue on WhatsApp
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSubmitted(false)
+                        setWhatsAppUrl("")
+                      }}
+                      className="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600"
+                    >
+                      Send Another Inquiry
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -234,13 +294,14 @@ function ContactSection() {
 
                   <button
                     type="submit"
+                    disabled={isSubmitting}
                     className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5"
                   >
-                    <Send size={16} /> Send via WhatsApp
+                    <Send size={16} /> {isSubmitting ? "Saving Inquiry..." : "Save Inquiry"}
                   </button>
 
                   <p className="text-xs text-slate-400 dark:text-slate-500 text-center">
-                    This form opens WhatsApp with your inquiry pre-filled. No data is stored on our servers.
+                    We save your inquiry first. WhatsApp is optional and only opens if you choose to continue there.
                   </p>
                 </form>
               )}
@@ -279,8 +340,8 @@ function MapSection() {
 function ContactFAQ() {
   const { ref, isVisible } = useScrollReveal()
   const faqs = [
-    { q: "How quickly do you respond?", a: "We respond within 30 minutes on WhatsApp during working hours (9 AM - 8 PM, Mon-Sat). Emails are answered within 24 hours." },
-    { q: "How do I book a date?", a: "Contact us via WhatsApp or the form above. Once we confirm availability, pay 50% advance to lock your date." },
+    { q: "How quickly do you respond?", a: "We review saved inquiries during working hours and usually reply the same day. WhatsApp is the fastest follow-up channel." },
+    { q: "How do I book a date?", a: "Submit the booking form or contact form first. Once we confirm availability, pay the required advance to lock your date." },
     { q: "Do you travel outside Bangalore?", a: "Yes! We cover events across India. Travel and accommodation charges apply for outstation bookings." },
     { q: "Can I visit your studio?", a: "We operate as a mobile studio with on-location shoots. For baby/newborn shoots, we come to your home or can arrange a studio setup." },
   ]

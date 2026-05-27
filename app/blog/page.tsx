@@ -12,6 +12,7 @@ import {
 } from "lucide-react"
 import { blogPosts, blogCategories, type BlogCategory } from "./data"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getWhatsAppLink } from "@/lib/constants"
 
 // ============ HERO ============
 function BlogHero() {
@@ -196,7 +197,7 @@ function BlogCTA() {
           Get expert guidance and a free quote. We&apos;ll help you plan the perfect session.
         </p>
         <a
-          href="https://wa.me/919845332306?text=Hi%20Orvex,%20I%20found%20your%20blog%20helpful!%20I'd%20like%20to%20discuss%20a%20shoot."
+          href={getWhatsAppLink("Hi Orvex, I found your blog helpful! I'd like to discuss a shoot.")}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"

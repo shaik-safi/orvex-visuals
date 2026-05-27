@@ -14,6 +14,7 @@ import {
   Share2,
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getWhatsAppLink } from "@/lib/constants"
 import { getBlogPost, getRelatedPosts, type BlogPost } from "../data"
 
 // ============ BREADCRUMB ============
@@ -184,7 +185,7 @@ function PostCTA() {
           Get a free consultation and personalized quote for your photoshoot.
         </p>
         <a
-          href="https://wa.me/919845332306?text=Hi%20Orvex,%20I%20read%20your%20blog%20and%20I'd%20like%20to%20book%20a%20shoot!"
+          href={getWhatsAppLink("Hi Orvex, I read your blog and I'd like to book a shoot!")}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"

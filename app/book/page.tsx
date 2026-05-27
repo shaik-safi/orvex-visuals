@@ -13,13 +13,16 @@ import {
   MessageCircle,
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { saveQuote } from "@/lib/save-quote"
+import { BOOKING_PLAN_STORAGE_KEY, PHONE_NUMBER } from "@/lib/constants"
 
 // ============ PLAN TYPE (from pricing calculator) ============
 interface PlanData {
-  services: { name: string; coverage: string; price: number }[]
+  services: { name: string; coverage: string; price: number; selections?: { name: string; qty: number; unitPrice?: number }[] }[]
   addOns: { name: string; qty: number; price: number }[]
   total: number
   date?: string
+  timeSlot?: string
   city?: string
   venue?: string
   customer?: { name: string; phone: string; email: string }
@@ -80,6 +83,7 @@ function BookingForm() {
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
   const [plan, setPlan] = useState<PlanData | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -95,20 +99,47 @@ function BookingForm() {
   // Parse plan from URL if coming from calculator
   useEffect(() => {
     const planParam = searchParams.get("plan")
+    const serviceParam = searchParams.get("service")
+    const budgetParam = searchParams.get("budget")
+    const messageParam = searchParams.get("message")
+    let parsedPlan: unknown = null
+
+    if (serviceParam || budgetParam || messageParam) {
+      setForm((prev) => ({
+        ...prev,
+        service: serviceParam || prev.service,
+        budget: budgetParam || prev.budget,
+        message: messageParam || prev.message,
+      }))
+    }
+
     if (planParam) {
       try {
-        const parsed = JSON.parse(decodeURIComponent(planParam))
-        // Validate plan structure
+        parsedPlan = JSON.parse(decodeURIComponent(planParam))
+      } catch { }
+    } else if (typeof window !== "undefined") {
+      const storedPlan = window.sessionStorage.getItem(BOOKING_PLAN_STORAGE_KEY)
+      if (storedPlan) {
+        try {
+          parsedPlan = JSON.parse(storedPlan)
+        } catch {
+          parsedPlan = null
+        }
+        window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
+      }
+    }
+
+    if (parsedPlan) {
+      try {
+        const parsed = parsedPlan as PlanData
         if (
           !parsed ||
           !Array.isArray(parsed.services) ||
           !Array.isArray(parsed.addOns) ||
           typeof parsed.total !== "number"
         ) return
-        setPlan(parsed as PlanData)
-        // Pre-fill form fields from calculator data
-        const serviceNames = parsed.services.map((s) => s.name).join(", ")
-        // Auto-select budget based on total
+        setPlan(parsed)
+        const serviceNames = parsed.services.map((serviceItem) => serviceItem.name).join(", ")
         let autoBudget = ""
         if (parsed.total < 15000) autoBudget = "Under \u20b915,000"
         else if (parsed.total < 30000) autoBudget = "\u20b915,000 \u2013 \u20b930,000"
@@ -143,28 +174,86 @@ function BookingForm() {
     email: form.email.length > 0 && !isValidEmail(form.email),
   }
 
-  const handleSubmit = () => {
-    let planSummary = ""
-    if (plan) {
-      const serviceLines = plan.services.map((s) => `  - ${s.name} - ${s.coverage} (Rs.${s.price.toLocaleString("en-IN")})`).join("\n")
-      const addonLines = plan.addOns.length > 0 ? `\nAdd-ons:\n${plan.addOns.map((a) => `  - ${a.name} x${a.qty} (Rs.${a.price.toLocaleString("en-IN")})`).join("\n")}` : ""
-      planSummary = `\n\nCustom Plan (from calculator):\nServices:\n${serviceLines}${addonLines}\nTotal: Rs.${plan.total.toLocaleString("en-IN")}\n`
+  const handleSubmit = async () => {
+    setIsSubmitting(true)
+    try {
+      const { quoteId, accessToken } = await saveQuote({
+        source: "booking",
+        customerName: form.name,
+        customerPhone: form.phone,
+        customerEmail: form.email || undefined,
+        date: form.eventDate || undefined,
+        timeSlot: plan?.timeSlot || undefined,
+        city: plan?.city || undefined,
+        venue: form.venue || undefined,
+        service: form.service,
+        budget: form.budget,
+        notes: form.message || undefined,
+        foundVia: form.source || undefined,
+        events: plan?.services.map((s) => ({
+          name: s.name,
+          duration: s.coverage,
+          selections: (s.selections ?? []).map((sel) => ({
+            name: sel.name,
+            qty: sel.qty,
+            unitPrice: sel.unitPrice ?? 0,
+          })),
+          price: s.price,
+        })),
+        globalAddOns: plan?.addOns,
+        total: plan?.total,
+      })
+      const parts = [
+        "Hi Orvex Visuals,",
+        "",
+        `Booking #${quoteId}`,
+        "",
+        `Name: ${form.name}`,
+        `Ph: ${form.phone}`,
+      ]
+      if (form.email) parts.push(`Email: ${form.email}`)
+      parts.push(`Service: ${form.service}`)
+      if (form.eventDate) parts.push(`Date: ${form.eventDate}`)
+      if (plan?.timeSlot) parts.push(`Time: ${plan.timeSlot}`)
+      if (form.venue) parts.push(`Venue: ${form.venue}`)
+      parts.push(`Budget: ${form.budget}`)
+      if (plan) parts.push(`Total: Rs.${plan.total.toLocaleString("en-IN")}`)
+      if (form.message) parts.push(`Notes: ${form.message}`)
+      parts.push("", `View booking: ${window.location.origin}/quote/${quoteId}?token=${encodeURIComponent(accessToken)}`)
+      parts.push("", "Please confirm.")
+      window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(parts.join("\n"))}`, '_blank')
+    } catch {
+      // Fallback: send detailed message if Firebase is not configured yet
+      const lines = [
+        "Hi Orvex Visuals, I'd like to book:",
+        "",
+        `Name: ${form.name}`,
+        `Ph: ${form.phone}`,
+      ]
+      if (form.email) lines.push(`Email: ${form.email}`)
+      lines.push(`Service: ${form.service}`)
+      if (form.eventDate) lines.push(`Date: ${form.eventDate}`)
+      if (plan?.timeSlot) lines.push(`Time: ${plan.timeSlot}`)
+      if (form.venue) lines.push(`Venue: ${form.venue}`)
+      lines.push(`Budget: ${form.budget}`)
+      if (plan) {
+        lines.push("", "Events:")
+        plan.services.forEach((s) => {
+          lines.push(`- ${s.name} (${s.coverage}) Rs.${s.price.toLocaleString("en-IN")}`)
+          if (s.selections) s.selections.forEach((sel) => lines.push(`  · ${sel.name} x${sel.qty}`))
+        })
+        if (plan.addOns.length > 0) {
+          lines.push("", "Extras:")
+          plan.addOns.forEach((a) => lines.push(`- ${a.name}${a.qty > 1 ? ` x${a.qty}` : ""} Rs.${a.price.toLocaleString("en-IN")}`))
+        }
+        lines.push("", `Total: Rs.${plan.total.toLocaleString("en-IN")}`)
+      }
+      if (form.message) lines.push("", `Notes: ${form.message}`)
+      lines.push("", "Please confirm.")
+      window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`, '_blank')
+    } finally {
+      setIsSubmitting(false)
     }
-
-    const text = encodeURIComponent(
-      `Hi Orvex Visuals, I'd like to book:\n\n` +
-      `Name: ${form.name}\n` +
-      `Phone: ${form.phone}\n` +
-      `Email: ${form.email || "Not provided"}\n` +
-      `Service: ${form.service}\n` +
-      `Date: ${form.eventDate || "Not decided"}\n` +
-      `Venue: ${form.venue || "Not decided"}\n` +
-      `Budget: ${form.budget}\n` +
-      `Details: ${form.message || "None"}\n` +
-      `Found via: ${form.source || "Website"}` +
-      planSummary
-    )
-    window.open(`https://wa.me/919845332306?text=${text}`, "_blank")
     setSubmitted(true)
   }
 

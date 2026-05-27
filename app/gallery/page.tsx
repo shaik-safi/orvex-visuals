@@ -129,14 +129,17 @@ function GalleryHero() {
       <div className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
       <div ref={ref} className={`max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-          Our Portfolio
+          Style Reference Gallery
         </span>
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white leading-[0.95] mb-6">
-          Stories We&apos;ve{" "}
-          <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Captured</span>
+          Visual{" "}
+          <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Direction</span>
         </h1>
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-          A glimpse into the moments, emotions, and celebrations we&apos;ve had the privilege to document.
+          Representative references used to show the style and mood we can plan for your event while verified client work is being refreshed.
+        </p>
+        <p className="mt-4 text-sm text-slate-400 dark:text-slate-500 max-w-xl mx-auto">
+          These are style references, not presented as direct client proof.
         </p>
       </div>
     </section>
@@ -183,7 +186,7 @@ function GalleryGrid() {
 
         {/* Results count */}
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 text-center">
-          <strong className="text-slate-900 dark:text-white">{filtered.length}</strong> photos
+          <strong className="text-slate-900 dark:text-white">{filtered.length}</strong> reference frames
         </p>
 
         {/* Masonry Grid */}
@@ -230,7 +233,7 @@ function GalleryGrid() {
         {filtered.length === 0 && (
           <div className="text-center py-20">
             <Camera size={40} className="text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-500 dark:text-slate-400">No photos in this category yet.</p>
+            <p className="text-slate-500 dark:text-slate-400">No reference frames in this category yet.</p>
           </div>
         )}
       </div>
@@ -259,25 +262,23 @@ function GalleryCTA() {
 
       <div className="relative max-w-3xl mx-auto px-4 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-          Want Your Story in Our Gallery?
+          Want This Style for Your Event?
         </h2>
         <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
-          Let&apos;s create stunning visuals for your special moments. Book a session today.
+          Build your package or start a booking request and we&apos;ll tailor the coverage around your event.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="https://wa.me/919845332306?text=Hi%20Orvex,%20I%20loved%20your%20gallery!%20I'd%20like%20to%20book%20a%20shoot."
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/book"
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            <MessageCircle size={20} /> Book a Shoot
+            <MessageCircle size={20} /> Start Booking
           </a>
           <a
-            href="/services"
+            href="/pricing#calculator"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            View Services <ArrowRight size={18} />
+            Build a Package <ArrowRight size={18} />
           </a>
         </div>
       </div>
