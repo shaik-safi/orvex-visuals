@@ -11,34 +11,39 @@ import {
   Instagram,
   Facebook,
   CheckCircle,
+  ChevronDown,
 } from "lucide-react"
-import { useScrollReveal } from "@/hooks/use-scroll-reveal"
-import { EMAIL, getWhatsAppLink,PHONE_DISPLAY, PHONE_NUMBER, SOCIAL_LINKS } from "@/lib/constants"
 
-// ============ HERO ============
-function ContactHero() {
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { useCurrentLocale } from "@/hooks/use-current-locale"
+import { EMAIL, getWhatsAppLink, PHONE_DISPLAY, PHONE_NUMBER, SOCIAL_LINKS } from "@/lib/constants"
+import { getPageMessages } from "@/lib/i18n/pages"
+import { applyTemplate } from "@/lib/i18n/home"
+
+type ContactMessages = ReturnType<typeof getPageMessages>["contactPage"]
+
+function ContactHero({ messages }: { messages: ContactMessages }) {
   const { ref, isVisible } = useScrollReveal()
   return (
     <section className="pt-32 pb-10 md:pt-40 md:pb-14 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 relative overflow-hidden">
       <div className="absolute top-20 right-1/3 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
       <div ref={ref} className={`max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-          Contact Orvex
+          {messages.hero.badge}
         </span>
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white leading-[0.95] mb-6">
-          Tell Us About{" "}
-          <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Your Event</span>
+          {messages.hero.titleLine1}{" "}
+          <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">{messages.hero.titleHighlight}</span>
         </h1>
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-          Ask a question, check availability, or share what you&apos;re planning. WhatsApp is usually the quickest way to reach us.
+          {messages.hero.description}
         </p>
       </div>
     </section>
   )
 }
 
-// ============ CONTACT INFO + FORM ============
-function ContactSection() {
+function ContactSection({ messages }: { messages: ContactMessages }) {
   const { ref, isVisible } = useScrollReveal()
   const [formState, setFormState] = useState({
     name: "",
@@ -52,18 +57,20 @@ function ContactSection() {
   const [whatsAppUrl, setWhatsAppUrl] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submissionResult, setSubmissionResult] = useState<"saved" | "whatsapp">("saved")
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const render = (template: string, params: Record<string, string>) => applyTemplate(template, params)
     const message = [
-      `Hi Orvex! I'm ${formState.name}.`,
+      render(messages.form.whatsappTemplate.start, { name: formState.name }),
       "",
-      `Service: ${formState.service}`,
-      formState.date ? `Date: ${formState.date}` : null,
-      formState.message ? `Message: ${formState.message}` : null,
+      render(messages.form.whatsappTemplate.service, { value: formState.service }),
+      formState.date ? render(messages.form.whatsappTemplate.date, { value: formState.date }) : null,
+      formState.message ? render(messages.form.whatsappTemplate.message, { value: formState.message }) : null,
       "",
-      `Phone: ${formState.phone}`,
-      formState.email ? `Email: ${formState.email}` : null,
+      render(messages.form.whatsappTemplate.phone, { value: formState.phone }),
+      formState.email ? render(messages.form.whatsappTemplate.email, { value: formState.email }) : null,
     ]
       .filter(Boolean)
       .join("\n")
@@ -106,11 +113,10 @@ function ContactSection() {
     <section ref={ref} className={`py-12 md:py-16 bg-white dark:bg-slate-950 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-5 gap-10">
-          {/* Contact Info */}
           <div className="lg:col-span-2 space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Contact Info</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Choose the channel that feels easiest for you.</p>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{messages.info.title}</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">{messages.info.description}</p>
             </div>
 
             <div className="space-y-4">
@@ -119,9 +125,9 @@ function ContactSection() {
                   <MessageCircle size={18} className="text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-white text-sm">WhatsApp (Fastest)</p>
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm">{messages.info.whatsapp.title}</p>
                   <p className="text-green-600 dark:text-green-400 text-sm">{PHONE_DISPLAY}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Usually the quickest reply</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{messages.info.whatsapp.subtitle}</p>
                 </div>
               </a>
 
@@ -130,9 +136,9 @@ function ContactSection() {
                   <Phone size={18} className="text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-white text-sm">Phone</p>
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm">{messages.info.phone.title}</p>
                   <p className="text-slate-600 dark:text-slate-300 text-sm">{PHONE_DISPLAY}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Mon-Sat, 9 AM - 8 PM</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{messages.info.phone.subtitle}</p>
                 </div>
               </a>
 
@@ -141,9 +147,9 @@ function ContactSection() {
                   <Mail size={18} className="text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-white text-sm">Email</p>
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm">{messages.info.email.title}</p>
                   <p className="text-slate-600 dark:text-slate-300 text-sm">{EMAIL}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Usually within 24 hours</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{messages.info.email.subtitle}</p>
                 </div>
               </a>
 
@@ -152,9 +158,9 @@ function ContactSection() {
                   <MapPin size={18} className="text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-white text-sm">Location</p>
-                  <p className="text-slate-600 dark:text-slate-300 text-sm">Bangalore, Karnataka, India</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Available across India for travel</p>
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm">{messages.info.location.title}</p>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm">{messages.info.location.line1}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{messages.info.location.line2}</p>
                 </div>
               </div>
 
@@ -163,15 +169,15 @@ function ContactSection() {
                   <Clock size={18} className="text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900 dark:text-white text-sm">Working Hours</p>
-                  <p className="text-slate-600 dark:text-slate-300 text-sm">Mon — Sat: 9 AM - 8 PM</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Sunday: By Appointment</p>
+                  <p className="font-semibold text-slate-900 dark:text-white text-sm">{messages.info.hours.title}</p>
+                  <p className="text-slate-600 dark:text-slate-300 text-sm">{messages.info.hours.line1}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{messages.info.hours.line2}</p>
                 </div>
               </div>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-slate-900 dark:text-white mb-3">Follow Us</p>
+              <p className="text-sm font-medium text-slate-900 dark:text-white mb-3">{messages.info.follow}</p>
               <div className="flex gap-3">
                 <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-500/10 transition-all">
                   <Instagram size={18} />
@@ -182,18 +188,23 @@ function ContactSection() {
               </div>
             </div>
           </div>
+
           <div className="lg:col-span-3">
             <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Tell Us What You Need</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Share a few details and we&apos;ll reply with the best next step. If you prefer, you can continue on WhatsApp afterward.</p>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{messages.form.title}</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{messages.form.description}</p>
 
               {submitted ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-green-100 dark:bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <CheckCircle size={32} className="text-green-500" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{submissionResult === "saved" ? "Thanks, we've got your details" : "Your WhatsApp message is ready"}</h4>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">{submissionResult === "saved" ? "We'll review your inquiry and follow up using the details you shared." : "We opened WhatsApp with your details. Review the draft there and send it when you're ready."}</p>
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                    {submissionResult === "saved" ? messages.form.savedTitle : messages.form.waTitle}
+                  </h4>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">
+                    {submissionResult === "saved" ? messages.form.savedDescription : messages.form.waDescription}
+                  </p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <a
                       href={whatsAppUrl || getWhatsAppLink()}
@@ -201,7 +212,7 @@ function ContactSection() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300"
                     >
-                      <MessageCircle size={16} /> {submissionResult === "saved" ? "Continue on WhatsApp" : "Open WhatsApp Again"}
+                      <MessageCircle size={16} /> {submissionResult === "saved" ? messages.form.continueWhatsapp : messages.form.openWhatsappAgain}
                     </a>
                     <button
                       type="button"
@@ -212,7 +223,7 @@ function ContactSection() {
                       }}
                       className="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600"
                     >
-                      {submissionResult === "saved" ? "Send Another Inquiry" : "Edit Inquiry"}
+                      {submissionResult === "saved" ? messages.form.sendAnother : messages.form.editInquiry}
                     </button>
                   </div>
                 </div>
@@ -220,62 +231,57 @@ function ContactSection() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Your Name *</label>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.form.labels.name}</label>
                       <input
                         type="text"
                         required
                         value={formState.name}
                         onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                        placeholder="John Doe"
+                        placeholder={messages.form.placeholders.name}
                         className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Phone Number *</label>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.form.labels.phone}</label>
                       <input
                         type="tel"
                         required
                         value={formState.phone}
                         onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
-                        placeholder="e.g. 98XXXXXXXX"
+                        placeholder={messages.form.placeholders.phone}
                         className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Email</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.form.labels.email}</label>
                     <input
                       type="email"
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                      placeholder="you@example.com"
+                      placeholder={messages.form.placeholders.email}
                       className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
                     />
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Service Required *</label>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.form.labels.service}</label>
                       <select
                         required
                         value={formState.service}
                         onChange={(e) => setFormState({ ...formState, service: e.target.value })}
                         className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm appearance-none"
                       >
-                        <option value="">Select a service</option>
-                        <option value="Wedding Photography">Wedding Photography</option>
-                        <option value="Pre-Wedding Shoot">Pre-Wedding Shoot</option>
-                        <option value="Baby/Newborn Shoot">Baby/Newborn Shoot</option>
-                        <option value="Birthday Photography">Birthday Photography</option>
-                        <option value="Event Photography">Event Photography</option>
-                        <option value="Videography">Videography</option>
-                        <option value="Corporate Photography">Corporate Photography</option>
-                        <option value="Other">Other</option>
+                        <option value="">{messages.form.serviceSelectPlaceholder}</option>
+                        {messages.form.serviceOptions.map((option) => (
+                          <option key={option} value={option}>{option}</option>
+                        ))}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Event Date</label>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.form.labels.date}</label>
                       <input
                         type="date"
                         value={formState.date}
@@ -286,12 +292,12 @@ function ContactSection() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Message</label>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.form.labels.message}</label>
                     <textarea
                       rows={4}
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
-                      placeholder="Tell us about your event, requirements, budget, or any questions..."
+                      placeholder={messages.form.placeholders.message}
                       className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm resize-none"
                     />
                   </div>
@@ -301,23 +307,51 @@ function ContactSection() {
                     disabled={isSubmitting}
                     className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5"
                   >
-                    <Send size={16} /> {isSubmitting ? "Sending..." : "Send Inquiry"}
+                    <Send size={16} /> {isSubmitting ? messages.form.sending : messages.form.send}
                   </button>
 
                   <p className="text-xs text-slate-400 dark:text-slate-500 text-center">
-                    Prefer WhatsApp? You can continue there after this step.
+                    {messages.form.helper}
                   </p>
                 </form>
               )}
             </div>
           </div>
         </div>
+
+        <section className="pt-16">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+                {messages.faq.title}
+              </h2>
+            </div>
+
+            <div className="space-y-3">
+              {messages.faq.items.map((faq, index) => (
+                <div key={index} className="bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                  <button
+                    onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                    className="w-full flex items-center justify-between p-5 text-left"
+                  >
+                    <span className="text-slate-900 dark:text-white font-medium pr-4 text-sm">{faq.q}</span>
+                    <ChevronDown size={16} className={`text-slate-400 flex-shrink-0 transition-transform duration-300 ${openFaqIndex === index ? "rotate-180" : ""}`} />
+                  </button>
+                  <div className={`overflow-hidden transition-all duration-300 ${openFaqIndex === index ? "max-h-32 opacity-100" : "max-h-0 opacity-0"}`}>
+                    <p className="px-5 pb-5 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+                      {faq.a}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     </section>
   )
 }
 
-// ============ MAP SECTION ============
 function MapSection() {
   const { ref, isVisible } = useScrollReveal()
   return (
@@ -340,57 +374,15 @@ function MapSection() {
   )
 }
 
-// ============ FAQ ============
-function ContactFAQ() {
-  const { ref, isVisible } = useScrollReveal()
-  const faqs = [
-    { q: "How quickly do you respond?", a: "We review saved inquiries during working hours and usually reply the same day. WhatsApp is the fastest follow-up channel." },
-    { q: "How do I book a date?", a: "Submit the booking form or contact form first. Once we confirm availability, pay the required advance to lock your date." },
-    { q: "Do you travel outside Bangalore?", a: "Yes! We cover events across India. Travel and accommodation charges apply for outstation bookings." },
-    { q: "Can I visit your studio?", a: "We operate as a mobile studio with on-location shoots. For baby/newborn shoots, we come to your home or can arrange a studio setup." },
-  ]
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
-
-  return (
-    <section ref={ref} className={`py-16 bg-white dark:bg-slate-950 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-            Quick Answers
-          </h2>
-        </div>
-
-        <div className="space-y-3">
-          {faqs.map((faq, i) => (
-            <div key={i} className="bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
-              <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex items-center justify-between p-5 text-left"
-              >
-                <span className="text-slate-900 dark:text-white font-medium pr-4 text-sm">{faq.q}</span>
-                <svg className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform duration-300 ${openIndex === i ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-              </button>
-              <div className={`overflow-hidden transition-all duration-300 ${openIndex === i ? "max-h-32 opacity-100" : "max-h-0 opacity-0"}`}>
-                <p className="px-5 pb-5 text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                  {faq.a}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-
 export default function ContactPage() {
+  const locale = useCurrentLocale()
+  const messages = getPageMessages(locale).contactPage
+
   return (
     <main>
-      <ContactHero />
-      <ContactSection />
+      <ContactHero messages={messages} />
+      <ContactSection messages={messages} />
       <MapSection />
-      <ContactFAQ />
     </main>
   )
 }

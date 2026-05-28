@@ -29,6 +29,10 @@ import {
   Calendar,
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { useCurrentLocale } from "@/hooks/use-current-locale"
+import { getPageMessages } from "@/lib/i18n/pages"
+import { applyTemplate } from "@/lib/i18n/home"
+import { withLocalePathname } from "@/lib/i18n/routing"
 
 // ============ DATA ============
 
@@ -85,9 +89,11 @@ function sanitizeLabel(value: string | null, fallback: string) {
   return trimmed.length > 0 ? trimmed.slice(0, 120) : fallback
 }
 
-function getServicePrefill(serviceSlug: string, serviceName: string): ServicePrefillPreset | null {
+type PricingMessages = ReturnType<typeof getPageMessages>["pricingPage"]
+
+function getServicePrefill(serviceSlug: string, serviceName: string, messages: PricingMessages): ServicePrefillPreset | null {
   const lookup = `${serviceSlug} ${serviceName}`.toLowerCase()
-  const label = `Suggested setup for ${serviceName}`
+  const label = applyTemplate(messages.handoff.suggestedSetup, { service: serviceName })
 
   if (lookup.includes("pre-wedding") || lookup.includes("post-wedding") || lookup.includes("engagement") || lookup.includes("anniversary")) {
     return {
@@ -171,11 +177,11 @@ function getServicePrefill(serviceSlug: string, serviceName: string): ServicePre
   return null
 }
 
-function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): PricingHandoffContext | null {
+function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>, messages: PricingMessages): PricingHandoffContext | null {
   const from = searchParams.get("from")
   if (!from) return null
 
-  const sourceLabel = sanitizeLabel(searchParams.get("source"), "your previous page")
+  const sourceLabel = sanitizeLabel(searchParams.get("source"), messages.handoff.defaultSource)
   const intent = searchParams.get("intent") || "availability"
   const packageName = searchParams.get("package")
   const templateName = searchParams.get("template")
@@ -192,7 +198,7 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): Pr
       sourceLabel,
       scrollToBuilder: false,
     }
-    prefillLabel = `${packageName} package selected`
+    prefillLabel = applyTemplate(messages.handoff.packageSelected, { name: packageName })
   } else if (templateName && templateName in eventTemplates) {
     prefill = {
       key: `template:${templateName}`,
@@ -201,7 +207,7 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): Pr
       sourceLabel,
       scrollToBuilder: false,
     }
-    prefillLabel = `${templateName} selected`
+    prefillLabel = applyTemplate(messages.handoff.templateSelected, { name: templateName })
   } else if (serviceSlug) {
     prefill = {
       key: `service:${serviceSlug}:${sourceLabel}`,
@@ -211,22 +217,22 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): Pr
       sourceLabel,
       scrollToBuilder: false,
     }
-    const servicePreset = getServicePrefill(serviceSlug, sourceLabel)
+    const servicePreset = getServicePrefill(serviceSlug, sourceLabel, messages)
     if (servicePreset) prefillLabel = servicePreset.label
   }
 
   const descriptions: Record<string, string> = {
-    booking: "Compare packages first or jump straight into the builder. Nothing is locked in until you send your request.",
-    availability: "This page helps you compare options clearly before you move ahead with booking or availability.",
-    "custom-package": "Your custom package builder is ready below. Start with the suggestion and change anything you want.",
-    style: "We turned that reference into a practical starting point so you can price it properly and adjust it your way.",
-    quote: "Shape the package here first, then check availability when you feel happy with the setup.",
+    booking: messages.handoff.descriptionBooking,
+    availability: messages.handoff.descriptionAvailability,
+    "custom-package": messages.handoff.descriptionCustom,
+    style: messages.handoff.descriptionStyle,
+    quote: messages.handoff.descriptionQuote,
   }
 
   return {
     from,
     sourceLabel,
-    headline: prefill ? "A suggested starting point is ready" : "Choose how you want to start",
+    headline: prefill ? messages.handoff.headlineReady : messages.handoff.headlineChoose,
     description: descriptions[intent] || descriptions.availability,
     prefillLabel: prefillLabel || undefined,
     prefill,
@@ -234,7 +240,7 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): Pr
   }
 }
 
-function PricingHandoffBanner({ handoff }: { handoff: PricingHandoffContext }) {
+function PricingHandoffBanner({ handoff, messages }: { handoff: PricingHandoffContext; messages: PricingMessages }) {
   return (
     <section className="pt-2 pb-10 md:pt-14 md:pb-14 bg-white dark:bg-slate-950">
       <div className="max-w-4xl mx-auto px-6">
@@ -242,7 +248,7 @@ function PricingHandoffBanner({ handoff }: { handoff: PricingHandoffContext }) {
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
               <MapPin size={12} />
-              Based on {handoff.sourceLabel}
+              {applyTemplate(messages.handoff.basedOn, { source: handoff.sourceLabel })}
             </span>
             {handoff.prefillLabel && (
               <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20">
@@ -258,13 +264,13 @@ function PricingHandoffBanner({ handoff }: { handoff: PricingHandoffContext }) {
               href="#calculator"
               className="inline-flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:opacity-90"
             >
-              Jump to Builder <ArrowRight size={15} />
+              {messages.handoff.jumpToBuilder} <ArrowRight size={15} />
             </a>
             <a
               href="#packages"
               className="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600"
             >
-              See Packages First
+              {messages.handoff.seePackagesFirst}
             </a>
           </div>
         </div>
@@ -274,7 +280,7 @@ function PricingHandoffBanner({ handoff }: { handoff: PricingHandoffContext }) {
 }
 
 // ============ HERO ============
-function PricingHero({ handoff }: { handoff?: PricingHandoffContext | null }) {
+function PricingHero({ messages }: { messages: PricingMessages }) {
   const { ref, isVisible } = useScrollReveal()
 
   return (
@@ -284,28 +290,28 @@ function PricingHero({ handoff }: { handoff?: PricingHandoffContext | null }) {
       <div ref={ref} className={`max-w-3xl mx-auto px-6 text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <div className="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-500/8 border border-amber-200 dark:border-amber-500/15 rounded-full px-5 py-2.5 mb-8">
           <Shield size={14} className="text-amber-500 dark:text-amber-400" />
-          <span className="text-amber-700 dark:text-amber-300/90 text-sm font-medium tracking-wide">All prices GST-inclusive &mdash; zero hidden charges</span>
+          <span className="text-amber-700 dark:text-amber-300/90 text-sm font-medium tracking-wide">{messages.hero.tagline}</span>
         </div>
 
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-slate-900 dark:text-white leading-[1.1] mb-6 tracking-tight">
-          Transparent{" "}
+          {messages.hero.titlePrefix}{" "}
           <span className="bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-400 dark:to-amber-500 bg-clip-text text-transparent">
-            Pricing
+            {messages.hero.titleHighlight}
           </span>
         </h1>
 
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-xl mx-auto mb-10 leading-relaxed">
-          See clear pricing upfront, compare coverage options, and choose what fits your event before you send a request.
+          {messages.hero.description}
         </p>
 
         <div className="max-w-2xl mx-auto rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 px-5 py-4 mb-8 shadow-sm">
           <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-            Start with a package or build your own. You can adjust everything before booking.
+            {messages.hero.subDescription}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-3 justify-center">
-          {["GST Included", "No Hidden Fees", "You Own Copyright", "5-Day Delivery"].map((tag) => (
+          {messages.hero.trustTags.map((tag) => (
             <span key={tag} className="flex items-center gap-2 text-slate-600 dark:text-slate-300 text-sm">
               <CheckCircle2 size={14} className="text-emerald-500 dark:text-emerald-400/80" />
               {tag}
@@ -318,19 +324,19 @@ function PricingHero({ handoff }: { handoff?: PricingHandoffContext | null }) {
 }
 
 // ============ PACKAGES SECTION ============
-function PackagesSection({ onCustomize }: { onCustomize?: (packageName: string) => void }) {
+function PackagesSection({ onCustomize, messages }: { onCustomize?: (packageName: string) => void; messages: PricingMessages }) {
   const { ref, isVisible } = useScrollReveal()
 
   return (
     <section id="packages" className="py-24 md:py-32 bg-white dark:bg-slate-950 transition-colors">
       <div ref={ref} className="max-w-6xl mx-auto px-6">
         <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">Package Starting Points</p>
+          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">{messages.packagesSection.badge}</p>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Event Packages
+            {messages.packagesSection.title}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-4 max-w-md mx-auto">
-            Pick the closest fit, then customize coverage, team, and extras in the builder below.
+            {messages.packagesSection.description}
           </p>
         </div>
 
@@ -349,7 +355,7 @@ function PackagesSection({ onCustomize }: { onCustomize?: (packageName: string) 
                 {pkg.popular && (
                   <div className="absolute -top-3 left-6">
                     <span className="bg-amber-500 text-slate-900 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                      Most Popular
+                      {messages.packagesSection.mostPopular}
                     </span>
                   </div>
                 )}
@@ -369,9 +375,9 @@ function PackagesSection({ onCustomize }: { onCustomize?: (packageName: string) 
                       <span className="text-3xl font-bold text-slate-900 dark:text-white">
                         &#8377;{pkg.price.toLocaleString("en-IN")}
                       </span>
-                      <span className="text-sm text-slate-500">onwards</span>
+                      <span className="text-sm text-slate-500">{messages.packagesSection.onwards}</span>
                     </div>
-                    <p className="text-xs text-slate-400 dark:text-slate-600 mt-1">GST inclusive</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-600 mt-1">{messages.packagesSection.gstInclusive}</p>
                   </div>
 
                   <ul className="space-y-3 mb-8">
@@ -525,7 +531,17 @@ function generateEventId() {
 }
 
 // ============ INTERACTIVE PRICE CALCULATOR ============
-function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest | null; handoff?: PricingHandoffContext | null }) {
+function PriceCalculator({
+  prefill,
+  handoff,
+  locale,
+  messages,
+}: {
+  prefill?: BuilderPrefillRequest | null
+  handoff?: PricingHandoffContext | null
+  locale: ReturnType<typeof useCurrentLocale>
+  messages: PricingMessages
+}) {
   const { ref, isVisible } = useScrollReveal()
   const router = useRouter()
   const [events, setEvents] = useState<EventBlock[]>([])
@@ -587,11 +603,11 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
     }
 
     if (prefill.type === "service") {
-      const servicePreset = getServicePrefill(prefill.serviceSlug, prefill.serviceName)
+      const servicePreset = getServicePrefill(prefill.serviceSlug, prefill.serviceName, messages)
       if (!servicePreset) return
       applyEventPresets(servicePreset.events, servicePreset.globalAddOns, null, prefill.scrollToBuilder)
     }
-  }, [prefill])
+  }, [prefill, messages])
 
   const addEvent = (name: string) => {
     const newEvent: EventBlock = {
@@ -827,7 +843,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem(BOOKING_PLAN_STORAGE_KEY, JSON.stringify(plan))
     }
-    router.push("/book")
+    router.push(withLocalePathname("/book", locale))
   }
 
   const handleSendEstimate = () => {
@@ -843,19 +859,19 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
 
       <div ref={ref} className="max-w-6xl mx-auto px-6 relative">
         <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">Custom Package Builder</p>
+          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">{messages.builder.badge}</p>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Build Your Package
+            {messages.builder.title}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-4 max-w-lg mx-auto">
             Pick your event type below — we&apos;ll suggest the right team. Add or remove anything you want.
           </p>
           {handoff && (
             <div className="mt-6 max-w-2xl mx-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-5 py-4 text-left shadow-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-400 mb-2">Suggested setup</p>
-              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">We added a suggested setup based on {handoff.sourceLabel}. Review it below and change anything you want.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-400 mb-2">{messages.builder.suggestedTitle}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{applyTemplate(messages.builder.suggestedDescription, { source: handoff.sourceLabel })}</p>
               {handoff.prefillLabel && (
-                <p className="mt-2 text-sm font-medium text-emerald-600 dark:text-emerald-300">{handoff.prefillLabel}. Change anything below.</p>
+                <p className="mt-2 text-sm font-medium text-emerald-600 dark:text-emerald-300">{applyTemplate(messages.builder.suggestedLabelSuffix, { label: handoff.prefillLabel })}</p>
               )}
             </div>
           )}
@@ -867,8 +883,8 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
 
             {/* Event Details */}
             <div className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: "100ms" }}>
-              <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Event Details</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">Choose coverage length inside each event card. Exact timing can be finalized during booking.</p>
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">{messages.builder.eventDetailsTitle}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">{messages.builder.eventDetailsHint}</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="relative">
                   <Calendar size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none z-10" />
@@ -887,7 +903,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                     value={eventCity}
                     onChange={(e) => setEventCity(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-amber-500/50 focus:outline-none transition-colors"
-                    placeholder="e.g. Bangalore, Mysore, Mangalore"
+                    placeholder={messages.builder.placeholders.city}
                   />
                 </div>
                 <div className="relative sm:col-span-2">
@@ -897,7 +913,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                     value={venueName}
                     onChange={(e) => setVenueName(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-amber-500/50 focus:outline-none transition-colors"
-                    placeholder="e.g. Rajmahal Convention, Taj West End"
+                    placeholder={messages.builder.placeholders.venue}
                   />
                 </div>
               </div>
@@ -906,9 +922,9 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
             {/* Step 1: Add Events */}
             <div className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: "200ms" }}>
               <div className="flex items-baseline justify-between mb-4">
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Your Events</p>
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{messages.builder.yourEvents}</p>
                 {events.length > 0 && (
-                  <span className="text-xs text-slate-400 dark:text-slate-500">{events.length} event{events.length > 1 ? "s" : ""}</span>
+                  <span className="text-xs text-slate-400 dark:text-slate-500">{applyTemplate(messages.builder.eventCount, { count: String(events.length) })}</span>
                 )}
               </div>
 
@@ -919,11 +935,11 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                   className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800/60 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 hover:border-amber-400 dark:hover:border-amber-500/30 hover:text-amber-600 dark:hover:text-amber-400 transition-all"
                 >
                   <Sparkles size={14} />
-                  {events.length > 0 ? "Change Event Type" : "Pick Your Event Type"}
+                  {events.length > 0 ? messages.builder.changeEventType : messages.builder.pickEventType}
                   <ChevronDown size={12} className={`transition-transform ${showTemplates ? "rotate-180" : ""}`} />
                 </button>
                 {events.length > 0 && (
-                  <span className="ml-3 text-[11px] text-slate-400 dark:text-slate-500">Replaces current selection</span>
+                  <span className="ml-3 text-[11px] text-slate-400 dark:text-slate-500">{messages.builder.replaceSelectionHint}</span>
                 )}
 
                 {showTemplates && (
@@ -935,7 +951,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                         className="px-3.5 py-2.5 rounded-lg text-left bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 hover:border-amber-400 dark:hover:border-amber-500/30 hover:text-amber-600 dark:hover:text-amber-400 transition-all"
                       >
                         <span className="text-xs font-medium block">{template}</span>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500">{presets.length} event{presets.length > 1 ? "s" : ""} · pre-filled</span>
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">{applyTemplate(messages.builder.templateCount, { count: String(presets.length) })}</span>
                       </button>
                     ))}
                   </div>
@@ -944,11 +960,11 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
 
               {/* Add custom event */}
               <button
-                onClick={() => addEvent("New Event")}
+                onClick={() => addEvent(messages.builder.newEventName)}
                 className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-amber-400 dark:hover:border-amber-500/40 hover:text-amber-600 dark:hover:text-amber-400 transition-all text-sm font-medium"
               >
                 <Plus size={14} />
-                Add Event / Day
+                {messages.builder.addEventDay}
               </button>
             </div>
 
@@ -974,8 +990,8 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                           <div className="flex-1 min-w-0 text-left">
                             <span className="text-sm font-medium text-slate-900 dark:text-white block truncate">{event.name}</span>
                             <span className="text-xs text-slate-500">
-                              {event.duration} · {serviceCount > 0 ? `${serviceCount} service${serviceCount > 1 ? "s" : ""}` : "No services yet"}
-                              {eventPrice > 0 && ` · ₹${(eventPrice / 1000).toFixed(0)}K`}
+                              {event.duration} - {serviceCount > 0 ? applyTemplate(messages.builder.servicesCount, { count: String(serviceCount) }) : messages.builder.noServicesYet}
+                              {eventPrice > 0 && ` - Rs.${(eventPrice / 1000).toFixed(0)}K`}
                             </span>
                           </div>
                           <ChevronDown size={14} className={`text-slate-400 dark:text-slate-500 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
@@ -998,16 +1014,16 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                               value={event.name}
                               onChange={(e) => updateEventName(event.id, e.target.value)}
                               className="w-full flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-800/40 text-sm text-slate-900 dark:text-white focus:border-amber-500/50 focus:outline-none transition-colors"
-                              placeholder="e.g. Reception, Haldi, Sangeeth..."
+                              placeholder={messages.builder.placeholders.eventName}
                             />
                             <div className="w-full sm:w-auto">
-                              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Coverage</p>
+                              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">{messages.builder.coverage}</p>
                               <div className="grid w-full grid-cols-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700/60 sm:flex sm:w-auto sm:min-w-[220px]">
-                                {(["Half Day", "Full Day"] as const).map((d) => (
+                                {([messages.builder.halfDay, messages.builder.fullDay] as const).map((d, index) => (
                                   <button
                                     key={d}
-                                    onClick={() => updateEventDuration(event.id, d)}
-                                    className={`px-3.5 py-2.5 text-xs font-medium transition-colors sm:min-w-[110px] ${event.duration === d
+                                    onClick={() => updateEventDuration(event.id, index === 0 ? "Half Day" : "Full Day")}
+                                    className={`px-3.5 py-2.5 text-xs font-medium transition-colors sm:min-w-[110px] ${event.duration === (index === 0 ? "Half Day" : "Full Day")
                                         ? "bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400"
                                         : "bg-slate-50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
                                       }`}
@@ -1021,7 +1037,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
 
                           {/* Services */}
                           <div>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Photography & Video Team</p>
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">{messages.builder.servicesTitle}</p>
                             <p className="text-[11px] text-slate-400 dark:text-slate-500 mb-3">Add or remove — we&apos;ve suggested what works best</p>
                             <div className="space-y-2">
                               {serviceRates.map((service) => {
@@ -1043,7 +1059,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                                     <div className="flex-1 min-w-0">
                                       <span className={`text-sm font-medium block ${qty > 0 ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}>
                                         {service.name}
-                                        {service.premium && <span className="ml-1.5 text-[10px] text-amber-500 dark:text-amber-400/70 font-normal">Premium</span>}
+                                        {service.premium && <span className="ml-1.5 text-[10px] text-amber-500 dark:text-amber-400/70 font-normal">{messages.builder.premium}</span>}
                                         {qty > 0 && <span className="ml-1.5 text-[10px] text-emerald-500 dark:text-emerald-400/80 font-normal">✓ Added</span>}
                                       </span>
                                       <span className="text-[11px] text-slate-400 dark:text-slate-500 block">{service.description}</span>
@@ -1074,7 +1090,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
 
                           {/* Event-specific add-ons */}
                           <div>
-                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">Extras</p>
+                            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">{messages.builder.extrasTitle}</p>
                             <div className="flex flex-wrap gap-2">
                               {eventAddOns.map((addon) => {
                                 const qty = event.addOns[addon.id] || 0
@@ -1108,8 +1124,8 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
             {/* Global Add-ons */}
             {events.length > 0 && (
               <div className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: "400ms" }}>
-                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Albums & Extras</p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">These apply to your overall package</p>
+                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{messages.builder.globalExtrasTitle}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">{messages.builder.globalExtrasHint}</p>
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden divide-y divide-slate-100 dark:divide-slate-800/60">
                   {globalAddOns.map((addon) => {
                     const Icon = addon.icon
@@ -1124,7 +1140,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                         <div className="flex-1 min-w-0">
                           <span className={`text-sm font-medium block ${isSelected ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}>
                             {addon.name}
-                            {addon.premium && <span className="ml-1.5 text-[10px] text-amber-500 dark:text-amber-400/70 font-normal">Premium</span>}
+                            {addon.premium && <span className="ml-1.5 text-[10px] text-amber-500 dark:text-amber-400/70 font-normal">{messages.builder.premium}</span>}
                           </span>
                           <span className="text-[11px] text-slate-400 dark:text-slate-500">{addon.description} · ₹{(addon.price / 1000).toFixed(0)}K</span>
                         </div>
@@ -1157,21 +1173,21 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
           <div className="lg:col-span-1" ref={summaryRef}>
             <div className={`sticky top-28 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: "300ms" }}>
               <div className="bg-white dark:bg-slate-900 rounded-2xl p-7 border border-slate-200 dark:border-slate-800">
-                <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-6">Your Package</h3>
+                <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-6">{messages.builder.summaryTitle}</h3>
 
                 {!hasContent ? (
                   <div className="text-center py-12">
                     <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
                       <Camera size={20} className="text-slate-400 dark:text-slate-600" />
                     </div>
-                    <p className="text-slate-500 text-sm">Add events to see your estimate</p>
-                    <p className="text-slate-400 dark:text-slate-600 text-xs mt-2">Use a template or add events one by one</p>
+                    <p className="text-slate-500 text-sm">{messages.builder.emptySummaryTitle}</p>
+                    <p className="text-slate-400 dark:text-slate-600 text-xs mt-2">{messages.builder.emptySummaryHint}</p>
                   </div>
                 ) : (
                   <>
                     {/* Events breakdown */}
                     <div className="space-y-2.5 mb-6">
-                      <p className="text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-widest font-medium">{events.length} Event{events.length > 1 ? "s" : ""}</p>
+                      <p className="text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-widest font-medium">{applyTemplate(messages.builder.summaryEventCount, { count: String(events.length) })}</p>
                       {events.map((event) => {
                         const price = getEventPrice(event)
                         return (
@@ -1199,7 +1215,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                     {/* Global Add-ons in summary */}
                     {Object.keys(globalAddOnQty).length > 0 && (
                       <div className="space-y-2 mb-6">
-                        <p className="text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-widest font-medium">Extras</p>
+                        <p className="text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-widest font-medium">{messages.builder.summaryExtrasTitle}</p>
                         {Object.entries(globalAddOnQty).map(([id, qty]) => {
                           const addon = globalAddOns.find((a) => a.id === id)
                           if (!addon || qty === 0) return null
@@ -1218,19 +1234,19 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                       {activePackageData && (
                         <div className="flex items-center gap-2 mb-3">
                           <span className="text-[11px] font-bold uppercase tracking-wider bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-lg">
-                            {activePackageData.name} Package
+                            {applyTemplate(messages.builder.packageBadge, { name: activePackageData.name })}
                           </span>
                         </div>
                       )}
                       <div className="flex justify-between items-end">
                         <span className="text-slate-500 dark:text-slate-400 text-sm">
-                          {activePackageData ? "Package Total" : "Estimated Total"}
+                          {activePackageData ? messages.builder.packageTotal : messages.builder.estimatedTotal}
                         </span>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-slate-900 dark:text-white">
                             &#8377;{totalPrice.toLocaleString("en-IN")}
                           </div>
-                          <span className="text-emerald-500 dark:text-emerald-400/70 text-[11px]">GST inclusive</span>
+                          <span className="text-emerald-500 dark:text-emerald-400/70 text-[11px]">{messages.builder.gstInclusive}</span>
                         </div>
                       </div>
                       {activePackageData && (
@@ -1244,7 +1260,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
 
                     {/* CTA Buttons */}
                     {!hasConfiguredEvents && (
-                      <p className="text-center text-slate-400 dark:text-slate-600 text-xs mb-4">Add services to at least one event to get started</p>
+                      <p className="text-center text-slate-400 dark:text-slate-600 text-xs mb-4">{messages.builder.addServiceHint}</p>
                     )}
                     <div className="space-y-3">
                       <button
@@ -1256,7 +1272,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                           }`}
                         disabled={!hasConfiguredEvents}
                       >
-                        Proceed to Book
+                        {messages.builder.proceedToBook}
                         <ArrowRight size={13} />
                       </button>
                       <button
@@ -1268,18 +1284,18 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                           }`}
                       >
                         <MessageCircle size={14} />
-                        {isSubmitting ? "Opening WhatsApp..." : "Send Estimate on WhatsApp"}
+                        {isSubmitting ? messages.builder.openingWhatsapp : messages.builder.sendEstimate}
                       </button>
-                      <p className="text-center text-slate-400 dark:text-slate-600 text-[10px]">Estimate is for sharing / discussion only. Book when you&apos;re ready.</p>
+                      <p className="text-center text-slate-400 dark:text-slate-600 text-[10px]">{messages.builder.estimateNote}</p>
                     </div>
 
                     {/* Trust signals */}
                     <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 space-y-2.5">
                       {[
-                        { icon: Shield, text: "No hidden charges" },
-                        { icon: Clock, text: "5-day delivery guarantee" },
-                        { icon: CheckCircle2, text: "100% copyright yours" },
-                        { icon: Star, text: "Backup equipment on-site" },
+                        { icon: Shield, text: messages.builder.trustSignals[0] },
+                        { icon: Clock, text: messages.builder.trustSignals[1] },
+                        { icon: CheckCircle2, text: messages.builder.trustSignals[2] },
+                        { icon: Star, text: messages.builder.trustSignals[3] },
                       ].map(({ icon: Icon, text }) => (
                         <div key={text} className="flex items-center gap-2.5 text-slate-500 text-xs">
                           <Icon size={12} className="text-emerald-500 dark:text-emerald-500/60" />
@@ -1352,7 +1368,7 @@ function ComparisonSection() {
 }
 
 // ============ CTA ============
-function PricingCTA() {
+function PricingCTA({ locale, messages }: { locale: ReturnType<typeof useCurrentLocale>; messages: PricingMessages }) {
   const { ref, isVisible } = useScrollReveal()
 
   return (
@@ -1363,29 +1379,29 @@ function PricingCTA() {
       <div className="relative max-w-2xl mx-auto px-6 text-center">
         <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-4 py-2 mb-8">
           <div className="w-1.5 h-1.5 bg-red-400 rounded-full animate-pulse" />
-          <span className="text-white/80 text-sm">Peak season weekends filling fast</span>
+          <span className="text-white/80 text-sm">{messages.cta.urgency}</span>
         </div>
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-5 tracking-tight">
-          Lock In Your Date
+          {messages.cta.title}
         </h2>
         <p className="text-amber-100/80 text-lg mb-10 max-w-md mx-auto">
-          Explore the options above, shape your package, and book only when it feels right.
+          {messages.cta.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="/pricing#calculator"
+            href={`${withLocalePathname("/pricing", locale)}#calculator`}
             className="inline-flex items-center justify-center gap-2 bg-white text-amber-700 hover:bg-slate-900 hover:text-white px-8 py-4 rounded-xl font-bold transition-all duration-300"
           >
-            Build Package to Book
+            {messages.cta.build}
           </a>
           <a
-            href={getWhatsAppLink("Hi Orvex, I'd like to discuss my event requirements")}
+            href={getWhatsAppLink(messages.cta.whatsappTemplate)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center border-2 border-white/30 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-xl font-bold transition-all duration-300"
           >
             <MessageCircle size={18} />
-            Chat With Us
+            {messages.cta.chat}
           </a>
         </div>
       </div>
@@ -1395,8 +1411,10 @@ function PricingCTA() {
 
 // ============ MAIN ============
 export default function PricingPage() {
+  const locale = useCurrentLocale()
+  const messages = getPageMessages(locale).pricingPage
   const searchParams = useSearchParams()
-  const handoff = getPricingHandoff(searchParams)
+  const handoff = getPricingHandoff(searchParams, messages)
   const [prefillRequest, setPrefillRequest] = useState<BuilderPrefillRequest | null>(handoff?.prefill || null)
 
   useEffect(() => {
@@ -1405,22 +1423,23 @@ export default function PricingPage() {
 
   return (
     <main>
-      <PricingHero handoff={handoff} />
-      {handoff && <PricingHandoffBanner handoff={handoff} />}
+      <PricingHero messages={messages} />
+      {handoff && <PricingHandoffBanner handoff={handoff} messages={messages} />}
       <PackagesSection
+        messages={messages}
         onCustomize={(pkg) =>
           setPrefillRequest({
             key: `manual-package:${pkg}:${Date.now()}`,
             type: "package",
             packageName: pkg,
-            sourceLabel: "Pricing Packages",
+            sourceLabel: messages.packagesSection.title,
             scrollToBuilder: true,
           })
         }
       />
-      <PriceCalculator prefill={prefillRequest} handoff={handoff} />
+      <PriceCalculator prefill={prefillRequest} handoff={handoff} locale={locale} messages={messages} />
       <ComparisonSection />
-      <PricingCTA />
+      <PricingCTA locale={locale} messages={messages} />
     </main>
   )
 }

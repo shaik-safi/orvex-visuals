@@ -1,0 +1,47 @@
+{
+  "navbar": {
+    "home": "Home",
+    "services": "Services",
+    "whyUs": "Why Us",
+    "gallery": "Gallery",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "contact": "Contact",
+    "blog": "Blog",
+    "about": "About",
+    "bookNow": "Book Now",
+    "themeToggle": "Toggle theme",
+    "openMenu": "Open navigation menu",
+    "closeMenu": "Close navigation menu"
+  },
+  "footer": {
+    "brandLine1": "Premium photography and videography coordination in Bangalore.",
+    "brandLine2": "Your moments, beautifully captured.",
+    "servicesTitle": "Services",
+    "quickLinksTitle": "Quick Links",
+    "contactTitle": "Contact",
+    "location": "Bangalore, Karnataka",
+    "copyright": "(c) 2026 Orvex Visuals. All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "instagramAria": "Visit Orvex Visuals on Instagram",
+    "facebookAria": "Visit Orvex Visuals on Facebook",
+    "serviceLinks": {
+      "wedding": "Wedding Photography",
+      "preWedding": "Pre-Wedding Shoot",
+      "baby": "Baby Photoshoot",
+      "event": "Event Photography",
+      "drone": "Drone Photography"
+    },
+    "quickLinks": {
+      "pricing": "Pricing",
+      "gallery": "Gallery",
+      "blog": "Blog",
+      "about": "About Us",
+      "faqs": "FAQs"
+    }
+  },
+  "floatingWhatsapp": {
+    "ariaLabel": "Chat on WhatsApp"
+  }
+}

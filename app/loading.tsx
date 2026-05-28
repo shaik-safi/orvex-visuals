@@ -1,4 +1,10 @@
-export default function Loading() {
+import { getPageMessages } from "@/lib/i18n/pages"
+import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
+
+export default async function Loading() {
+  const locale = await resolveRequestLocale()
+  const message = getPageMessages(locale).system.loading
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
       <div className="flex flex-col items-center gap-4">
@@ -6,7 +12,7 @@ export default function Loading() {
           <div className="absolute inset-0 rounded-full border-2 border-slate-200 dark:border-slate-800" />
           <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-amber-500 animate-spin" />
         </div>
-        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Just a moment...</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{message}</p>
       </div>
     </div>
   )
