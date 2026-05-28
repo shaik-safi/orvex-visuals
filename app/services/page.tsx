@@ -10,6 +10,8 @@ import {
   Star,
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getWhatsAppLink } from "@/lib/constants"
+import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 import { categories, services, type Category } from "./data"
 
 // ============ HERO ============
@@ -194,19 +196,21 @@ function ServicesCTA() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/pricing#calculator"
+            href={buildPricingHandoffHref({ from: "services", intent: "custom-package" })}
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            <MessageCircle size={20} />
             Build Custom Package
+            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </Link>
-          <Link
-            href="/pricing"
+          <a
+            href={getWhatsAppLink("Hi Orvex, I need help choosing the right photography package for my event.")}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            Start Booking
-            <ArrowRight size={18} />
-          </Link>
+            <MessageCircle size={20} />
+            Talk Through My Options
+          </a>
         </div>
       </div>
     </section>

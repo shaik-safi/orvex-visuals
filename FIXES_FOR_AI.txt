@@ -1,0 +1,1288 @@
+================================================================================
+ORVEX VISUALS — PHASE 1 CTA REBALANCE (Feed this file to an AI to apply changes)
+================================================================================
+
+PROJECT ROOT:
+  <your-machine-path>\orvex-visuals-main
+
+WHAT THIS PHASE DOES:
+  This phase reduces the feeling that every button sends the user to the same
+  pricing page.
+
+  The rule for this phase is:
+    - keep one strong pricing CTA per CTA block
+    - make the second CTA exploratory or conversational
+
+  This phase is intentionally LOW RISK.
+  Do NOT change pricing logic, booking logic, sessionStorage logic, API logic,
+  Firestore logic, forms, or schemas.
+
+IMPORTANT RULES FOR THE AI APPLYING THESE FIXES:
+  1. Read each file before editing it.
+  2. Apply every fix exactly as shown — do not rename, reformat, or refactor anything else.
+  3. All file paths below are relative to the project root.
+  4. Where you see OLD CODE / NEW CODE blocks, replace the OLD with the NEW.
+     Match whitespace and indentation exactly.
+  5. Do not create any new markdown or documentation files.
+  6. Do not edit app/pricing/page.tsx or app/book/page.tsx in this phase.
+  7. Do not change About page CTA logic, Contact page CTA logic, or the home CTA banner.
+  8. After all fixes, confirm each file was saved successfully.
+
+FILES TO EDIT IN THIS PHASE:
+  1. components/home/ClientSections.tsx
+  2. app/services/page.tsx
+  3. app/services/[slug]/page.tsx
+  4. app/gallery/page.tsx
+  5. app/blog/[slug]/page.tsx
+
+--------------------------------------------------------------------------------
+FILE 1: components/home/ClientSections.tsx
+GOAL:
+  Keep one strong pricing CTA in the hero and make the second CTA exploratory.
+
+REPLACE THIS OLD CODE:
+
+        <div className="animate-fade-in-up animation-delay-600 flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/pricing"
+            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/30 hover:-translate-y-1"
+          >
+            Check Availability — It&apos;s Free
+            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:-translate-y-1"
+          >
+            See Transparent Pricing
+          </Link>
+        </div>
+
+WITH THIS NEW CODE:
+
+        <div className="animate-fade-in-up animation-delay-600 flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/pricing"
+            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/30 hover:-translate-y-1"
+          >
+            Check Pricing &amp; Availability
+            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link
+            href="/services"
+            className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:-translate-y-1"
+          >
+            Explore Services
+          </Link>
+        </div>
+
+DO NOT CHANGE:
+  The lower CTA banner in this same file already has a healthy split:
+  WhatsApp + pricing. Leave that section alone.
+
+--------------------------------------------------------------------------------
+FILE 2: app/services/page.tsx
+GOAL:
+  Keep one pricing-builder CTA and make the second CTA conversational.
+
+CHANGE IMPORTS:
+
+OLD CODE:
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { categories, services, type Category } from "./data"
+
+NEW CODE:
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getWhatsAppLink } from "@/lib/constants"
+import { categories, services, type Category } from "./data"
+
+REPLACE THIS OLD CODE:
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/pricing#calculator"
+            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            <MessageCircle size={20} />
+            Build Custom Package
+          </Link>
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
+          >
+            Start Booking
+            <ArrowRight size={18} />
+          </Link>
+        </div>
+
+WITH THIS NEW CODE:
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/pricing#calculator"
+            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            Build Custom Package
+            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <a
+            href={getWhatsAppLink("Hi Orvex, I need help choosing the right photography package for my event.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
+          >
+            <MessageCircle size={20} />
+            Talk Through My Options
+          </a>
+        </div>
+
+--------------------------------------------------------------------------------
+FILE 3: app/services/[slug]/page.tsx
+GOAL:
+  Make the service-detail page feel less like it keeps bouncing the user back to the same pricing page.
+  Keep pricing accessible, but turn package-card and secondary CTA actions into conversation actions.
+
+CHANGE IMPORTS:
+
+OLD CODE:
+import {
+  MessageCircle,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  Star,
+  Shield,
+  Clock,
+  MapPin,
+  ChevronDown,
+} from "lucide-react"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getServiceDetail, type ServiceDetail } from "../data"
+import { PHOTO_DELIVERY_DAYS } from "@/lib/constants"
+
+NEW CODE:
+import {
+  MessageCircle,
+  ArrowRight,
+  Check,
+  Star,
+  Shield,
+  Clock,
+  MapPin,
+  ChevronDown,
+} from "lucide-react"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getServiceDetail, type ServiceDetail } from "../data"
+import { PHOTO_DELIVERY_DAYS, getWhatsAppLink } from "@/lib/constants"
+
+REPLACE THIS HERO CTA BLOCK:
+
+OLD CODE:
+        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            <MessageCircle size={18} /> Start Booking
+          </Link>
+          <a
+            href="#packages"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-1"
+          >
+            View Packages <ArrowRight size={16} />
+          </a>
+        </div>
+
+NEW CODE:
+        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            <MessageCircle size={18} /> Check Pricing &amp; Availability
+          </Link>
+          <a
+            href="#packages"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-1"
+          >
+            View Packages <ArrowRight size={16} />
+          </a>
+        </div>
+
+REPLACE EACH PACKAGE BUTTON BLOCK:
+
+OLD CODE:
+              <Link
+                href="/pricing"
+                className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
+                  ? "bg-white text-amber-600 hover:bg-amber-50 shadow-lg"
+                  : "bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20"
+                  }`}
+              >
+                Book {pkg.name}
+              </Link>
+
+NEW CODE:
+              <a
+                href={getWhatsAppLink(`Hi Orvex, I'm interested in the ${pkg.name} package for ${service.name}. Can you guide me on availability and next steps?`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
+                  ? "bg-white text-amber-600 hover:bg-amber-50 shadow-lg"
+                  : "bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20"
+                  }`}
+              >
+                Ask About {pkg.name}
+              </a>
+
+REPLACE THE BOTTOM CTA BLOCK:
+
+OLD CODE:
+        <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
+          Start your booking request and we&apos;ll confirm the right coverage for your event.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            <MessageCircle size={20} /> Start Booking Request
+          </Link>
+          <Link
+            href="/pricing#calculator"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
+          >
+            <ArrowLeft size={18} /> Build Custom Package
+          </Link>
+        </div>
+
+NEW CODE:
+        <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
+          Compare pricing online or talk with us to choose the right coverage for your event.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            <ArrowRight size={20} /> Check Pricing &amp; Availability
+          </Link>
+          <a
+            href={getWhatsAppLink(`Hi Orvex, I'm interested in ${service.name}. Can you help me choose the right coverage?`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
+          >
+            <MessageCircle size={18} /> Talk on WhatsApp
+          </a>
+        </div>
+
+DO NOT CHANGE:
+  Keep the in-page "View Packages" anchor and keep the "Build a Custom Package"
+  text link to /pricing#calculator. Those are still useful and truthful.
+
+--------------------------------------------------------------------------------
+FILE 4: app/gallery/page.tsx
+GOAL:
+  Keep one package-builder CTA and make the second CTA conversational.
+
+CHANGE IMPORTS:
+
+OLD CODE:
+import { useState, useEffect, useCallback } from "react"
+import Image from "next/image"
+import {
+  ArrowRight,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Expand,
+  Camera,
+  MessageCircle,
+} from "lucide-react"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+
+NEW CODE:
+import { useState, useEffect, useCallback } from "react"
+import Link from "next/link"
+import Image from "next/image"
+import {
+  ArrowRight,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Expand,
+  Camera,
+  MessageCircle,
+} from "lucide-react"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getWhatsAppLink } from "@/lib/constants"
+
+REPLACE THIS OLD CTA BLOCK:
+
+        <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
+          Build your package or start a booking request and we&apos;ll tailor the coverage around your event.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            <MessageCircle size={20} /> Start Booking
+          </a>
+          <a
+            href="/pricing#calculator"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
+          >
+            Build a Package <ArrowRight size={18} />
+          </a>
+        </div>
+
+WITH THIS NEW CTA BLOCK:
+
+        <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
+          Build your package online or talk to us about the style you want, and we&apos;ll tailor the coverage around your event.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/pricing#calculator"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            Build a Package <ArrowRight size={18} />
+          </Link>
+          <a
+            href={getWhatsAppLink("Hi Orvex, I like the style on your gallery page. Can you suggest the right package for my event?")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
+          >
+            <MessageCircle size={20} /> Talk About This Style
+          </a>
+        </div>
+
+--------------------------------------------------------------------------------
+FILE 5: app/blog/[slug]/page.tsx
+GOAL:
+  Keep one pricing CTA at the end of each article and add one conversational CTA.
+
+CHANGE IMPORTS:
+
+OLD CODE:
+} from "lucide-react"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getBlogPost, getRelatedPosts, type BlogPost } from "../data"
+
+NEW CODE:
+} from "lucide-react"
+import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getWhatsAppLink } from "@/lib/constants"
+import { getBlogPost, getRelatedPosts, type BlogPost } from "../data"
+
+REPLACE THIS OLD CTA BLOCK:
+
+        <Link
+          href= "/pricing"
+          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+        >
+          <MessageCircle size={18} /> Check Pricing &amp; Book
+        </Link>
+
+WITH THIS NEW CTA BLOCK:
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/pricing"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            Check Pricing &amp; Availability <ArrowRight size={18} />
+          </Link>
+          <a
+            href={getWhatsAppLink("Hi Orvex, I read your blog and want help choosing the right package for my shoot.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-1"
+          >
+            <MessageCircle size={18} /> Ask on WhatsApp
+          </a>
+        </div>
+
+--------------------------------------------------------------------------------
+POST-CHANGE CHECKLIST
+After applying all 5 file edits, verify these behaviors:
+
+  1. Home hero now has:
+     - one pricing CTA to /pricing
+     - one exploration CTA to /services
+
+  2. Services page footer now has:
+     - one CTA to /pricing#calculator
+     - one WhatsApp CTA
+
+  3. Service detail page now has:
+     - hero CTA to /pricing
+     - hero secondary anchor to #packages
+     - package-card buttons opening WhatsApp with the package name in the message
+     - bottom CTA with /pricing plus WhatsApp
+
+  4. Gallery page now has:
+     - one CTA to /pricing#calculator
+     - one WhatsApp CTA
+
+  5. Blog post page now has:
+     - one CTA to /pricing
+     - one WhatsApp CTA
+
+IMPORTANT FINAL NOTE
+  This phase only rebalances CTA behavior.
+  It does NOT make pricing page source-aware yet.
+  That belongs in Phase 2.
+
+
+================================================================================
+ORVEX VISUALS — PHASE 2 SMARTER PRICING HANDOFF
+================================================================================
+
+APPLY THIS ONLY AFTER PHASE 1.
+
+GOAL:
+  Make the pricing page explain:
+    1. why the user is here
+    2. which page they came from
+    3. when possible, preload a relevant package, template, or service starting point
+
+IMPORTANT RULES FOR THIS PHASE:
+  1. Do NOT change booking logic in /book.
+  2. Do NOT change the sessionStorage booking handoff.
+  3. Do NOT remove /pricing as the main booking funnel.
+  4. This phase only improves context and routing into /pricing.
+  5. Keep all existing UI style and spacing patterns as close as possible.
+
+FILES TO EDIT IN THIS PHASE:
+  1. lib/pricing-handoff.ts (new file)
+  2. app/pricing/page.tsx
+  3. components/Navbar.tsx
+  4. components/home/ClientSections.tsx
+  5. app/services/page.tsx
+  6. app/services/[slug]/page.tsx
+  7. app/gallery/page.tsx
+  8. app/blog/[slug]/page.tsx
+  9. app/quote/[id]/page.tsx
+
+--------------------------------------------------------------------------------
+FILE 1: lib/pricing-handoff.ts
+GOAL:
+  Centralize how links build source-aware URLs to /pricing.
+
+CREATE THIS NEW FILE WITH EXACTLY THIS CONTENT:
+
+export interface PricingHandoffLinkOptions {
+  from: string
+  source?: string
+  intent?: string
+  service?: string
+  packageName?: string
+  template?: string
+}
+
+export function buildPricingHandoffHref({
+  from,
+  source,
+  intent,
+  service,
+  packageName,
+  template,
+}: PricingHandoffLinkOptions): string {
+  const params = new URLSearchParams()
+  params.set("from", from)
+  if (source) params.set("source", source)
+  if (intent) params.set("intent", intent)
+  if (service) params.set("service", service)
+  if (packageName) params.set("package", packageName)
+  if (template) params.set("template", template)
+  return `/pricing?${params.toString()}`
+}
+
+--------------------------------------------------------------------------------
+FILE 2: app/pricing/page.tsx
+GOAL:
+  Parse the source context from query params, show it clearly, and prefill the
+  calculator when possible.
+
+CHANGE IMPORTS AT THE TOP:
+
+OLD CODE:
+import { useState, useRef, useEffect } from "react"
+import { useRouter } from "next/navigation"
+
+NEW CODE:
+import { useState, useRef, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+
+ALSO ADD THIS IMPORT:
+import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+INSERT THE FOLLOWING BLOCK IMMEDIATELY AFTER THE EXISTING `const packages = ...` BLOCK:
+
+type BuilderPrefillRequest =
+  | {
+    key: string
+    type: "package"
+    packageName: string
+    sourceLabel: string
+    scrollToBuilder?: boolean
+  }
+  | {
+    key: string
+    type: "template"
+    templateName: string
+    sourceLabel: string
+    scrollToBuilder?: boolean
+  }
+  | {
+    key: string
+    type: "service"
+    serviceSlug: string
+    serviceName: string
+    sourceLabel: string
+    scrollToBuilder?: boolean
+  }
+
+interface PricingHandoffContext {
+  sourceLabel: string
+  from: string
+  headline: string
+  description: string
+  prefillLabel?: string
+  prefill: BuilderPrefillRequest | null
+  prefillKey: string
+}
+
+function sanitizeLabel(value: string | null, fallback: string) {
+  if (!value) return fallback
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed.slice(0, 120) : fallback
+}
+
+function getServicePrefill(serviceSlug: string, serviceName: string) {
+  const lookup = `${serviceSlug} ${serviceName}`.toLowerCase()
+
+  if (lookup.includes("pre-wedding") || lookup.includes("post-wedding") || lookup.includes("engagement") || lookup.includes("anniversary")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [
+        {
+          name: serviceName,
+          duration: "Half Day" as const,
+          services: { "candid-photo": 1 },
+          addOns: lookup.includes("pre-wedding") || lookup.includes("post-wedding") ? { drone: 1 } : {},
+        },
+      ],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("baby") || lookup.includes("maternity") || lookup.includes("newborn")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "candid-photo": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("corporate") || lookup.includes("conference") || lookup.includes("seminar") || lookup.includes("award")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Full Day" as const, services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("housewarming")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("birthday") || lookup.includes("naming") || lookup.includes("cradle") || lookup.includes("haldi") || lookup.includes("mehendi") || lookup.includes("sangeet") || lookup.includes("event")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("cinematic") || lookup.includes("videography") || lookup.includes("video")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { [lookup.includes("cinematic") ? "cinematic-video" : "traditional-video"]: 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("drone")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "candid-photo": 1 }, addOns: { drone: 1 } }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("portrait") || lookup.includes("portfolio") || lookup.includes("studio") || lookup.includes("product")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "traditional-photo": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("wedding")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Full Day" as const, services: { "traditional-photo": 1, "candid-photo": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  return null
+}
+
+function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): PricingHandoffContext | null {
+  const from = searchParams.get("from")
+  if (!from) return null
+
+  const sourceLabel = sanitizeLabel(searchParams.get("source"), "your previous page")
+  const intent = searchParams.get("intent") || "availability"
+  const packageName = searchParams.get("package")
+  const templateName = searchParams.get("template")
+  const serviceSlug = searchParams.get("service")
+
+  let prefill: BuilderPrefillRequest | null = null
+  let prefillLabel = ""
+
+  if (packageName && PACKAGES.some((pkg) => pkg.name === packageName)) {
+    prefill = {
+      key: `package:${packageName}`,
+      type: "package",
+      packageName,
+      sourceLabel,
+      scrollToBuilder: false,
+    }
+    prefillLabel = `${packageName} package prefilled below`
+  } else if (templateName && templateName in eventTemplates) {
+    prefill = {
+      key: `template:${templateName}`,
+      type: "template",
+      templateName,
+      sourceLabel,
+      scrollToBuilder: false,
+    }
+    prefillLabel = `${templateName} template prefilled below`
+  } else if (serviceSlug) {
+    prefill = {
+      key: `service:${serviceSlug}:${sourceLabel}`,
+      type: "service",
+      serviceSlug,
+      serviceName: sourceLabel,
+      sourceLabel,
+      scrollToBuilder: false,
+    }
+    const servicePreset = getServicePrefill(serviceSlug, sourceLabel)
+    if (servicePreset) prefillLabel = servicePreset.label
+  }
+
+  const descriptions: Record<string, string> = {
+    booking: "All online bookings start here so you can compare coverage, pricing, and availability before you submit your request.",
+    availability: "This page is the pricing and availability step, so you can compare options before moving to booking.",
+    "custom-package": "You came here to build a custom package, so the builder below is the next step.",
+    style: "You came here to turn a style reference into a real event package with pricing and coverage clarity.",
+    quote: "You came here to turn what you saw into a real package, quote, and availability check.",
+  }
+
+  return {
+    from,
+    sourceLabel,
+    headline: `You came from ${sourceLabel}`,
+    description: descriptions[intent] || descriptions.availability,
+    prefillLabel: prefillLabel || undefined,
+    prefill,
+    prefillKey: `${from}:${sourceLabel}:${intent}:${packageName || ""}:${templateName || ""}:${serviceSlug || ""}`,
+  }
+}
+
+function PricingHandoffBanner({ handoff }: { handoff: PricingHandoffContext }) {
+  return (
+    <section className="-mt-8 pb-10 md:pb-14 bg-white dark:bg-slate-950">
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="rounded-2xl border border-amber-200/70 dark:border-amber-500/20 bg-amber-50/70 dark:bg-amber-500/5 p-5 md:p-6 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
+              <MapPin size={12} />
+              {handoff.sourceLabel}
+            </span>
+            {handoff.prefillLabel && (
+              <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20">
+                <Sparkles size={12} />
+                {handoff.prefillLabel}
+              </span>
+            )}
+          </div>
+          <h2 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white mb-2">{handoff.headline}</h2>
+          <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-4">{handoff.description}</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href="#calculator"
+              className="inline-flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:opacity-90"
+            >
+              Jump to Builder <ArrowRight size={15} />
+            </a>
+            <a
+              href="/pricing"
+              className="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600"
+            >
+              Stay on Pricing Overview
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+CHANGE THE PRICING HERO SIGNATURE:
+
+OLD CODE:
+function PricingHero() {
+
+NEW CODE:
+function PricingHero({ handoff }: { handoff?: PricingHandoffContext | null }) {
+
+INSIDE THE HERO, AFTER THE MAIN DESCRIPTION PARAGRAPH AND BEFORE THE EXISTING TAG LIST, ADD THIS BLOCK:
+
+        <div className="max-w-2xl mx-auto rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 px-5 py-4 mb-8 shadow-sm">
+          <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+            All online bookings start here so you can compare coverage, pricing, and availability before you submit your request.
+          </p>
+          {handoff && (
+            <p className="mt-2 text-sm font-medium text-amber-600 dark:text-amber-300">
+              We also used context from {handoff.sourceLabel} to make the builder a better starting point.
+            </p>
+          )}
+        </div>
+
+INSIDE THE HERO, AFTER THE EXISTING TAG LIST, ADD THIS BLOCK:
+
+        {handoff && (
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 dark:bg-amber-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
+              From {handoff.sourceLabel}
+            </span>
+            {handoff.prefillLabel && (
+              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300">
+                {handoff.prefillLabel}
+              </span>
+            )}
+          </div>
+        )}
+
+CHANGE THE PRICECALCULATOR SIGNATURE:
+
+OLD CODE:
+function PriceCalculator({ prefilledPackage }: { prefilledPackage?: string | null }) {
+
+NEW CODE:
+function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest | null; handoff?: PricingHandoffContext | null }) {
+
+INSIDE PriceCalculator, BEFORE THE EXISTING PACKAGE PREFILL useEffect, INSERT THIS HELPER:
+
+  const applyEventPresets = (presets: EventPreset[], globalAddOns: Record<string, number> = {}, packageName?: string | null, scrollToBuilder = false) => {
+    const newEvents = presets.map((preset) => ({
+      id: generateEventId(),
+      name: preset.name,
+      duration: preset.duration as "Half Day" | "Full Day",
+      services: { ...preset.services } as Record<string, number>,
+      addOns: { ...preset.addOns } as Record<string, number>,
+    }))
+    setEvents(newEvents)
+    setExpandedEvents(newEvents.map((event) => event.id))
+    setGlobalAddOnQty({ ...globalAddOns })
+    setActivePackage(packageName || null)
+    setShowTemplates(false)
+    if (scrollToBuilder) {
+      setTimeout(() => calculatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100)
+    }
+  }
+
+REPLACE THE OLD `useEffect(() => { ... }, [prefilledPackage])` PACKAGE-PREFILL EFFECT WITH THIS NEW ONE:
+
+  useEffect(() => {
+    if (!prefill) return
+
+    if (prefill.type === "package") {
+      const pkg = PACKAGES.find((item) => item.name === prefill.packageName)
+      if (!pkg || !pkg.builderPreset) return
+      applyEventPresets(pkg.builderPreset.events, pkg.builderPreset.globalAddOns as Record<string, number>, prefill.packageName, prefill.scrollToBuilder)
+      return
+    }
+
+    if (prefill.type === "template") {
+      const presets = eventTemplates[prefill.templateName]
+      if (!presets) return
+      applyEventPresets(presets, {}, null, prefill.scrollToBuilder)
+      return
+    }
+
+    if (prefill.type === "service") {
+      const servicePreset = getServicePrefill(prefill.serviceSlug, prefill.serviceName)
+      if (!servicePreset) return
+      applyEventPresets(servicePreset.events, servicePreset.globalAddOns, null, prefill.scrollToBuilder)
+    }
+  }, [prefill])
+
+INSIDE THE CALCULATOR HEADER, AFTER THE EXISTING DESCRIPTION PARAGRAPH, ADD THIS BLOCK:
+
+          {handoff && (
+            <div className="mt-6 max-w-2xl mx-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-5 py-4 text-left shadow-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-400 mb-2">From {handoff.sourceLabel}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{handoff.description}</p>
+              {handoff.prefillLabel && (
+                <p className="mt-2 text-sm font-medium text-emerald-600 dark:text-emerald-300">{handoff.prefillLabel}. Change anything below.</p>
+              )}
+            </div>
+          )}
+
+REPLACE THE ENTIRE EXISTING BOTTOM PricingPage FUNCTION WITH THIS:
+
+export default function PricingPage() {
+  const searchParams = useSearchParams()
+  const handoff = getPricingHandoff(searchParams)
+  const [prefillRequest, setPrefillRequest] = useState<BuilderPrefillRequest | null>(handoff?.prefill || null)
+
+  useEffect(() => {
+    setPrefillRequest(handoff?.prefill || null)
+  }, [handoff?.prefillKey])
+
+  return (
+    <main>
+      <PricingHero handoff={handoff} />
+      {handoff && <PricingHandoffBanner handoff={handoff} />}
+      <PackagesSection
+        onCustomize={(pkg) =>
+          setPrefillRequest({
+            key: `manual-package:${pkg}:${Date.now()}`,
+            type: "package",
+            packageName: pkg,
+            sourceLabel: "Pricing Packages",
+            scrollToBuilder: true,
+          })
+        }
+      />
+      <PriceCalculator prefill={prefillRequest} handoff={handoff} />
+      <ComparisonSection />
+      <PricingCTA />
+    </main>
+  )
+}
+
+--------------------------------------------------------------------------------
+FILES 3 TO 9: PASS SOURCE CONTEXT INTO /pricing
+GOAL:
+  Every important pricing CTA should now tell /pricing where the user came from.
+
+FILE: components/Navbar.tsx
+  Add:
+    import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+  Replace both `Book Now` href values from:
+    /pricing
+
+  To:
+    buildPricingHandoffHref({ from: "navbar", source: "Site Navigation", intent: "booking" })
+
+FILE: components/home/ClientSections.tsx
+  Add:
+    import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+  Change the hero primary CTA href from:
+    /pricing
+  To:
+    buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability" })
+
+  Change the lower CTA banner pricing button href from:
+    /pricing
+  To:
+    buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "booking" })
+
+FILE: app/services/page.tsx
+  Add:
+    import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+  Change the `Build Custom Package` href from:
+    /pricing#calculator
+  To:
+    buildPricingHandoffHref({ from: "services", source: "Services Page", intent: "custom-package" })
+
+FILE: app/services/[slug]/page.tsx
+  Add:
+    import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+  Change the hero pricing CTA href from:
+    /pricing
+  To:
+    buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" })
+
+  Change the `Build a Custom Package` text-link href from:
+    /pricing#calculator
+  To:
+    buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "custom-package" })
+
+  Change the bottom pricing CTA href from:
+    /pricing
+  To:
+    buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" })
+
+FILE: app/gallery/page.tsx
+  Add:
+    import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+  Change the `Build a Package` href from:
+    /pricing#calculator
+  To:
+    buildPricingHandoffHref({ from: "gallery", source: "Style Reference Gallery", intent: "style" })
+
+FILE: app/blog/[slug]/page.tsx
+  Add:
+    import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+  Change the article pricing CTA href from:
+    /pricing
+  To:
+    buildPricingHandoffHref({ from: "blog", source: post.title, intent: "quote" })
+
+FILE: app/quote/[id]/page.tsx
+  Add:
+    import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+  Change both links that go to `/pricing` so they become:
+    buildPricingHandoffHref({ from: "quote", source: "Saved Booking", intent: "custom-package" })
+
+--------------------------------------------------------------------------------
+PHASE 2 CHECKLIST
+After applying Phase 2, verify the following:
+
+  1. Going from the homepage hero to pricing shows a context hint telling the user
+     they came from Homepage Hero.
+
+  2. Going from a service detail page to pricing shows:
+     - the service name as the source
+     - a reason for landing on pricing
+     - a suggested prefilled starting point in the builder when the service is safely mappable
+
+  3. Going from gallery to pricing shows that the user came from the gallery and
+     explains that pricing is the step where style becomes a real package.
+
+  4. Going from a blog post to pricing shows the blog post title as the source.
+
+  5. Clicking a package card inside pricing still pre-fills the builder and scrolls
+     to the calculator.
+
+  6. The pricing page still ends in the same booking funnel:
+     pricing builder -> sessionStorage plan -> /book
+
+IMPORTANT FINAL NOTE FOR PHASE 2
+  This phase does NOT remove the pricing funnel.
+  It makes the funnel understandable to first-time visitors.
+  That is the key UX improvement.
+
+
+================================================================================
+ORVEX VISUALS — PHASE 2 POLISH (Navbar Pricing Context + Safe Gallery/Blog Prefills)
+================================================================================
+
+APPLY THIS ONLY AFTER PHASE 2.
+
+GOAL:
+  1. Make the normal navbar Pricing links source-aware too
+  2. Add safe prefills for gallery based on the active filter the visitor selected
+  3. Add safe prefills for blog posts when the article topic clearly maps to a real service/template
+
+WHY THIS EXISTS:
+  Phase 2 made pricing source-aware for the main CTA entries.
+  This polish pass closes two remaining UX gaps:
+    - the normal nav Pricing link was still generic
+    - gallery/blog could explain the source, but were not yet using stronger safe prefills
+
+FILES TO EDIT IN THIS POLISH PASS:
+  1. components/Navbar.tsx
+  2. lib/pricing-handoff.ts
+  3. app/gallery/page.tsx
+  4. app/blog/[slug]/page.tsx
+
+--------------------------------------------------------------------------------
+FILE 1: components/Navbar.tsx
+GOAL:
+  Make the regular nav Pricing links source-aware without breaking active-link styling.
+
+REPLACE BOTH `Pricing` LINK OBJECTS:
+
+OLD CODE:
+  { label: "Pricing", href: "/pricing" },
+
+NEW CODE:
+  { label: "Pricing", href: buildPricingHandoffHref({ from: "navbar-pricing", source: "Pricing Navigation", intent: "availability" }) },
+
+DO THIS IN BOTH ARRAYS:
+  - homepageLinks
+  - siteLinks
+
+ALSO ADD THIS NORMALIZER INSIDE THE COMPONENT, AFTER `const links = ...`:
+
+  const normalizeHref = (href: string) => href.split("?")[0].split("#")[0]
+
+AND UPDATE `isActiveLink` LIKE THIS:
+
+OLD CODE:
+  const isActiveLink = (href: string) => {
+    if (href === "/") return pathname === "/"
+    return pathname.startsWith(href)
+  }
+
+NEW CODE:
+  const isActiveLink = (href: string) => {
+    const normalizedHref = normalizeHref(href)
+    if (normalizedHref === "/") return pathname === "/"
+    return pathname.startsWith(normalizedHref)
+  }
+
+WHY THIS MATTERS:
+  Once the navbar Pricing link becomes `/pricing?...`, the old active-state check stops matching.
+  This tiny normalizer keeps the current active-link styling correct.
+
+--------------------------------------------------------------------------------
+FILE 2: lib/pricing-handoff.ts
+GOAL:
+  Add shared safe-mapping helpers so gallery/blog can pass stronger intent into pricing.
+
+ADD THIS INTERFACE DIRECTLY BELOW `PricingHandoffLinkOptions`:
+
+interface BlogPricingHandoffInput {
+  title: string
+  slug: string
+  category: string
+  tags?: string[]
+}
+
+ADD THESE TWO FUNCTIONS BELOW `buildPricingHandoffHref(...)`:
+
+export function getGalleryPricingHandoff(category: string): PricingHandoffLinkOptions {
+  const base = { from: "gallery", intent: "style" } as const
+
+  switch (category) {
+    case "wedding":
+      return { ...base, source: "Wedding Gallery", service: "wedding" }
+    case "pre-wedding":
+      return { ...base, source: "Pre-Wedding Gallery", template: "Pre-Wedding Shoot" }
+    case "events":
+      return { ...base, source: "Events Gallery", template: "Birthday / Event" }
+    case "baby":
+      return { ...base, source: "Baby & Family Gallery", template: "Baby / Maternity" }
+    case "portraits":
+      return { ...base, source: "Portrait Gallery", service: "portrait" }
+    case "cinematic":
+      return { ...base, source: "Cinematic Gallery", service: "cinematic-video" }
+    default:
+      return { ...base, source: "Style Reference Gallery" }
+  }
+}
+
+export function getBlogPricingHandoff({ title, slug, category, tags = [] }: BlogPricingHandoffInput): PricingHandoffLinkOptions {
+  const searchText = `${title} ${slug} ${category} ${tags.join(" ")}`.toLowerCase()
+  const base = { from: "blog", source: title, intent: "quote" } as const
+
+  if (searchText.includes("pre-wedding")) {
+    return { ...base, template: "Pre-Wedding Shoot" }
+  }
+
+  if (searchText.includes("baby") || searchText.includes("newborn") || searchText.includes("maternity")) {
+    return { ...base, template: "Baby / Maternity" }
+  }
+
+  if (searchText.includes("housewarming")) {
+    return { ...base, template: "Housewarming" }
+  }
+
+  if (searchText.includes("corporate") || searchText.includes("conference") || searchText.includes("seminar") || searchText.includes("award")) {
+    return { ...base, template: "Corporate Event" }
+  }
+
+  if (searchText.includes("birthday") || searchText.includes("naming") || searchText.includes("cradle") || searchText.includes("anniversary") || searchText.includes("event")) {
+    return { ...base, template: "Birthday / Event" }
+  }
+
+  if (searchText.includes("portrait") || searchText.includes("headshot") || searchText.includes("portfolio") || searchText.includes("studio") || searchText.includes("product")) {
+    return { ...base, service: "portrait" }
+  }
+
+  if (searchText.includes("cinematic") || searchText.includes("videography") || searchText.includes("video")) {
+    return { ...base, service: "cinematic-video" }
+  }
+
+  if (searchText.includes("wedding")) {
+    return { ...base, service: "wedding" }
+  }
+
+  return base
+}
+
+IMPORTANT SAFETY NOTE:
+  These mappings are intentionally conservative.
+  Do NOT map blog posts to package names unless the article clearly matches a real current package in the repo.
+
+--------------------------------------------------------------------------------
+FILE 3: app/gallery/page.tsx
+GOAL:
+  Use the visitor's selected gallery filter as the pricing handoff source.
+
+CHANGE THIS IMPORT:
+
+OLD CODE:
+import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+NEW CODE:
+import { buildPricingHandoffHref, getGalleryPricingHandoff } from "@/lib/pricing-handoff"
+
+CHANGE `GalleryGrid` SO `activeCategory` IS LIFTED OUT OF THE GRID AND PASSED IN:
+
+OLD CODE:
+function GalleryGrid() {
+  const { ref, isVisible } = useScrollReveal()
+  const [activeCategory, setActiveCategory] = useState<GalleryCategory>("all")
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+
+NEW CODE:
+function GalleryGrid({
+  activeCategory,
+  setActiveCategory,
+}: {
+  activeCategory: GalleryCategory
+  setActiveCategory: (category: GalleryCategory) => void
+}) {
+  const { ref, isVisible } = useScrollReveal()
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+
+CHANGE THE CTA SIGNATURE:
+
+OLD CODE:
+function GalleryCTA() {
+  const { ref, isVisible } = useScrollReveal()
+
+NEW CODE:
+function GalleryCTA({ activeCategory }: { activeCategory: GalleryCategory }) {
+  const { ref, isVisible } = useScrollReveal()
+  const pricingHandoff = getGalleryPricingHandoff(activeCategory)
+
+CHANGE THE CTA PRICING HREF:
+
+OLD CODE:
+href={buildPricingHandoffHref({ from: "gallery", source: "Style Reference Gallery", intent: "style" })}
+
+NEW CODE:
+href={buildPricingHandoffHref(pricingHandoff)}
+
+CHANGE THE PAGE ROOT TO OWN THE ACTIVE CATEGORY:
+
+OLD CODE:
+export default function GalleryPage() {
+  return (
+    <main>
+      <GalleryHero />
+      <GalleryGrid />
+      <GalleryCTA />
+    </main>
+  )
+}
+
+NEW CODE:
+export default function GalleryPage() {
+  const [activeCategory, setActiveCategory] = useState<GalleryCategory>("all")
+
+  return (
+    <main>
+      <GalleryHero />
+      <GalleryGrid activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+      <GalleryCTA activeCategory={activeCategory} />
+    </main>
+  )
+}
+
+RESULT:
+  If the user is browsing Pre-Wedding references and then clicks the pricing CTA,
+  pricing now gets a real pre-wedding template hint instead of only generic source text.
+
+--------------------------------------------------------------------------------
+FILE 4: app/blog/[slug]/page.tsx
+GOAL:
+  Let each article pass the strongest safe prefill derived from its title/slug/category/tags.
+
+CHANGE THIS IMPORT:
+
+OLD CODE:
+import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+
+NEW CODE:
+import { buildPricingHandoffHref, getBlogPricingHandoff } from "@/lib/pricing-handoff"
+
+CHANGE THE CTA SIGNATURE:
+
+OLD CODE:
+function PostCTA() {
+
+NEW CODE:
+function PostCTA({ post }: { post: BlogPost }) {
+
+CHANGE THE PRICING HREF:
+
+OLD CODE:
+href={buildPricingHandoffHref({ from: "blog", source: post.title, intent: "quote" })}
+
+NEW CODE:
+href={buildPricingHandoffHref(getBlogPricingHandoff(post))}
+
+CHANGE THE PAGE RENDER CALL:
+
+OLD CODE:
+<PostCTA />
+
+NEW CODE:
+<PostCTA post={post} />
+
+IMPORTANT NOTE:
+  This change also fixes the CTA component so it receives `post` explicitly instead of
+  reading it without a prop.
+
+--------------------------------------------------------------------------------
+POLISH PASS CHECKLIST
+After applying this pass, verify the following:
+
+  1. Clicking the normal navbar `Pricing` link now lands on pricing with source context.
+
+  2. The navbar Pricing item still highlights correctly as active on non-home pages.
+
+  3. On gallery:
+     - `All Work` still behaves as generic source-only pricing handoff
+     - `Pre-Wedding` sends a pre-wedding template hint
+     - `Baby & Family` sends a baby/maternity template hint
+     - `Wedding` sends a safe generic wedding service hint
+
+  4. On blog:
+     - pre-wedding articles send pre-wedding template context
+     - baby/maternity articles send baby/maternity template context
+     - wedding articles send a generic wedding service hint
+     - articles without a safe mapping still send source-only blog context
+
+  5. Pricing still remains the main funnel and `/book` behavior is unchanged.
+
+FINAL NOTE FOR THIS POLISH PASS
+  This is a refinement layer, not a new funnel.
+  It improves relevance without making risky assumptions.

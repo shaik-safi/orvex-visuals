@@ -12,6 +12,8 @@ import {
   MessageCircle,
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { getWhatsAppLink } from "@/lib/constants"
+import { buildPricingHandoffHref, getGalleryPricingHandoff } from "@/lib/pricing-handoff"
 
 // ============ DATA ============
 type GalleryCategory = "all" | "wedding" | "pre-wedding" | "events" | "baby" | "portraits" | "cinematic"
@@ -147,9 +149,14 @@ function GalleryHero() {
 }
 
 // ============ GALLERY GRID ============
-function GalleryGrid() {
+function GalleryGrid({
+  activeCategory,
+  setActiveCategory,
+}: {
+  activeCategory: GalleryCategory
+  setActiveCategory: (category: GalleryCategory) => void
+}) {
   const { ref, isVisible } = useScrollReveal()
-  const [activeCategory, setActiveCategory] = useState<GalleryCategory>("all")
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   const filtered = galleryImages.filter(
@@ -253,8 +260,9 @@ function GalleryGrid() {
 }
 
 // ============ CTA ============
-function GalleryCTA() {
+function GalleryCTA({ activeCategory }: { activeCategory: GalleryCategory }) {
   const { ref, isVisible } = useScrollReveal()
+  const pricingHandoff = getGalleryPricingHandoff(activeCategory)
   return (
     <section ref={ref} className={`py-20 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
@@ -269,16 +277,19 @@ function GalleryCTA() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="/pricing"
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+            href={buildPricingHandoffHref(pricingHandoff)}
+            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            <MessageCircle size={20} /> Start Booking
+            Build a Package
+            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <a
-            href="/pricing#calculator"
+            href={getWhatsAppLink("Hi Orvex, I love this style! Can you help me book similar coverage for my event?")}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            Build a Package <ArrowRight size={18} />
+            <MessageCircle size={20} /> Talk About This Style
           </a>
         </div>
       </div>
@@ -287,11 +298,13 @@ function GalleryCTA() {
 }
 
 export default function GalleryPage() {
+  const [activeCategory, setActiveCategory] = useState<GalleryCategory>("all")
+
   return (
     <main>
       <GalleryHero />
-      <GalleryGrid />
-      <GalleryCTA />
+      <GalleryGrid activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+      <GalleryCTA activeCategory={activeCategory} />
     </main>
   )
 }

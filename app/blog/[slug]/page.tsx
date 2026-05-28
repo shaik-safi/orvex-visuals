@@ -15,6 +15,8 @@ import {
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getBlogPost, getRelatedPosts, type BlogPost } from "../data"
+import { getWhatsAppLink } from "@/lib/constants"
+import { buildPricingHandoffHref, getBlogPricingHandoff } from "@/lib/pricing-handoff"
 
 // ============ BREADCRUMB ============
 function Breadcrumb({ title }: { title: string }) {
@@ -169,8 +171,14 @@ function RelatedPosts({ currentSlug }: { currentSlug: string }) {
 }
 
 // ============ CTA ============
-function PostCTA() {
+function PostCTA({ post }: { post: BlogPost }) {
   const { ref, isVisible } = useScrollReveal()
+  const pricingHandoff = getBlogPricingHandoff({
+    title: post.title,
+    slug: post.slug,
+    category: post.category,
+    tags: post.tags,
+  })
   return (
     <section ref={ref} className={`py-14 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
@@ -183,12 +191,23 @@ function PostCTA() {
         <p className="text-slate-400 text-base mb-6 max-w-md mx-auto">
           Get a free consultation and personalized quote for your photoshoot.
         </p>
-        <Link
-          href= "/pricing"
-          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
-        >
-          <MessageCircle size={18} /> Check Pricing &amp; Book
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href={buildPricingHandoffHref(pricingHandoff)}
+            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+          >
+            Check Pricing &amp; Availability
+            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </a>
+          <a
+            href={getWhatsAppLink("Hi Orvex, I read your blog and loved it! Can you help me plan my photoshoot?")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-1"
+          >
+            <MessageCircle size={18} /> Ask on WhatsApp
+          </a>
+        </div>
       </div>
     </section>
   )
@@ -254,7 +273,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
       />
       <ArticleHero post={post} />
       <ArticleContent post={post} />
-      <PostCTA />
+      <PostCTA post={post} />
       <RelatedPosts currentSlug={slug} />
     </main>
   )

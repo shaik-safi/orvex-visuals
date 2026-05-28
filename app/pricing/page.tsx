@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 // saveQuote is only called from /book — pricing page sends estimates only
 import { BOOKING_PLAN_STORAGE_KEY, PACKAGES, SERVICE_RATES, EVENT_ADDONS, GLOBAL_ADDONS, getWhatsAppLink, WA_MESSAGES, PHONE_NUMBER, computePackagePrice } from "@/lib/constants"
+import { parsePricingHandoff, getSourceDisplayName, type HandoffSource } from "@/lib/pricing-handoff"
 import {
   Camera,
   Video,
@@ -38,6 +39,40 @@ const packages = PACKAGES.map((pkg) => ({
   icon: pkg.name === "Starter" ? Star : pkg.name === "Signature" ? Crown : Gift,
   popular: pkg.name === "Signature",
 }))
+
+// ============ CONTEXT BANNER ============
+function PricingContextBanner({ from, source }: { from: HandoffSource | null; source: string | null }) {
+  if (!from) return null
+
+  const displaySource = getSourceDisplayName(from, source ?? undefined)
+  const bannerMessages: Record<HandoffSource, string> = {
+    home: "Coming from our homepage? We have pre-built packages to get you started.",
+    services: "Looking at a specific service? Our calculator lets you customize anything.",
+    gallery: "Loved the style in our gallery? Build a package with similar coverage.",
+    blog: "Found inspiration in our blog? Let's create something perfect for your event.",
+    contact: "Reached out to us? Here's the pricing transparency you asked for.",
+    quote: "Back to your saved booking? Pick up right where you left off.",
+    navbar: "Ready to explore pricing? Let's build your perfect package.",
+  }
+
+  return (
+    <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/15 rounded-2xl p-4 md:p-5 mb-8">
+      <div className="flex items-start gap-3">
+        <div className="w-5 h-5 rounded-full bg-amber-200 dark:bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+          <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
+            {bannerMessages[from]}
+          </p>
+          <p className="text-xs text-amber-800 dark:text-amber-200/70 mt-1">
+            You came from: <span className="font-semibold">{displaySource}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 // ============ HERO ============
 function PricingHero() {
@@ -288,7 +323,7 @@ function generateEventId() {
 }
 
 // ============ INTERACTIVE PRICE CALCULATOR ============
-function PriceCalculator({ prefilledPackage }: { prefilledPackage?: string | null }) {
+function PriceCalculator({ prefilledPackage, handoffFrom, handoffService }: { prefilledPackage?: string | null; handoffFrom?: HandoffSource | null; handoffService?: string | null }) {
   const { ref, isVisible } = useScrollReveal()
   const router = useRouter()
   const [events, setEvents] = useState<EventBlock[]>([])
@@ -1142,12 +1177,19 @@ function PricingCTA() {
 // ============ MAIN ============
 export default function PricingPage() {
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  
+  // Parse handoff context from URL
+  const handoffContext = parsePricingHandoff(searchParams)
 
   return (
     <main>
       <PricingHero />
+      <div className="max-w-6xl mx-auto px-6 pt-8">
+        <PricingContextBanner from={handoffContext.from} source={handoffContext.source} />
+      </div>
       <PackagesSection onCustomize={(pkg) => setSelectedPackage(pkg)} />
-      <PriceCalculator prefilledPackage={selectedPackage} />
+      <PriceCalculator prefilledPackage={selectedPackage} handoffFrom={handoffContext.from} handoffService={handoffContext.service} />
       <ComparisonSection />
       <PricingCTA />
     </main>

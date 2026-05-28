@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ArrowRight, ChevronDown, MessageCircle } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getWhatsAppLink, WA_MESSAGES, IMAGES } from "@/lib/constants"
+import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 
 // Helper: get upcoming month names for urgency messaging
 function getUpcomingMonths() {
@@ -94,17 +95,17 @@ export function Hero() {
 
         <div className="animate-fade-in-up animation-delay-600 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/pricing"
+            href={buildPricingHandoffHref({ from: "home" })}
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/30 hover:-translate-y-1"
           >
-            Check Availability — It&apos;s Free
+            Check Pricing & Availability
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
-            href="/pricing"
+            href="/services"
             className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            See Transparent Pricing
+            Explore Services
           </Link>
         </div>
 

@@ -16,7 +16,8 @@ import {
 } from "lucide-react"
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getServiceDetail, type ServiceDetail } from "../data"
-import { PHOTO_DELIVERY_DAYS } from "@/lib/constants"
+import { PHOTO_DELIVERY_DAYS, getWhatsAppLink } from "@/lib/constants"
+import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 
 
 // ============ SERVICE HERO ============
@@ -51,16 +52,18 @@ function ServiceHero({ service }: { service: ServiceDetail }) {
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/pricing"
+            href={buildPricingHandoffHref({ from: "services", service: service.slug, intent: "view-packages" })}
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            <MessageCircle size={18} /> Start Booking
+            Check Pricing &amp; Availability
           </Link>
           <a
-            href="#packages"
+            href={getWhatsAppLink(`Hi Orvex, I'm interested in your ${service.name} service.`)}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-1"
           >
-            View Packages <ArrowRight size={16} />
+            <MessageCircle size={16} /> Ask About This Service
           </a>
         </div>
 
@@ -180,15 +183,17 @@ function PackagesSection({ service }: { service: ServiceDetail }) {
                 ))}
               </ul>
 
-              <Link
-                href="/pricing"
+              <a
+                href={getWhatsAppLink(`Hi Orvex, I'm interested in your ${pkg.name} package for ${service.name}.`)}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
                   ? "bg-white text-amber-600 hover:bg-amber-50 shadow-lg"
                   : "bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20"
                   }`}
               >
-                Book {pkg.name}
-              </Link>
+                Ask About {pkg.name}
+              </a>
             </div>
           ))}
         </div>
@@ -334,17 +339,19 @@ function ServiceCTA({ service }: { service: ServiceDetail }) {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/pricing"
+            href={buildPricingHandoffHref({ from: "services", service: service.slug, intent: "custom-package" })}
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            <MessageCircle size={20} /> Start Booking Request
+            Check Pricing &amp; Availability
           </Link>
-          <Link
-            href="/pricing#calculator"
+          <a
+            href={getWhatsAppLink(`Hi Orvex, I want to know more about your ${service.name} service and booking details.`)}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            <ArrowLeft size={18} /> Build Custom Package
-          </Link>
+            <MessageCircle size={20} /> Talk on WhatsApp
+          </a>
         </div>
       </div>
     </section>
