@@ -86,12 +86,12 @@ export function Hero() {
           Timeless Photography &amp; Films
           <br />
           <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
-            for Wedding, Families &amp; Events
+            for Weddings &amp; Milestones
           </span>
         </h1>
 
         <p className="animate-fade-in-up animation-delay-400 text-lg md:text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed">
-          Thoughtful coverage, clear pricing, fast delivery and full ownership for weddings, families, and events.
+          Thoughtful coverage, transparent pricing, fast delivery and full ownership for the moments that matter most.
           Your photos stay fully yours.
         </p>
 
