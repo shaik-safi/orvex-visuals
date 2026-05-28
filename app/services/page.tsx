@@ -9,18 +9,16 @@ import {
   Search,
   Star,
 } from "lucide-react"
-import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getWhatsAppLink } from "@/lib/constants"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 import { categories, services, type Category } from "./data"
 
 // ============ HERO ============
 function ServicesHero() {
-  const { ref, isVisible } = useScrollReveal()
   return (
     <section className="pt-32 pb-12 md:pt-40 md:pb-16 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 relative overflow-hidden">
       <div className="absolute top-20 left-1/4 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-      <div ref={ref} className={`max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+      <div className="max-w-4xl mx-auto px-4 text-center">
         <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
           {services.length}+ Photography Services
         </span>
@@ -39,7 +37,6 @@ function ServicesHero() {
 
 // ============ SERVICES GRID ============
 function ServicesGrid() {
-  const { ref, isVisible } = useScrollReveal()
   const [activeCategory, setActiveCategory] = useState<Category>("all")
   const [searchQuery, setSearchQuery] = useState("")
 
@@ -51,9 +48,9 @@ function ServicesGrid() {
 
   return (
     <section className="py-12 md:py-16 bg-white dark:bg-slate-950 transition-colors">
-      <div ref={ref} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Search + Filter Bar */}
-        <div className={`mb-10 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+        <div className="mb-10">
           {/* Search */}
           <div className="relative max-w-md mx-auto mb-6">
             <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -100,8 +97,7 @@ function ServicesGrid() {
               <Link
                 key={service.slug}
                 href={`/services/${service.slug}`}
-                className={`group relative bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/40 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                  }`}
+                className="group relative bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/40 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10"
                 style={{ transitionDelay: `${Math.min(i * 60, 500)}ms` }}
               >
                 {/* Image */}
@@ -114,7 +110,7 @@ function ServicesGrid() {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     loading="lazy"
-                    quality={75}
+                    quality={65}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
@@ -181,9 +177,8 @@ function ServicesGrid() {
 
 // ============ CTA ============
 function ServicesCTA() {
-  const { ref, isVisible } = useScrollReveal()
   return (
-    <section ref={ref} className={`py-20 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+    <section className="py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(245,158,11,0.1),transparent)]" />
 

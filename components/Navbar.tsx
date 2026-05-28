@@ -100,8 +100,8 @@ export default function Navbar() {
               <div className="relative w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/40 transition-all duration-300 group-hover:scale-105">
                 <span className="text-white font-bold text-sm tracking-tight">OV</span>
               </div>
-              <div className="hidden sm:block">
-                <span className={logoTextClasses}>Orvex Visuals</span>
+              <div className="block max-w-[6.75rem] sm:max-w-none">
+                <span className={`${logoTextClasses} block text-sm leading-tight sm:text-lg`}>Orvex Visuals</span>
               </div>
             </a>
           ) : (
@@ -109,8 +109,8 @@ export default function Navbar() {
               <div className="relative w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/40 transition-all duration-300 group-hover:scale-105">
                 <span className="text-white font-bold text-sm tracking-tight">OV</span>
               </div>
-              <div className="hidden sm:block">
-                <span className={logoTextClasses}>Orvex Visuals</span>
+              <div className="block max-w-[6.75rem] sm:max-w-none">
+                <span className={`${logoTextClasses} block text-sm leading-tight sm:text-lg`}>Orvex Visuals</span>
               </div>
             </Link>
           )}
@@ -160,8 +160,8 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div id="mobile-navigation" className={`lg:hidden overflow-hidden transition-all duration-500 ease-out ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-          <div className="pb-6 pt-2 space-y-1 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl mt-2 p-4 shadow-xl">
+        <div id="mobile-navigation" className={`lg:hidden overflow-hidden transition-all duration-500 ease-out ${isOpen ? "max-h-[calc(100vh-5.5rem)] opacity-100" : "max-h-0 opacity-0"}`}>
+          <div className="mt-2 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain rounded-2xl bg-white/95 p-4 pb-6 pt-2 shadow-xl backdrop-blur-xl dark:bg-slate-900/95">
             {links.map((link) =>
               link.href.startsWith("#") ? (
                 <a
