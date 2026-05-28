@@ -23,14 +23,14 @@ function ContactHero() {
       <div className="absolute top-20 right-1/3 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
       <div ref={ref} className={`max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-          Get In Touch
+          Contact Orvex
         </span>
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white leading-[0.95] mb-6">
-          Let&apos;s Start{" "}
-          <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Your Story</span>
+          Tell Us About{" "}
+          <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Your Event</span>
         </h1>
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-          Have a question or ready to book? We respond within 30 minutes on WhatsApp.
+          Ask a question, check availability, or share what you&apos;re planning. WhatsApp is usually the quickest way to reach us.
         </p>
       </div>
     </section>
@@ -51,6 +51,7 @@ function ContactSection() {
   const [submitted, setSubmitted] = useState(false)
   const [whatsAppUrl, setWhatsAppUrl] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submissionResult, setSubmissionResult] = useState<"saved" | "whatsapp">("saved")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,9 +87,13 @@ function ContactSection() {
       })
 
       if (!response.ok) {
+        setSubmissionResult("whatsapp")
         window.open(nextWhatsAppUrl, "_blank", "noopener,noreferrer")
+      } else {
+        setSubmissionResult("saved")
       }
     } catch {
+      setSubmissionResult("whatsapp")
       window.open(nextWhatsAppUrl, "_blank", "noopener,noreferrer")
     } finally {
       setWhatsAppUrl(nextWhatsAppUrl)
@@ -105,7 +110,7 @@ function ContactSection() {
           <div className="lg:col-span-2 space-y-6">
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Contact Info</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Reach out through any channel. We&apos;re always happy to help!</p>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">Choose the channel that feels easiest for you.</p>
             </div>
 
             <div className="space-y-4">
@@ -116,7 +121,7 @@ function ContactSection() {
                 <div>
                   <p className="font-semibold text-slate-900 dark:text-white text-sm">WhatsApp (Fastest)</p>
                   <p className="text-green-600 dark:text-green-400 text-sm">{PHONE_DISPLAY}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Responds within 30 mins</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Usually the quickest reply</p>
                 </div>
               </a>
 
@@ -138,7 +143,7 @@ function ContactSection() {
                 <div>
                   <p className="font-semibold text-slate-900 dark:text-white text-sm">Email</p>
                   <p className="text-slate-600 dark:text-slate-300 text-sm">{EMAIL}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Responds within 24 hours</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Usually within 24 hours</p>
                 </div>
               </a>
 
@@ -149,7 +154,7 @@ function ContactSection() {
                 <div>
                   <p className="font-semibold text-slate-900 dark:text-white text-sm">Location</p>
                   <p className="text-slate-600 dark:text-slate-300 text-sm">Bangalore, Karnataka, India</p>
-                  <p className="text-xs text-slate-400 mt-0.5">Available PAN India for travel</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Available across India for travel</p>
                 </div>
               </div>
 
@@ -177,20 +182,18 @@ function ContactSection() {
               </div>
             </div>
           </div>
-
-          <p className="text-slate-500 dark:text-slate-400 text-sm">WhatsApp opened with your inquiry pre-filled.</p>
           <div className="lg:col-span-3">
             <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Send an Inquiry</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Submit here to save your inquiry first. WhatsApp stays optional for faster follow-up.</p>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Tell Us What You Need</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Share a few details and we&apos;ll reply with the best next step. If you prefer, you can continue on WhatsApp afterward.</p>
 
               {submitted ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-green-100 dark:bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <CheckCircle size={32} className="text-green-500" />
                   </div>
-                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Inquiry Saved</h4>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">Your inquiry was recorded. We&apos;ll follow up using the details you shared.</p>
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{submissionResult === "saved" ? "Thanks, we've got your details" : "Your WhatsApp message is ready"}</h4>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">{submissionResult === "saved" ? "We'll review your inquiry and follow up using the details you shared." : "We opened WhatsApp with your details. Review the draft there and send it when you're ready."}</p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <a
                       href={whatsAppUrl || getWhatsAppLink()}
@@ -198,17 +201,18 @@ function ContactSection() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300"
                     >
-                      <MessageCircle size={16} /> Continue on WhatsApp
+                      <MessageCircle size={16} /> {submissionResult === "saved" ? "Continue on WhatsApp" : "Open WhatsApp Again"}
                     </a>
                     <button
                       type="button"
                       onClick={() => {
                         setSubmitted(false)
                         setWhatsAppUrl("")
+                        setSubmissionResult("saved")
                       }}
                       className="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600"
                     >
-                      Send Another Inquiry
+                      {submissionResult === "saved" ? "Send Another Inquiry" : "Edit Inquiry"}
                     </button>
                   </div>
                 </div>
@@ -297,11 +301,11 @@ function ContactSection() {
                     disabled={isSubmitting}
                     className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5"
                   >
-                    <Send size={16} /> {isSubmitting ? "Saving Inquiry..." : "Save Inquiry"}
+                    <Send size={16} /> {isSubmitting ? "Sending..." : "Send Inquiry"}
                   </button>
 
                   <p className="text-xs text-slate-400 dark:text-slate-500 text-center">
-                    We save your inquiry first. WhatsApp is optional and only opens if you choose to continue there.
+                    Prefer WhatsApp? You can continue there after this step.
                   </p>
                 </form>
               )}

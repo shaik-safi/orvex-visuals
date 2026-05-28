@@ -78,21 +78,21 @@ export function Hero() {
         <div className="animate-fade-in-up">
           <div className="inline-flex items-center gap-2 bg-red-500/20 backdrop-blur-sm border border-red-400/30 rounded-full px-5 py-2 mb-8">
             <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-            <span className="text-white/90 text-sm font-medium">Only 3 Weekend Slots Left for {next}</span>
+            <span className="text-white/90 text-sm font-medium">Planning for {next}? Check availability early.</span>
           </div>
         </div>
 
         <h1 className="animate-fade-in-up animation-delay-200 text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[0.9] mb-8 tracking-tight">
-          Bangalore&apos;s Most Trusted
+          Photography &amp; Films
           <br />
           <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
-            Visual Storytellers
+            for Meaningful Celebrations
           </span>
         </h1>
 
         <p className="animate-fade-in-up animation-delay-400 text-lg md:text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed">
-          We don&apos;t just take photos — we craft heirloom art that makes you relive every emotion.
-          Delivered in 5 days. Zero hidden costs. You own every frame.
+          Thoughtful coverage, clear pricing, and fast delivery for weddings, families, and events.
+          Your photos stay fully yours.
         </p>
 
         <div className="animate-fade-in-up animation-delay-600 flex flex-col sm:flex-row gap-4 justify-center">
@@ -136,10 +136,10 @@ export function FAQSection() {
   const { ref, isVisible } = useScrollReveal()
 
   const faqs = [
-    { q: "How quickly will I get my photos?", a: "Edited photos delivered within 5 days. Cinematic video within 15 days. Fastest in Bangalore." },
+    { q: "How quickly will I get my photos?", a: "Edited photos are delivered within 5 days. Cinematic video arrives within 15 days." },
     { q: "Do I own the copyright to my photos?", a: "Yes! 100% copyright belongs to you. All photos and videos are fully yours." },
     { q: "Are your prices inclusive of GST?", a: "Yes. All prices shown are final. No hidden charges, no surprise 18% add-on." },
-    { q: "How do I book?", a: "Book through our website form or WhatsApp. We confirm availability within 2 hours." },
+    { q: "How do I book?", a: "Start with pricing, the booking form, or WhatsApp. We usually confirm availability within 2 hours." },
     { q: "What is included in packages?", a: "Professional photographer(s), all edited photos (digital), highlight reel, backup equipment, and pre-event planning call." },
   ]
 
@@ -195,13 +195,13 @@ export function CTABanner() {
       <div className="relative max-w-4xl mx-auto px-4 text-center">
         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-5 py-2 mb-6">
           <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-          <span className="text-white/90 text-sm font-medium">{nextTwo} filling up fast</span>
+          <span className="text-white/90 text-sm font-medium">Planning for {nextTwo}? Ask about availability.</span>
         </div>
         <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-          Your Perfect Day<br />Deserves Perfect Frames
+          Ready to Plan<br />Your Coverage?
         </h2>
         <p className="text-amber-100 text-lg md:text-xl mb-10 max-w-xl mx-auto">
-          Book in 2 minutes. Get a free personalized quote within 2 hours. No calls, no pressure — just clarity.
+          Start with pricing or send us a WhatsApp message. We&apos;ll help you choose the right coverage with clear next steps.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
@@ -211,14 +211,14 @@ export function CTABanner() {
             className="group inline-flex items-center justify-center gap-3 bg-white text-amber-700 hover:bg-slate-900 hover:text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
           >
             <MessageCircle size={22} />
-            Get Free Quote on WhatsApp
+            Ask on WhatsApp
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <Link
             href={buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "booking" })}
             className="inline-flex items-center justify-center border-2 border-white/40 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            Book Online — 2 Min Form
+            Start Booking Request
           </Link>
         </div>
       </div>

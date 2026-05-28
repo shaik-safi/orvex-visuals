@@ -44,23 +44,23 @@ const services = homepageSlugs.map((slug) => {
 const expectations = [
   {
     title: "Fast, clear communication",
-    text: `You get a structured response ${RESPONSE_TIME_PROMISE}, with your next step clearly explained.`,
+    text: `You hear from us ${RESPONSE_TIME_PROMISE} with clear options and an easy next step.`,
   },
   {
     title: "Transparent booking flow",
-    text: "Estimate first, booking second. No hidden add-ons and no ambiguous package promises.",
+    text: "See pricing first, then choose how you want to proceed. No hidden add-ons and no vague package promises.",
   },
   {
     title: "Clear delivery promises",
-    text: `Edited photos are promised in ${PHOTO_DELIVERY_DAYS} working days with ownership staying with you.`,
+    text: `Edited photos arrive in ${PHOTO_DELIVERY_DAYS} working days, with copyright staying with you.`,
   },
 ]
 
 const features = [
   { icon: Clock, title: `${PHOTO_DELIVERY_DAYS}-Day Photo Delivery`, desc: `Edited photos are delivered in ${PHOTO_DELIVERY_DAYS} working days with a clear turnaround promise.`, stat: `${PHOTO_DELIVERY_DAYS} days` },
-  { icon: Shield, title: "You Own Everything", desc: "Every photo, every frame, every video — 100% copyright yours from day one. No watermarks, no restrictions, no annual fees.", stat: "100% yours" },
-  { icon: Receipt, title: "Honest, Final Pricing", desc: "The price you see is the price you pay. GST included, no surprise add-ons. We despise hidden charges as much as you do.", stat: "Zero hidden fees" },
-  { icon: Smartphone, title: "Book Online", desc: `Build an estimate, move to booking, and get a secure booking link ${RESPONSE_TIME_PROMISE}.`, stat: RESPONSE_TIME_PROMISE },
+  { icon: Shield, title: "Copyright Stays With You", desc: "Copyright stays with you from day one. No watermarks, usage restrictions, or recurring fees.", stat: "100% yours" },
+  { icon: Receipt, title: "Honest, Final Pricing", desc: "The price you see already includes GST, so you can plan with confidence and avoid last-minute surprises.", stat: "Zero hidden fees" },
+  { icon: Smartphone, title: "Start Online", desc: `Build an estimate online, then move to booking when you're ready. We'll guide you from there within ${RESPONSE_TIME_PROMISE}.`, stat: RESPONSE_TIME_PROMISE },
 ]
 
 // ============ SERVER COMPONENTS ============
@@ -103,7 +103,7 @@ function ServicesSection() {
             <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Every Milestone</span>
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-4 max-w-xl mx-auto text-lg">
-            Weddings, baby shoots, corporates — {allServices.length}+ services under one roof, all with the same uncompromising quality.
+            Weddings, baby shoots, corporate events, and more — wide-ranging coverage with one consistent standard of care.
           </p>
         </div>
 
@@ -156,14 +156,14 @@ function WhyOrvex() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-16">
           <span className="inline-block bg-amber-500/10 text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            Why Clients Choose Us
+            Why Orvex
           </span>
           <h2 className="text-3xl md:text-5xl font-bold text-white">
-            The Orvex{" "}
-            <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">Promise</span>
+            What You Can{" "}
+            <span className="bg-gradient-to-r from-amber-300 to-amber-500 bg-clip-text text-transparent">Count On</span>
           </h2>
           <p className="text-slate-400 mt-4 max-w-xl mx-auto text-lg">
-            Other studios make you wait 45 days, charge hidden GST, and keep your copyright. We do the opposite.
+            Clear pricing, dependable delivery timelines, and straightforward ownership from the start.
           </p>
         </div>
 
@@ -198,10 +198,10 @@ function WhyOrvex() {
 
 function HowItWorks() {
   const steps = [
-    { step: "01", title: "Tell Us Your Vision", desc: `Share your event details via our builder or booking form. We respond ${RESPONSE_TIME_PROMISE} with the next step.` },
-    { step: "02", title: "We Handle Everything", desc: "Our team matches you with the ideal photographer, plans the shot list, and coordinates logistics. You relax." },
-    { step: "03", title: "Enjoy Your Day", desc: "Professional capture with backup equipment and a second shooter for peace of mind. You celebrate, we create art." },
-    { step: "04", title: `Gallery in ${PHOTO_DELIVERY_DAYS} Days`, desc: `Professionally edited photos delivered digitally in ${PHOTO_DELIVERY_DAYS} working days. Full copyright is yours forever.` },
+    { step: "01", title: "Tell Us About Your Event", desc: `Share your details through the builder or booking form. We'll respond ${RESPONSE_TIME_PROMISE} with clear options and next steps.` },
+    { step: "02", title: "Plan the Coverage", desc: "We help shape the right coverage, timeline, and team for your event." },
+    { step: "03", title: "Coverage on the Day", desc: "Our team works with a calm presence, backup equipment, and attention to the moments that matter." },
+    { step: "04", title: `Gallery in ${PHOTO_DELIVERY_DAYS} Days`, desc: `Edited photos are delivered digitally within ${PHOTO_DELIVERY_DAYS} working days, and copyright stays with you.` },
   ]
 
   return (

@@ -68,7 +68,7 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
   if (loading) {
     return (
       <div className="flex items-center justify-center bg-white dark:bg-slate-950">
-        <div className="animate-pulse text-slate-400">Loading booking...</div>
+        <div className="animate-pulse text-slate-400">Opening your saved package...</div>
       </div>
     )
   }
@@ -78,7 +78,7 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
       <div className="flex flex-col items-center justify-center bg-white dark:bg-slate-950 px-4">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Booking Not Found</h1>
         <p className="text-slate-500 dark:text-slate-400 mb-6">{error || "This booking does not exist or has expired."}</p>
-        <Link href={buildPricingHandoffHref({ from: "quote", source: "Saved Booking", intent: "custom-package" })} className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
+        <Link href={buildPricingHandoffHref({ from: "quote", source: "Your saved package", intent: "custom-package" })} className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
           ← Build a new package
         </Link>
       </div>
@@ -107,7 +107,7 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
       {/* ── Action bar — screen only ── */}
       <div className="print:hidden max-w-3xl mx-auto px-4 mb-6 flex items-center justify-between">
         <Link
-          href={buildPricingHandoffHref({ from: "quote", source: "Saved Booking", intent: "custom-package" })}
+          href={buildPricingHandoffHref({ from: "quote", source: "Your saved package", intent: "custom-package" })}
           className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
         >
           <ArrowLeft size={14} /> Back to Pricing

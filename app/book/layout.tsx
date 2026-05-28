@@ -1,12 +1,12 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Book a Photographer in Bangalore — Free Quote | Orvex Visuals",
+  title: "Start a Booking Request in Bangalore | Orvex Visuals",
   description:
-    "Book your photographer in 2 minutes. Fill the form, get a free quote within 2 hours. Wedding, pre-wedding, baby, events. No call needed.",
+    "Share your event details, review your plan, and get clear next steps on pricing and availability from Orvex Visuals.",
   openGraph: {
-    title: "Book a Photographer | Orvex Visuals Bangalore",
-    description: "Quick booking form. Free quote within 2 hours. GST-inclusive transparent pricing.",
+    title: "Start a Booking Request | Orvex Visuals Bangalore",
+    description: "Share your event details and receive clear next steps on pricing and availability.",
     type: "website",
   },
 }

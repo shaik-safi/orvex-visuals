@@ -207,7 +207,7 @@ function BookingForm() {
     return (
       <section className="pt-32 pb-20 bg-white dark:bg-slate-950">
         <div className="max-w-lg mx-auto px-4 text-center text-slate-500 dark:text-slate-400">
-          Redirecting to pricing...
+          Taking you back to pricing...
         </div>
       </section>
     )
@@ -220,8 +220,8 @@ function BookingForm() {
           <div className="w-20 h-20 bg-green-100 dark:bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle size={40} className="text-green-600 dark:text-green-400" />
           </div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">Booking Sent!</h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-6">Your inquiry has been sent via WhatsApp. We&apos;ll respond within 2 hours with a personalized quote.</p>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">WhatsApp Draft Ready</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-6">We opened WhatsApp with your booking details. Review the message there and send it when you&apos;re ready.</p>
           <Link href="/" className="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 font-medium hover:underline">
             <ArrowLeft size={16} /> Back to Home
           </Link>
@@ -235,11 +235,11 @@ function BookingForm() {
       <div className="max-w-2xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-10">
-          <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">Book in 2 Minutes</span>
+          <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">Booking Request</span>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-            Book Your <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Shoot</span>
+            Share Your <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Booking Details</span>
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-lg">Fill the form, get a free personalized quote within 2 hours. No call needed.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-lg">Tell us about your event and we&apos;ll reply within 2 hours with availability and the best next step.</p>
         </div>
 
         {/* Progress */}
@@ -256,7 +256,7 @@ function BookingForm() {
         {plan && (
           <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-5 mb-6">
             <h4 className="text-sm font-bold text-amber-700 dark:text-amber-400 mb-3 flex items-center gap-2">
-              <Camera size={16} /> Your Custom Plan
+              <Camera size={16} /> Your Plan Summary
             </h4>
             <div className="space-y-1.5 text-sm text-slate-700 dark:text-slate-300">
               {plan.services.map((s, i) => (
@@ -362,7 +362,7 @@ function BookingForm() {
                   <ArrowLeft size={18} /> Back
                 </button>
                 <button onClick={handleSubmit} disabled={!form.budget || isSubmitting} className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20">
-                  <MessageCircle size={18} /> {isSubmitting ? "Sending…" : "Send via WhatsApp"}
+                  <MessageCircle size={18} /> {isSubmitting ? "Preparing WhatsApp..." : "Continue to WhatsApp"}
                 </button>
               </div>
             </div>
@@ -371,8 +371,8 @@ function BookingForm() {
 
         {/* Trust badges */}
         <div className="mt-8 flex flex-wrap justify-center gap-4 text-xs text-slate-400">
-          <span className="flex items-center gap-1"><CheckCircle size={12} className="text-green-500" /> Free quote in 2 hours</span>
-          <span className="flex items-center gap-1"><CheckCircle size={12} className="text-green-500" /> No spam, ever</span>
+          <span className="flex items-center gap-1"><CheckCircle size={12} className="text-green-500" /> Reply within 2 hours</span>
+          <span className="flex items-center gap-1"><CheckCircle size={12} className="text-green-500" /> Your details stay private</span>
           <span className="flex items-center gap-1"><CheckCircle size={12} className="text-green-500" /> GST-inclusive pricing</span>
         </div>
       </div>
@@ -384,7 +384,7 @@ function BookingForm() {
 export default function BookPage() {
   return (
     <main>
-      <Suspense fallback={<div className="pt-32 pb-20 text-center text-slate-400">Loading...</div>}>
+      <Suspense fallback={<div className="pt-32 pb-20 text-center text-slate-400">Preparing your booking form...</div>}>
         <BookingForm />
       </Suspense>
     </main>

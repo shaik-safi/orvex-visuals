@@ -87,10 +87,11 @@ function sanitizeLabel(value: string | null, fallback: string) {
 
 function getServicePrefill(serviceSlug: string, serviceName: string): ServicePrefillPreset | null {
   const lookup = `${serviceSlug} ${serviceName}`.toLowerCase()
+  const label = `Suggested setup for ${serviceName}`
 
   if (lookup.includes("pre-wedding") || lookup.includes("post-wedding") || lookup.includes("engagement") || lookup.includes("anniversary")) {
     return {
-      label: `${serviceName} starting point loaded`,
+      label,
       events: [
         {
           name: serviceName,
@@ -105,7 +106,7 @@ function getServicePrefill(serviceSlug: string, serviceName: string): ServicePre
 
   if (lookup.includes("baby") || lookup.includes("maternity") || lookup.includes("newborn")) {
     return {
-      label: `${serviceName} starting point loaded`,
+      label,
       events: [{ name: serviceName, duration: "Half Day" as const, services: { "candid-photo": 1 }, addOns: {} }],
       globalAddOns: {} as Record<string, number>,
     }
@@ -113,7 +114,7 @@ function getServicePrefill(serviceSlug: string, serviceName: string): ServicePre
 
   if (lookup.includes("corporate") || lookup.includes("conference") || lookup.includes("seminar") || lookup.includes("award")) {
     return {
-      label: `${serviceName} starting point loaded`,
+      label,
       events: [{ name: serviceName, duration: "Full Day" as const, services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} }],
       globalAddOns: {} as Record<string, number>,
     }
@@ -121,7 +122,7 @@ function getServicePrefill(serviceSlug: string, serviceName: string): ServicePre
 
   if (lookup.includes("housewarming")) {
     return {
-      label: `${serviceName} starting point loaded`,
+      label,
       events: [{ name: serviceName, duration: "Half Day" as const, services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} }],
       globalAddOns: {} as Record<string, number>,
     }
@@ -129,7 +130,7 @@ function getServicePrefill(serviceSlug: string, serviceName: string): ServicePre
 
   if (lookup.includes("birthday") || lookup.includes("naming") || lookup.includes("cradle") || lookup.includes("haldi") || lookup.includes("mehendi") || lookup.includes("sangeet") || lookup.includes("event")) {
     return {
-      label: `${serviceName} starting point loaded`,
+      label,
       events: [{ name: serviceName, duration: "Half Day" as const, services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} }],
       globalAddOns: {} as Record<string, number>,
     }
@@ -137,7 +138,7 @@ function getServicePrefill(serviceSlug: string, serviceName: string): ServicePre
 
   if (lookup.includes("cinematic") || lookup.includes("videography") || lookup.includes("video")) {
     return {
-      label: `${serviceName} starting point loaded`,
+      label,
       events: [{ name: serviceName, duration: "Half Day" as const, services: { [lookup.includes("cinematic") ? "cinematic-video" : "traditional-video"]: 1 }, addOns: {} }],
       globalAddOns: {} as Record<string, number>,
     }
@@ -145,7 +146,7 @@ function getServicePrefill(serviceSlug: string, serviceName: string): ServicePre
 
   if (lookup.includes("drone")) {
     return {
-      label: `${serviceName} starting point loaded`,
+      label,
       events: [{ name: serviceName, duration: "Half Day" as const, services: { "candid-photo": 1 }, addOns: { drone: 1 } }],
       globalAddOns: {} as Record<string, number>,
     }
@@ -153,7 +154,7 @@ function getServicePrefill(serviceSlug: string, serviceName: string): ServicePre
 
   if (lookup.includes("portrait") || lookup.includes("portfolio") || lookup.includes("studio") || lookup.includes("product")) {
     return {
-      label: `${serviceName} starting point loaded`,
+      label,
       events: [{ name: serviceName, duration: "Half Day" as const, services: { "traditional-photo": 1 }, addOns: {} }],
       globalAddOns: {} as Record<string, number>,
     }
@@ -161,7 +162,7 @@ function getServicePrefill(serviceSlug: string, serviceName: string): ServicePre
 
   if (lookup.includes("wedding")) {
     return {
-      label: `${serviceName} starting point loaded`,
+      label,
       events: [{ name: serviceName, duration: "Full Day" as const, services: { "traditional-photo": 1, "candid-photo": 1 }, addOns: {} }],
       globalAddOns: {} as Record<string, number>,
     }
@@ -191,7 +192,7 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): Pr
       sourceLabel,
       scrollToBuilder: false,
     }
-    prefillLabel = `${packageName} package prefilled below`
+    prefillLabel = `${packageName} package selected`
   } else if (templateName && templateName in eventTemplates) {
     prefill = {
       key: `template:${templateName}`,
@@ -200,7 +201,7 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): Pr
       sourceLabel,
       scrollToBuilder: false,
     }
-    prefillLabel = `${templateName} template prefilled below`
+    prefillLabel = `${templateName} selected`
   } else if (serviceSlug) {
     prefill = {
       key: `service:${serviceSlug}:${sourceLabel}`,
@@ -215,17 +216,17 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): Pr
   }
 
   const descriptions: Record<string, string> = {
-    booking: "All online bookings start here so you can compare coverage, pricing, and availability before you submit your request.",
-    availability: "This page is the pricing and availability step, so you can compare options before moving to booking.",
-    "custom-package": "You came here to build a custom package, so the builder below is the next step.",
-    style: "You came here to turn a style reference into a real event package with pricing and coverage clarity.",
-    quote: "You came here to turn what you saw into a real package, quote, and availability check.",
+    booking: "Compare packages first or jump straight into the builder. Nothing is locked in until you send your request.",
+    availability: "This page helps you compare options clearly before you move ahead with booking or availability.",
+    "custom-package": "Your custom package builder is ready below. Start with the suggestion and change anything you want.",
+    style: "We turned that reference into a practical starting point so you can price it properly and adjust it your way.",
+    quote: "Shape the package here first, then check availability when you feel happy with the setup.",
   }
 
   return {
     from,
     sourceLabel,
-    headline: `You came from ${sourceLabel}`,
+    headline: prefill ? "A suggested starting point is ready" : "Choose how you want to start",
     description: descriptions[intent] || descriptions.availability,
     prefillLabel: prefillLabel || undefined,
     prefill,
@@ -239,12 +240,12 @@ function PricingHandoffBanner({ handoff }: { handoff: PricingHandoffContext }) {
       <div className="max-w-4xl mx-auto px-6">
         <div className="rounded-2xl border border-amber-200/70 dark:border-amber-500/20 bg-amber-50/70 dark:bg-amber-500/5 p-5 md:p-6 shadow-sm">
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
               <MapPin size={12} />
-              {handoff.sourceLabel}
+              Based on {handoff.sourceLabel}
             </span>
             {handoff.prefillLabel && (
-              <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20">
                 <Sparkles size={12} />
                 {handoff.prefillLabel}
               </span>
@@ -260,10 +261,10 @@ function PricingHandoffBanner({ handoff }: { handoff: PricingHandoffContext }) {
               Jump to Builder <ArrowRight size={15} />
             </a>
             <a
-              href="/pricing"
+              href="#packages"
               className="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600"
             >
-              Stay on Pricing Overview
+              See Packages First
             </a>
           </div>
         </div>
@@ -294,18 +295,13 @@ function PricingHero({ handoff }: { handoff?: PricingHandoffContext | null }) {
         </h1>
 
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-xl mx-auto mb-10 leading-relaxed">
-          While others say &ldquo;call for quote&rdquo; and surprise you with 18% GST later &mdash; we show the final number upfront.
+          See clear pricing upfront, compare coverage options, and choose what fits your event before you send a request.
         </p>
 
         <div className="max-w-2xl mx-auto rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 px-5 py-4 mb-8 shadow-sm">
           <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-            All online bookings start here so you can compare coverage, pricing, and availability before you submit your request.
+            Start with a package or build your own. You can adjust everything before booking.
           </p>
-          {handoff && (
-            <p className="mt-2 text-sm font-medium text-amber-600 dark:text-amber-300">
-              We also used context from {handoff.sourceLabel} to make the builder a better starting point.
-            </p>
-          )}
         </div>
 
         <div className="flex flex-wrap gap-3 justify-center">
@@ -316,19 +312,6 @@ function PricingHero({ handoff }: { handoff?: PricingHandoffContext | null }) {
             </span>
           ))}
         </div>
-
-        {handoff && (
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
-            <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 dark:bg-amber-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
-              From {handoff.sourceLabel}
-            </span>
-            {handoff.prefillLabel && (
-              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300">
-                {handoff.prefillLabel}
-              </span>
-            )}
-          </div>
-        )}
       </div>
     </section>
   )
@@ -339,15 +322,15 @@ function PackagesSection({ onCustomize }: { onCustomize?: (packageName: string) 
   const { ref, isVisible } = useScrollReveal()
 
   return (
-    <section className="py-24 md:py-32 bg-white dark:bg-slate-950 transition-colors">
+    <section id="packages" className="py-24 md:py-32 bg-white dark:bg-slate-950 transition-colors">
       <div ref={ref} className="max-w-6xl mx-auto px-6">
         <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">Full Event Coverage</p>
+          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">Package Starting Points</p>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
             Event Packages
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-4 max-w-md mx-auto">
-            Starter presets for your event. Pick one to begin &mdash; customize services, add video, drone, or extras in the builder below.
+            Pick the closest fit, then customize coverage, team, and extras in the builder below.
           </p>
         </div>
 
@@ -410,7 +393,7 @@ function PackagesSection({ onCustomize }: { onCustomize?: (packageName: string) 
                     >
                       Start with {pkg.name} →
                     </button>
-                    <p className="text-[11px] text-center text-slate-400 dark:text-slate-500">Pre-fills the builder below — customize anything</p>
+                    <p className="text-[11px] text-center text-slate-400 dark:text-slate-500">Starts in the builder, and you can change anything</p>
                   </div>
                 </div>
               </div>
@@ -537,9 +520,6 @@ const eventTemplates: Record<string, EventPreset[]> = {
 
 // Package-to-builder presets are now sourced from PACKAGES[].builderPreset in constants.ts
 
-const timeSlots = ["Morning", "Afternoon", "Evening", "Full Day"] as const
-type TimeSlot = (typeof timeSlots)[number]
-
 function generateEventId() {
   return `event-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
@@ -557,7 +537,6 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
 
   // Event metadata
   const [eventDate, setEventDate] = useState("")
-  const [timeSlot, setTimeSlot] = useState<TimeSlot>("Full Day")
   const [eventCity, setEventCity] = useState("")
   const [venueName, setVenueName] = useState("")
 
@@ -763,7 +742,6 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
     lines.push("")
 
     if (eventDate) lines.push(`Date: ${formatDate(eventDate)}`)
-    if (timeSlot && timeSlot !== "Full Day") lines.push(`Time: ${timeSlot}`)
     if (eventCity) lines.push(`Location: ${eventCity}${venueName ? ` - ${venueName}` : ""}`)
     if (eventDate || eventCity) lines.push("")
 
@@ -837,7 +815,6 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
       total: totalPrice,
       packageName: activePackage || undefined,
       date: eventDate,
-      timeSlot,
       city: eventCity,
       venue: venueName,
     }
@@ -875,8 +852,8 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
           </p>
           {handoff && (
             <div className="mt-6 max-w-2xl mx-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-5 py-4 text-left shadow-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-400 mb-2">From {handoff.sourceLabel}</p>
-              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{handoff.description}</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-400 mb-2">Suggested setup</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">We added a suggested setup based on {handoff.sourceLabel}. Review it below and change anything you want.</p>
               {handoff.prefillLabel && (
                 <p className="mt-2 text-sm font-medium text-emerald-600 dark:text-emerald-300">{handoff.prefillLabel}. Change anything below.</p>
               )}
@@ -891,6 +868,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
             {/* Event Details */}
             <div className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`} style={{ transitionDelay: "100ms" }}>
               <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">Event Details</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mb-4">Choose coverage length inside each event card. Exact timing can be finalized during booking.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="relative">
                   <Calendar size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none z-10" />
@@ -902,20 +880,6 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                     className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-sm text-slate-900 dark:text-white focus:border-amber-500/50 focus:outline-none transition-colors dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-60 dark:[&::-webkit-calendar-picker-indicator]:invert"
                   />
                 </div>
-                <div className="flex rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 overflow-hidden">
-                  {timeSlots.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => setTimeSlot(slot)}
-                      className={`flex-1 py-3 text-xs font-medium transition-colors ${timeSlot === slot
-                          ? "bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border-b-2 border-amber-500"
-                          : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
-                        }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </div>
                 <div className="relative">
                   <MapPin size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                   <input
@@ -926,7 +890,7 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                     placeholder="e.g. Bangalore, Mysore, Mangalore"
                   />
                 </div>
-                <div className="relative">
+                <div className="relative sm:col-span-2">
                   <MapPin size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
                   <input
                     type="text"
@@ -1028,27 +992,30 @@ function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest
                       {isExpanded && (
                         <div className="px-5 pb-6 space-y-5 border-t border-slate-100 dark:border-slate-800/60 pt-5">
                           {/* Event name + duration */}
-                          <div className="flex gap-3">
+                          <div className="flex flex-col gap-3 sm:flex-row">
                             <input
                               type="text"
                               value={event.name}
                               onChange={(e) => updateEventName(event.id, e.target.value)}
-                              className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-800/40 text-sm text-slate-900 dark:text-white focus:border-amber-500/50 focus:outline-none transition-colors"
+                              className="w-full flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-800/40 text-sm text-slate-900 dark:text-white focus:border-amber-500/50 focus:outline-none transition-colors"
                               placeholder="e.g. Reception, Haldi, Sangeeth..."
                             />
-                            <div className="flex rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700/60">
-                              {(["Half Day", "Full Day"] as const).map((d) => (
-                                <button
-                                  key={d}
-                                  onClick={() => updateEventDuration(event.id, d)}
-                                  className={`px-3.5 py-2.5 text-xs font-medium transition-colors ${event.duration === d
-                                      ? "bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400"
-                                      : "bg-slate-50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
-                                    }`}
-                                >
-                                  {d}
-                                </button>
-                              ))}
+                            <div className="w-full sm:w-auto">
+                              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">Coverage</p>
+                              <div className="grid w-full grid-cols-2 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700/60 sm:flex sm:w-auto sm:min-w-[220px]">
+                                {(["Half Day", "Full Day"] as const).map((d) => (
+                                  <button
+                                    key={d}
+                                    onClick={() => updateEventDuration(event.id, d)}
+                                    className={`px-3.5 py-2.5 text-xs font-medium transition-colors sm:min-w-[110px] ${event.duration === d
+                                        ? "bg-amber-100 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400"
+                                        : "bg-slate-50 dark:bg-slate-800/40 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                                      }`}
+                                  >
+                                    {d}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
                           </div>
 
@@ -1402,7 +1369,7 @@ function PricingCTA() {
           Lock In Your Date
         </h2>
         <p className="text-amber-100/80 text-lg mb-10 max-w-md mx-auto">
-          Build your package above, then book when you&apos;re ready. No pressure, no follow-up calls.
+          Explore the options above, shape your package, and book only when it feels right.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
