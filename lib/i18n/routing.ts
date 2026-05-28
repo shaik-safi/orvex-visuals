@@ -32,3 +32,4 @@ export function withLocaleHref(href: string, locale: AppLocale): string {
   const withQuery = query ? `${localizedPath}?${query}` : localizedPath
   return hash ? `${withQuery}#${hash}` : withQuery
 }
+
