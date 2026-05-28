@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Portfolio Gallery — Wedding & Event Photography | Orvex Visuals",
+  title: "Portfolio Gallery — Wedding & Event Photography",
   description:
     "Browse our photography portfolio. Wedding, pre-wedding, baby, events & portrait photography in Bangalore. See our best work and get inspired.",
   keywords: ["photography portfolio Bangalore", "wedding photo gallery", "candid photography samples", "pre-wedding shoot gallery"],

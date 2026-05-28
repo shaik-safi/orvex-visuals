@@ -1,9 +1,9 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Photography Pricing in Bangalore (2026) — Transparent Rates | Orvex Visuals",
+  title: "Photography Pricing in Bangalore (2026) — Transparent Rates",
   description:
-    "Complete photography pricing for Bangalore. Wedding from ₹20K, pre-wedding from ₹15K, events from ₹8K. All prices GST-inclusive. No hidden charges.",
+    "See clear GST-inclusive photography pricing for weddings, pre-Wedding shoots, baby sessions, and events in bangalore before you send a request.",
   keywords: ["photography pricing Bangalore", "wedding photographer cost", "cheap photographer Bangalore", "photography packages with prices"],
   alternates: { canonical: "/pricing" },
   openGraph: {

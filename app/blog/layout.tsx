@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Photography Blog — Tips, Guides & Pricing | Orvex Visuals Bangalore",
+  title: "Photography Blog — Tips, Guides & Pricing",
   description:
     "Photography tips, location guides, pricing breakdowns, and expert advice for Bangalore. Pre-wedding spots, wedding costs, baby shoot ideas & more.",
   openGraph: {

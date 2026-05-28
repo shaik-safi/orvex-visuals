@@ -236,7 +236,7 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): Pr
 
 function PricingHandoffBanner({ handoff }: { handoff: PricingHandoffContext }) {
   return (
-    <section className="-mt-8 pb-10 md:pb-14 bg-white dark:bg-slate-950">
+    <section className="pt-2 pb-10 md:pt-14 md:pb-14 bg-white dark:bg-slate-950">
       <div className="max-w-4xl mx-auto px-6">
         <div className="rounded-2xl border border-amber-200/70 dark:border-amber-500/20 bg-amber-50/70 dark:bg-amber-500/5 p-5 md:p-6 shadow-sm">
           <div className="flex flex-wrap items-center gap-2 mb-3">

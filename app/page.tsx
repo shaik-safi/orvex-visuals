@@ -60,7 +60,7 @@ const features = [
   { icon: Clock, title: `${PHOTO_DELIVERY_DAYS}-Day Photo Delivery`, desc: `Edited photos are delivered in ${PHOTO_DELIVERY_DAYS} working days with a clear turnaround promise.`, stat: `${PHOTO_DELIVERY_DAYS} days` },
   { icon: Shield, title: "Copyright Stays With You", desc: "Copyright stays with you from day one. No watermarks, usage restrictions, or recurring fees.", stat: "100% yours" },
   { icon: Receipt, title: "Honest, Final Pricing", desc: "The price you see already includes GST, so you can plan with confidence and avoid last-minute surprises.", stat: "Zero hidden fees" },
-  { icon: Smartphone, title: "Start Online", desc: `Build an estimate online, then move to booking when you're ready. We'll guide you from there within ${RESPONSE_TIME_PROMISE}.`, stat: RESPONSE_TIME_PROMISE },
+  { icon: Smartphone, title: "Start Online", desc: `Build an estimate online, then move to booking when you're ready. We'll guide you from there ${RESPONSE_TIME_PROMISE}.`, stat: RESPONSE_TIME_PROMISE },
 ]
 
 // ============ SERVER COMPONENTS ============

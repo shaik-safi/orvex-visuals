@@ -58,7 +58,7 @@ export function Hero() {
         <Image
           key={src}
           src={src}
-          alt="Orvex Visuals Photography"
+          alt=""
           fill
           className={`object-cover transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0"}`}
           sizes="100vw"
@@ -83,15 +83,15 @@ export function Hero() {
         </div>
 
         <h1 className="animate-fade-in-up animation-delay-200 text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[0.9] mb-8 tracking-tight">
-          Photography &amp; Films
+          Timeless Photography &amp; Films
           <br />
           <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
-            for Meaningful Celebrations
+            for Wedding, Families &amp; Events
           </span>
         </h1>
 
         <p className="animate-fade-in-up animation-delay-400 text-lg md:text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed">
-          Thoughtful coverage, clear pricing, and fast delivery for weddings, families, and events.
+          Thoughtful coverage, clear pricing, fast delivery and full ownership for weddings, families, and events.
           Your photos stay fully yours.
         </p>
 
