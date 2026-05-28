@@ -1,0 +1,767 @@
+{
+  "about": {
+    "hero": {
+      "badge": "About Us",
+      "titleLine1": "We Capture",
+      "titleHighlight": "Emotions",
+      "titleLine2": "Not Just Photos",
+      "description": "Orvex Visuals is a Bangalore-based photography and videography studio passionate about turning your life's most precious moments into timeless visual stories.",
+      "facts": {
+        "location": "Bangalore, India",
+        "since": "Since 2020",
+        "workflow": "Booking-first workflow"
+      },
+      "proofTitle": "What we can stand behind",
+      "proofPoints": [
+        "Edited photos in {PHOTO_DELIVERY_DAYS} working days. Videos in {VIDEO_DELIVERY_DAYS} working days.",
+        "Transparent GST-inclusive pricing with a written booking summary.",
+        "Your delivered photos and videos remain yours with no surprise licensing restrictions."
+      ],
+      "proofNote": "We removed unverified review counts and stock team imagery so this page reflects only claims we can support in production."
+    },
+    "story": {
+      "badge": "Our Story",
+      "title": "From Passion to Profession",
+      "paragraphs": [
+        "Orvex Visuals started with a simple belief - every moment deserves to be captured beautifully, and professional photography should not cost a fortune. Founded in Bangalore in 2020, we set out to make world-class photography accessible to everyone.",
+        "What began as a one-person passion project has grown into a booking-first studio experience focused on transparent planning, fast delivery, and clean communication from inquiry to final handoff.",
+        "Our philosophy is simple: combine artistic vision with technical excellence, keep pricing transparent (all GST-inclusive, no surprises), and treat every client like family. We are not just photographers - we are visual storytellers who happen to have cameras."
+      ]
+    },
+    "stats": [
+      { "label": "Photo Delivery", "numberTemplate": "{PHOTO_DELIVERY_DAYS} Days" },
+      { "label": "Video Delivery", "numberTemplate": "{VIDEO_DELIVERY_DAYS} Days" },
+      { "label": "Advance To Confirm", "numberTemplate": "30%" },
+      { "label": "Copyright Yours", "numberTemplate": "100%" }
+    ],
+    "why": {
+      "badge": "Why Orvex",
+      "title": "What Sets Us Apart",
+      "items": [
+        { "title": "Detail-Oriented", "description": "We obsess over every frame, every angle, every edit to ensure perfection." },
+        { "title": "Transparent Pricing", "description": "All prices are GST-inclusive. What we quote is what you pay. No surprises." },
+        { "title": "Quick Turnaround", "descriptionTemplate": "Photos in {PHOTO_DELIVERY_DAYS} working days. Videos in {VIDEO_DELIVERY_DAYS} working days." },
+        { "title": "Client-First Approach", "description": "Your vision drives our work. We listen, plan, and execute to your expectations." },
+        { "title": "Pro Equipment", "description": "Top-tier Sony and Canon gear with full backup sets on every shoot." },
+        { "title": "Always On Time", "description": "We arrive early, set up in advance, and never miss a moment." }
+      ]
+    },
+    "team": {
+      "badge": "The Team",
+      "title": "The People Behind the Lens",
+      "description": "We show the workflow clearly instead of using stock headshots for people you have not actually met.",
+      "members": [
+        {
+          "name": "Planning and Coordination",
+          "role": "Pre-event alignment",
+          "speciality": "Timelines, deliverables, and coverage planning before shoot day."
+        },
+        {
+          "name": "Capture Team",
+          "role": "Shoot execution",
+          "speciality": "Photography and videography teams matched to the event format."
+        },
+        {
+          "name": "Editing and Delivery",
+          "role": "Post-production",
+          "speciality": "Clean edits, organized delivery, and final handoff on schedule."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Let's Create Something Beautiful",
+      "description": "Ready to work with us? We would love to hear about your project.",
+      "whatsapp": "Get in Touch",
+      "services": "View Services"
+    }
+  },
+  "servicesPage": {
+    "hero": {
+      "badgeTemplate": "{count}+ Photography Services",
+      "titleLine1": "Every Moment",
+      "titleHighlight": "Deserves",
+      "titleLine2": "the Best",
+      "description": "From weddings to birthdays, corporate events to baby shoots - we have specialized photographers for every occasion."
+    },
+    "searchPlaceholder": "Search services...",
+    "categoryLabels": {
+      "all": "All Services",
+      "wedding": "Wedding",
+      "pre-wedding": "Pre-Wedding",
+      "events": "Events and Ceremonies",
+      "baby-kids": "Baby and Kids",
+      "videography": "Videography",
+      "corporate": "Corporate and Portfolio",
+      "products": "Albums and Prints"
+    },
+    "resultsTemplate": "Showing {count} services",
+    "popular": "Popular",
+    "priceFrom": "From",
+    "viewDetails": "View Details",
+    "emptyState": "No services found. Try a different search or category.",
+    "cta": {
+      "title": "Do not see what you need?",
+      "description": "We cover all types of events. Tell us your requirement and we will create a custom package.",
+      "build": "Build Custom Package",
+      "talk": "Talk Through My Options",
+      "whatsappTemplate": "Hi Orvex, I'd like to discuss my event requirements and get a custom package."
+    }
+  },
+  "serviceDetailPage": {
+    "breadcrumbs": {
+      "home": "Home",
+      "services": "Services"
+    },
+    "hero": {
+      "checkPricing": "Check Pricing and Availability",
+      "viewPackages": "View Packages",
+      "badgeGst": "GST Inclusive",
+      "badgeDeliveryTemplate": "{PHOTO_DELIVERY_DAYS}-Day Photo Delivery",
+      "badgeArea": "Bangalore and Beyond",
+      "badgeSummary": "Booking Summary Included"
+    },
+    "overview": {
+      "badge": "About This Service",
+      "title": "What We Offer",
+      "note": "Representative visual references while the verified client portfolio is being refreshed."
+    },
+    "packages": {
+      "pricingTemplate": "{service} Pricing",
+      "titleTemplate": "{service} Packages",
+      "description": "For this service only. All prices GST-inclusive, no hidden charges.",
+      "mostPopular": "MOST POPULAR",
+      "durationPrefix": "Duration:",
+      "askTemplate": "Ask About {package}",
+      "customize": "Need something different? Mix and match services for your event.",
+      "buildCustom": "Build a Custom Package"
+    },
+    "process": {
+      "badge": "How It Works",
+      "title": "Our Process"
+    },
+    "faq": {
+      "badge": "FAQ",
+      "title": "Common Questions"
+    },
+    "related": {
+      "title": "Related Services",
+      "learnMore": "Learn More"
+    },
+    "cta": {
+      "titleTemplate": "Ready to Book Your {service}?",
+      "description": "Compare pricing online or talk with us to choose the right coverage for your event.",
+      "checkPricing": "Check Pricing and Availability",
+      "whatsapp": "Talk on WhatsApp"
+    }
+  },
+  "blogPage": {
+    "hero": {
+      "badge": "Blog and Guides",
+      "titleLine1": "Tips, Guides and",
+      "titleHighlight": "Inspiration",
+      "description": "Photography tips, location guides, pricing breakdowns, and expert advice to help you plan the perfect shoot."
+    },
+    "featured": "Featured",
+    "readUnit": "min read",
+    "readArticle": "Read Article",
+    "searchPlaceholder": "Search articles...",
+    "categoryLabels": {
+      "all": "All Posts",
+      "pre-wedding": "Pre-Wedding",
+      "wedding": "Wedding",
+      "baby-maternity": "Baby and Maternity",
+      "pricing-guide": "Pricing Guides",
+      "locations": "Locations",
+      "tips": "Tips and Ideas",
+      "events": "Events"
+    },
+    "countTemplate": "{count} articles",
+    "read": "Read",
+    "empty": "No articles found. Try a different search or category.",
+    "cta": {
+      "title": "Planning a Photoshoot?",
+      "description": "Get expert guidance and a free quote. We will help you plan the perfect session.",
+      "button": "Chat With Us"
+    }
+  },
+  "blogPostPage": {
+    "breadcrumbs": {
+      "home": "Home",
+      "blog": "Blog"
+    },
+    "meta": {
+      "readUnit": "min read",
+      "expertRole": "Photography Experts"
+    },
+    "tagsLabel": "Tags",
+    "backToBlog": "Back to Blog",
+    "share": "Share",
+    "relatedTitle": "You Might Also Like",
+    "relatedRead": "Read",
+    "cta": {
+      "title": "Liked What You Read? Let's Create Your Story",
+      "description": "Get a free consultation and personalized quote for your photoshoot.",
+      "pricing": "Check Pricing and Availability",
+      "whatsapp": "Ask on WhatsApp",
+      "whatsappTemplate": "Hi Orvex, I read your blog and would like help planning my photoshoot."
+    },
+    "notFound": {
+      "title": "Post Not Found",
+      "description": "The blog post you are looking for does not exist."
+    }
+  },
+  "galleryPage": {
+    "hero": {
+      "badge": "Style Reference Gallery",
+      "titleLine1": "Visual",
+      "titleHighlight": "Direction",
+      "description": "Representative references used to show the style and mood we can plan for your event while verified client work is being refreshed.",
+      "note": "These are style references, not presented as direct client proof."
+    },
+    "categories": {
+      "all": "All Work",
+      "wedding": "Weddings",
+      "pre-wedding": "Pre-Wedding",
+      "events": "Events",
+      "baby": "Baby and Family",
+      "portraits": "Portraits",
+      "cinematic": "Cinematic"
+    },
+    "lightboxCounterTemplate": "{current} / {total}",
+    "resultsTemplate": "{count} reference frames",
+    "empty": "No reference frames in this category yet.",
+    "cta": {
+      "title": "Want This Style for Your Event?",
+      "description": "Build your package online or talk to us about the style you want, and we will tailor the coverage around your event.",
+      "build": "Build a Package",
+      "talk": "Talk About This Style"
+    }
+  },
+  "contactPage": {
+    "hero": {
+      "badge": "Contact Orvex",
+      "titleLine1": "Tell Us About",
+      "titleHighlight": "Your Event",
+      "description": "Ask a question, check availability, or share what you are planning. WhatsApp is usually the quickest way to reach us."
+    },
+    "info": {
+      "title": "Contact Info",
+      "description": "Choose the channel that feels easiest for you.",
+      "whatsapp": {
+        "title": "WhatsApp (Fastest)",
+        "subtitle": "Usually the quickest reply"
+      },
+      "phone": {
+        "title": "Phone",
+        "subtitle": "Mon-Sat, 9 AM - 8 PM"
+      },
+      "email": {
+        "title": "Email",
+        "subtitle": "Usually within 24 hours"
+      },
+      "location": {
+        "title": "Location",
+        "line1": "Bangalore, Karnataka, India",
+        "line2": "Available across India for travel"
+      },
+      "hours": {
+        "title": "Working Hours",
+        "line1": "Mon - Sat: 9 AM - 8 PM",
+        "line2": "Sunday: By Appointment"
+      },
+      "follow": "Follow Us"
+    },
+    "form": {
+      "title": "Tell Us What You Need",
+      "description": "Share a few details and we will reply with the best next step. If you prefer, you can continue on WhatsApp afterward.",
+      "savedTitle": "Thanks, we have got your details",
+      "savedDescription": "We will review your inquiry and follow up using the details you shared.",
+      "waTitle": "Your WhatsApp message is ready",
+      "waDescription": "We opened WhatsApp with your details. Review the draft there and send it when you are ready.",
+      "whatsappTemplate": {
+        "start": "Hi Orvex, my name is {name}.",
+        "service": "Service: {value}",
+        "date": "Event Date: {value}",
+        "message": "Message: {value}",
+        "phone": "Phone: {value}",
+        "email": "Email: {value}"
+      },
+      "continueWhatsapp": "Continue on WhatsApp",
+      "openWhatsappAgain": "Open WhatsApp Again",
+      "sendAnother": "Send Another Inquiry",
+      "editInquiry": "Edit Inquiry",
+      "labels": {
+        "name": "Your Name *",
+        "phone": "Phone Number *",
+        "email": "Email",
+        "service": "Service Required *",
+        "date": "Event Date",
+        "message": "Message"
+      },
+      "placeholders": {
+        "name": "John Doe",
+        "phone": "e.g. 98XXXXXXXX",
+        "email": "you@example.com",
+        "message": "Tell us about your event, requirements, budget, or any questions..."
+      },
+      "serviceSelectPlaceholder": "Select a service",
+      "serviceOptions": [
+        "Wedding Photography",
+        "Pre-Wedding Shoot",
+        "Baby/Newborn Shoot",
+        "Birthday Photography",
+        "Event Photography",
+        "Videography",
+        "Corporate Photography",
+        "Other"
+      ],
+      "sending": "Sending...",
+      "send": "Send Inquiry",
+      "helper": "Prefer WhatsApp? You can continue there after this step."
+    },
+    "faq": {
+      "title": "Quick Answers",
+      "items": [
+        {
+          "q": "How quickly do you respond?",
+          "a": "We review saved inquiries during working hours and usually reply the same day. WhatsApp is the fastest follow-up channel."
+        },
+        {
+          "q": "How do I book a date?",
+          "a": "Submit the booking form or contact form first. Once we confirm availability, pay the required advance to lock your date."
+        },
+        {
+          "q": "Do you travel outside Bangalore?",
+          "a": "Yes! We cover events across India. Travel and accommodation charges apply for outstation bookings."
+        },
+        {
+          "q": "Can I visit your studio?",
+          "a": "We operate as a mobile studio with on-location shoots. For baby/newborn shoots, we come to your home or can arrange a studio setup."
+        }
+      ]
+    }
+  },
+  "bookPage": {
+    "redirecting": "Taking you back to pricing...",
+    "submittedTitle": "WhatsApp Draft Ready",
+    "submittedDescription": "We opened WhatsApp with your booking details. Review the message there and send it when you are ready.",
+    "backHome": "Back to Home",
+    "hero": {
+      "badge": "Booking Request",
+      "titleLine1": "Share Your",
+      "titleHighlight": "Booking Details",
+      "description": "Tell us about your event and we will reply within 2 hours with availability and the best next step."
+    },
+    "summary": {
+      "title": "Your Plan Summary",
+      "total": "Total"
+    },
+    "steps": {
+      "details": "Your Details",
+      "event": "Event Details",
+      "budget": "Budget and Notes"
+    },
+    "fields": {
+      "fullName": "Full Name *",
+      "phone": "Phone Number *",
+      "email": "Email (Optional)",
+      "service": "Service Needed *",
+      "eventDate": "Event Date",
+      "venue": "Venue / Location",
+      "budget": "Approx. Budget *",
+      "requirements": "Any specific requirements?",
+      "source": "How did you find us?"
+    },
+    "placeholders": {
+      "fullName": "e.g. Rahul Sharma",
+      "phone": "e.g. 98456 XXXXX",
+      "email": "e.g. you@email.com",
+      "service": "e.g. Wedding Photography",
+      "venue": "e.g., Palace Grounds, Bangalore",
+      "requirements": "e.g., Need 2 photographers, want drone coverage, specific style preference..."
+    },
+    "sourceOptions": ["Select", "Google Search", "Instagram", "Friend / Family", "Blog article", "Other"],
+    "errors": {
+      "name": "Enter at least 2 characters",
+      "phone": "Enter a valid 10-digit Indian mobile number",
+      "email": "Enter a valid email address",
+      "date": "Please select a future date"
+    },
+    "actions": {
+      "nextEvent": "Next: Event Details",
+      "next": "Next",
+      "back": "Back",
+      "continue": "Continue to WhatsApp",
+      "preparing": "Preparing WhatsApp..."
+    },
+    "trust": [
+      "Reply within 2 hours",
+      "Your details stay private",
+      "GST-inclusive pricing"
+    ],
+    "whatsapp": {
+      "saved": {
+        "start": "Hi Orvex, I just submitted a booking request.",
+        "bookingId": "Booking ID: {quoteId}",
+        "name": "Name: {value}",
+        "phone": "Phone: {value}",
+        "email": "Email: {value}",
+        "service": "Service: {value}",
+        "date": "Event Date: {value}",
+        "time": "Time Slot: {value}",
+        "venue": "Venue: {value}",
+        "budget": "Budget: {value}",
+        "total": "Package Total: Rs.{value}",
+        "notes": "Notes: {value}",
+        "viewBooking": "View booking: {url}",
+        "confirm": "Please confirm availability and next steps."
+      },
+      "fallback": {
+        "start": "Hi Orvex, I want to book a photography service.",
+        "name": "Name: {value}",
+        "phone": "Phone: {value}",
+        "email": "Email: {value}",
+        "service": "Service: {value}",
+        "date": "Event Date: {value}",
+        "time": "Time Slot: {value}",
+        "venue": "Venue: {value}",
+        "budget": "Budget: {value}",
+        "eventsTitle": "Event Plan:",
+        "eventLine": "- {name} ({coverage}) - Rs.{price}",
+        "eventSelectionLine": "  - {name} x{qty}",
+        "extrasTitle": "Add-ons:",
+        "extraLine": "- {name}{qty} - Rs.{price}",
+        "total": "Estimated Total: Rs.{value}",
+        "notes": "Notes: {value}",
+        "confirm": "Please share availability and next steps."
+      }
+    },
+    "fallback": "Preparing your booking form..."
+  },
+  "privacyPage": {
+    "title": "Privacy Policy",
+    "updated": "Last updated: January 2026",
+    "sections": [
+      {
+        "title": "1. Information We Collect",
+        "body": "When you use our booking form, contact form, or WhatsApp, we may collect your name, phone number, email address (optional), event details (date, venue, type), and budget preferences. We do not collect payment card information. Payments, if applicable, are handled separately via UPI or bank transfer."
+      },
+      {
+        "title": "2. How We Use Your Information",
+        "body": "We use your information to respond to your inquiry, prepare estimates or booking summaries, coordinate your photography session, and continue the conversation over WhatsApp, email, or phone when needed. We never sell or rent your personal data for third-party marketing."
+      },
+      {
+        "title": "3. Photos and Media",
+        "body": "Photos and videos captured during your event are delivered exclusively to you. We may use select images (with your consent) for our portfolio, website gallery, and social media. You may opt out of portfolio usage at any time by informing us in writing."
+      },
+      {
+        "title": "4. Data Storage and Security",
+        "body": "Inquiry and booking details submitted through the site may be stored in secured systems that are accessible only to authorized team members. Some conversations may continue on WhatsApp or email after submission. Media retention and archival timelines can vary by project and are confirmed directly with the client instead of being guaranteed globally on the site."
+      },
+      {
+        "title": "5. Cookies and Analytics",
+        "body": "Our website uses essential cookies and Vercel Analytics to understand traffic patterns. We do not use third-party advertising trackers. Analytics data is anonymized and cannot identify individual users."
+      },
+      {
+        "title": "6. Third-Party Services",
+        "body": "We use services such as WhatsApp Business (Meta) for communication, Firebase/Firestore for inquiry and booking storage, Google Drive or similar delivery tools for media handoff, and Vercel for hosting. Each service has its own privacy policy governing its handling of data."
+      },
+      {
+        "title": "7. Your Rights",
+        "body": "You may request: access to your stored data, correction of inaccurate data, deletion of your data, or withdrawal of portfolio consent at any time."
+      },
+      {
+        "title": "8. Contact",
+        "bodyTemplate": "For privacy concerns, email us at {EMAIL} or message us on WhatsApp at {PHONE_DISPLAY}."
+      }
+    ]
+  },
+  "termsPage": {
+    "title": "Terms of Service",
+    "updated": "Last updated: January 2026",
+    "sections": [
+      {
+        "title": "1. Services",
+        "body": "Orvex Visuals provides photography and videography coordination services in Bangalore and surrounding areas. We connect you with professional, vetted photographers from our curated network to cover your events."
+      },
+      {
+        "title": "2. Booking and Payment",
+        "body": "A booking is confirmed upon receipt of 30% advance payment. The remaining balance is due on the day of the event before the shoot begins. We accept UPI, NEFT/IMPS bank transfer, and cash. All prices are inclusive of GST (18%)."
+      },
+      {
+        "title": "3. Cancellation and Refunds",
+        "list": [
+          "7+ days before event: Full refund of advance",
+          "3-7 days before event: 50% refund of advance",
+          "Less than 3 days: No refund (team is already reserved)",
+          "Date change: Free if requested 5+ days in advance (subject to availability)"
+        ]
+      },
+      {
+        "title": "4. Delivery",
+        "bodyTemplate": "Edited photos are delivered within {PHOTO_DELIVERY_DAYS} working days via online gallery. Videos are delivered within {VIDEO_DELIVERY_DAYS} working days. Rush delivery may be available for specific packages. One round of revisions is included where applicable."
+      },
+      {
+        "title": "5. Copyright and Usage",
+        "body": "You receive full personal usage rights to all delivered photos and videos. Orvex Visuals retains the right to use select images for portfolio, marketing, and social media purposes unless you opt out in writing before the event. Commercial usage by the client requires separate written agreement."
+      },
+      {
+        "title": "6. Limitations of Liability",
+        "body": "While we take every precaution, Orvex Visuals is not liable for: unforeseen equipment failure beyond backup coverage, venue/weather restrictions preventing coverage, delays caused by event schedule changes, or loss/damage of delivered files after handover to client."
+      },
+      {
+        "title": "7. Client Responsibilities",
+        "body": "Clients are expected to: provide accurate event details at booking, inform us of any venue restrictions or special requirements, ensure photographer access to key moments, and communicate schedule changes promptly."
+      },
+      {
+        "title": "8. Force Majeure",
+        "body": "Neither party is liable for failure to perform due to circumstances beyond reasonable control including natural disasters, government restrictions, pandemics, or civil unrest. In such cases, we will offer a full reschedule or refund."
+      },
+      {
+        "title": "9. Disputes",
+        "body": "Any disputes shall be resolved amicably through discussion. If unresolved, disputes are subject to the jurisdiction of courts in Bangalore, Karnataka, India."
+      },
+      {
+        "title": "10. Contact",
+        "bodyTemplate": "For questions about these terms, email {EMAIL} or call {PHONE_DISPLAY}."
+      }
+    ]
+  },
+  "quotePage": {
+    "loading": "Opening your saved package...",
+    "notFoundTitle": "Booking Not Found",
+    "notFoundDescription": "This booking does not exist or has expired.",
+    "newPackage": "Build a new package",
+    "backToPricing": "Back to Pricing",
+    "downloadPdf": "Download PDF",
+    "askQuestion": "Ask a Question",
+    "savedPackageSource": "Saved Package",
+    "whatsappMessageTemplate": "Hi {BRAND_NAME}, I have a question about quote #{id}.",
+    "bookingReference": "Booking Reference",
+    "preparedFor": "Prepared for",
+    "labels": {
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "eventDate": "Event Date",
+      "venue": "Venue",
+      "service": "Service",
+      "budget": "Budget",
+      "notes": "Notes",
+      "packageOverview": "Package Overview",
+      "coveragePlan": "Coverage Plan",
+      "addons": "Add-ons",
+      "totalInvestment": "Total Investment",
+      "terms": "Terms and Conditions"
+    },
+    "headings": {
+      "customer": "Customer",
+      "bookingDetails": "Booking Details",
+      "eventCoverage": "Event Coverage",
+      "extras": "Extras",
+      "notes": "Notes",
+      "total": "Total",
+      "terms": "Terms"
+    },
+    "terms": [
+      "This is your booking summary. Final amount confirmed after discussion.",
+      "Booking confirmation requires 30% advance payment.",
+      "Photos delivered within 5 working days. Videos within 15 working days.",
+      "Free cancellation 7+ days before event. 50% refund 3-7 days before.",
+      "Full copyright of all deliverables belongs to you.",
+      "Booking summary valid for 30 days from date of creation."
+    ],
+    "footerSite": "orvexvisuals.com",
+    "metaLine": "Inclusive of all services - No hidden charges",
+    "signatory": "Authorised Signatory",
+    "placeholders": {
+      "na": "-",
+      "noContent": "This booking does not exist or has expired."
+    }
+  },
+  "adminPage": {
+    "title": "Orvex Admin",
+    "signinSubtitle": "Sign in to view all quotes",
+    "password": "Admin Password",
+    "passwordPlaceholder": "Enter admin password",
+    "wrongPassword": "Wrong password. Try again.",
+    "checking": "Checking...",
+    "signIn": "Sign In",
+    "stats": {
+      "totalQuotes": "Total Quotes",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "confirmedRevenue": "Confirmed Revenue",
+      "thisMonth": "{count} this month",
+      "awaiting": "awaiting follow-up",
+      "conversion": "{rate}% conversion",
+      "revenueSub": "from confirmed bookings"
+    },
+    "filters": {
+      "searchPlaceholder": "Name, phone, email, city, notes...",
+      "filters": "Filters",
+      "exportCsv": "Export CSV",
+      "source": "Source",
+      "city": "City",
+      "sortBy": "Sort by",
+      "eventDateFrom": "Event date from",
+      "eventDateTo": "Event date to",
+      "resetFilters": "Reset filters",
+      "allSources": "All sources",
+      "pricingSource": "Pricing calculator",
+      "bookingSource": "Direct booking form",
+      "allCities": "All cities",
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "eventDate": "By event date",
+      "amountHigh": "Amount: high to low",
+      "amountLow": "Amount: low to high",
+      "resultCount": "{count} results"
+    },
+    "statuses": {
+      "all": "All",
+      "new": "New",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled"
+    },
+    "csv": {
+      "headers": ["ID", "Name", "Phone", "Email", "Status", "Event Date", "City", "Venue", "Service", "Total", "Source", "Found Via", "Notes", "Created At"],
+      "filePrefix": "orvex-quotes",
+      "exportTitle": "Export quotes as CSV"
+    },
+    "quick": {
+      "whatsapp": "WhatsApp",
+      "eventDateLine": "{date}{time}",
+      "events": "Events",
+      "selectionLine": "{name} x{qty}",
+      "addOns": "Add-ons",
+      "addOnLine": "{name} x{qty} - {price}",
+      "serviceLabel": "Service:",
+      "budgetLabel": "Budget:",
+      "sourceLabel": "Source:",
+      "foundViaLabel": "Found via:",
+      "notes": "Notes"
+    },
+    "emptyValue": "-",
+    "unknownCustomer": "Unknown customer",
+    "totalQuotesHeader": "All quotes ({count})",
+    "loadingQuotes": "Loading quotes...",
+    "loadError": "Could not load quotes. Check your Firebase configuration.",
+    "noResults": "No quotes match your filters.",
+    "noQuotes": "No quotes yet. They will appear here after customers book.",
+    "refreshTitle": "Refresh",
+    "signOutTitle": "Sign out",
+    "statusUpdateFail": "Failed to update status. Please try again."
+  },
+  "pricingPage": {
+    "handoff": {
+      "defaultSource": "your previous page",
+      "headlineReady": "A suggested starting point is ready",
+      "headlineChoose": "Choose how you want to start",
+      "descriptionBooking": "Compare packages first or jump straight into the builder. Nothing is locked in until you send your request.",
+      "descriptionAvailability": "This page helps you compare options clearly before you move ahead with booking or availability.",
+      "descriptionCustom": "Your custom package builder is ready below. Start with the suggestion and change anything you want.",
+      "descriptionStyle": "We turned that reference into a practical starting point so you can price it properly and adjust it your way.",
+      "descriptionQuote": "Shape the package here first, then check availability when you feel happy with the setup.",
+      "packageSelected": "{name} package selected",
+      "templateSelected": "{name} selected",
+      "suggestedSetup": "Suggested setup for {service}",
+      "basedOn": "Based on {source}",
+      "jumpToBuilder": "Jump to Builder",
+      "seePackagesFirst": "See Packages First"
+    },
+    "hero": {
+      "tagline": "All prices GST-inclusive - zero hidden charges",
+      "titlePrefix": "Transparent",
+      "titleHighlight": "Pricing",
+      "description": "See clear pricing upfront, compare coverage options, and choose what fits your event before you send a request.",
+      "subDescription": "Start with a package or build your own. You can adjust everything before booking.",
+      "trustTags": ["GST Included", "No Hidden Fees", "You Own Copyright", "5-Day Delivery"]
+    },
+    "packagesSection": {
+      "badge": "Package Starting Points",
+      "title": "Event Packages",
+      "description": "Pick the closest fit, then customize coverage, team, and extras in the builder below.",
+      "mostPopular": "Most Popular",
+      "onwards": "onwards",
+      "gstInclusive": "GST inclusive",
+      "startWith": "Start with {name}",
+      "changeAny": "Starts in the builder, and you can change anything"
+    },
+    "cta": {
+      "urgency": "Peak season weekends filling fast",
+      "title": "Lock In Your Date",
+      "description": "Explore the options above, shape your package, and book only when it feels right.",
+      "build": "Build Package to Book",
+      "chat": "Chat With Us",
+      "whatsappTemplate": "Hi Orvex, I'd like to discuss my event requirements."
+    },
+    "builder": {
+      "badge": "Custom Package Builder",
+      "title": "Build Your Event Plan",
+      "suggestedTitle": "Suggested Start",
+      "suggestedDescription": "Based on {source}, we prepared a starting setup for you.",
+      "suggestedLabelSuffix": "{label}",
+      "eventDetailsTitle": "Event Details",
+      "eventDetailsHint": "These details help us prepare a better estimate.",
+      "placeholders": {
+        "city": "Event city",
+        "venue": "Venue name",
+        "eventName": "Event name"
+      },
+      "yourEvents": "Your Events",
+      "eventCount": "{count} events",
+      "changeEventType": "Change event type",
+      "pickEventType": "Pick an event type",
+      "replaceSelectionHint": "Selecting a template replaces current events",
+      "templateCount": "{count} events",
+      "newEventName": "New Event",
+      "addEventDay": "Add Event Day",
+      "servicesCount": "{count} services",
+      "noServicesYet": "No services selected yet",
+      "coverage": "Coverage",
+      "halfDay": "Half Day",
+      "fullDay": "Full Day",
+      "servicesTitle": "Services",
+      "premium": "Premium",
+      "extrasTitle": "Event Add-ons",
+      "globalExtrasTitle": "Global Add-ons",
+      "globalExtrasHint": "Applied once across your package.",
+      "summaryTitle": "Estimate Summary",
+      "emptySummaryTitle": "Add your first event to see the estimate",
+      "emptySummaryHint": "Choose a template or add an event day to begin.",
+      "summaryEventCount": "{count} events",
+      "summaryExtrasTitle": "Add-ons",
+      "packageBadge": "{name} Package",
+      "packageTotal": "Package Total",
+      "estimatedTotal": "Estimated Total",
+      "gstInclusive": "GST Inclusive",
+      "addServiceHint": "Add at least one service to continue.",
+      "proceedToBook": "Proceed to Booking",
+      "openingWhatsapp": "Opening WhatsApp...",
+      "sendEstimate": "Send Estimate on WhatsApp",
+      "estimateNote": "This is an estimate. Final scope is confirmed on call.",
+      "trustSignals": [
+        "No hidden charges",
+        "Fast response",
+        "Verified team",
+        "Client-first planning"
+      ]
+    }
+  },
+  "system": {
+    "notFound": {
+      "title": "Page Not Found",
+      "description": "Looks like this page wandered off frame. Let's get you back to capturing moments.",
+      "backHome": "Back to Home",
+      "viewServices": "View Services",
+      "popular": "Popular pages:"
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again.",
+      "tryAgain": "Try Again"
+    },
+    "loading": "Just a moment..."
+  }
+}

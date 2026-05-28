@@ -4,25 +4,29 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, ChevronDown, MessageCircle } from "lucide-react"
+
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getWhatsAppLink, WA_MESSAGES, IMAGES } from "@/lib/constants"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+import { applyTemplate, type HomeMessages } from "@/lib/i18n/home"
+import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
 
-// Helper: get upcoming month names for urgency messaging
-function getUpcomingMonths() {
+function getUpcomingMonths(localeTag: string) {
   const now = new Date()
-  const m1 = new Date(now.getFullYear(), now.getMonth() + 1, 1)
-  const m2 = new Date(now.getFullYear(), now.getMonth() + 2, 1)
-  const monthName = (d: Date) => d.toLocaleString("en-IN", { month: "long" })
-  const withYear = (d: Date) => d.toLocaleString("en-IN", { month: "long", year: "numeric" })
-  return { next: withYear(m1), nextTwo: `${monthName(m1)} & ${monthName(m2)} ${m2.getFullYear()}` }
+  const first = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  const second = new Date(now.getFullYear(), now.getMonth() + 2, 1)
+  const monthName = (date: Date) => date.toLocaleString(localeTag, { month: "long" })
+  const withYear = (date: Date) => date.toLocaleString(localeTag, { month: "long", year: "numeric" })
+  return {
+    next: withYear(first),
+    nextTwo: `${monthName(first)} & ${monthName(second)} ${second.getFullYear()}`,
+  }
 }
 
-// ============ HERO (Client — image carousel + animation) ============
-export function Hero() {
+export function Hero({ messages }: { messages: HomeMessages }) {
   const [currentImage, setCurrentImage] = useState(0)
   const images = IMAGES.hero
-  const { next } = getUpcomingMonths()
+  const { next } = getUpcomingMonths(messages.localeTag)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -44,13 +48,6 @@ export function Hero() {
 
     return () => window.clearTimeout(preloadTimer)
   }, [images])
-
-  const stats = [
-    { number: "500+", label: "Weddings Delivered" },
-    { number: "4.9★", label: "Google Rating" },
-    { number: "5-Day", label: "Delivery Guaranteed" },
-    { number: "100%", label: "Copyright Yours" },
-  ]
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-12">
@@ -78,41 +75,43 @@ export function Hero() {
         <div className="animate-fade-in-up">
           <div className="inline-flex items-center gap-2 bg-red-500/20 backdrop-blur-sm border border-red-400/30 rounded-full px-5 py-2 mb-8">
             <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-            <span className="text-white/90 text-sm font-medium">Planning for {next}? Check availability early.</span>
+            <span className="text-white/90 text-sm font-medium">
+              {applyTemplate(messages.hero.urgencyTemplate, { month: next })}
+            </span>
           </div>
         </div>
 
         <h1 className="animate-fade-in-up animation-delay-200 text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[0.9] mb-8 tracking-tight">
-          Timeless Photography &amp; Films
+          {messages.hero.headingLine1}
           <br />
           <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
-            for Weddings &amp; Milestones
+            {messages.hero.headingHighlight}
           </span>
         </h1>
 
         <p className="animate-fade-in-up animation-delay-400 text-lg md:text-xl text-white/70 mb-12 max-w-2xl mx-auto leading-relaxed">
-          Cinematic photography and films for weddings and milestone celebrations, with clear pricing, fast delivery, and complete ownership.
+          {messages.hero.description}
         </p>
 
         <div className="animate-fade-in-up animation-delay-600 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability" })}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability" }), messages.locale)}
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/30 hover:-translate-y-1"
           >
-            Check Pricing &amp; Availability
+            {messages.hero.primaryCta}
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
-            href="/services"
+            href={withLocalePathname("/services", messages.locale)}
             className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            Explore Services
+            {messages.hero.secondaryCta}
           </Link>
         </div>
 
         <div className="animate-fade-in-up animation-delay-800 mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-          {stats.map((stat, i) => (
-            <div key={i} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all duration-300">
+          {messages.hero.stats.map((stat, index) => (
+            <div key={index} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all duration-300">
               <div className="text-2xl md:text-3xl font-bold text-white">{stat.number}</div>
               <div className="text-white/50 text-xs md:text-sm mt-1">{stat.label}</div>
             </div>
@@ -129,46 +128,37 @@ export function Hero() {
   )
 }
 
-// ============ FAQ SECTION (Client — accordion state) ============
-export function FAQSection() {
+export function FAQSection({ messages }: { messages: HomeMessages }) {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
   const { ref, isVisible } = useScrollReveal()
-
-  const faqs = [
-    { q: "How quickly will I get my photos?", a: "Edited photos are delivered within 5 days. Cinematic video arrives within 15 days." },
-    { q: "Do I own the copyright to my photos?", a: "Yes! 100% copyright belongs to you. All photos and videos are fully yours." },
-    { q: "Are your prices inclusive of GST?", a: "Yes. All prices shown are final. No hidden charges, no surprise 18% add-on." },
-    { q: "How do I book?", a: "Start with pricing, the booking form, or WhatsApp. We usually confirm availability within 2 hours." },
-    { q: "What is included in packages?", a: "Professional photographer(s), all edited photos (digital), highlight reel, backup equipment, and pre-event planning call." },
-  ]
 
   return (
     <section id="faq" className="py-24 md:py-32 bg-slate-50 dark:bg-slate-900 transition-colors duration-500">
       <div ref={ref} className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            FAQ
+            {messages.faq.badge}
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white">Common Questions</h2>
+          <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white">{messages.faq.heading}</h2>
         </div>
 
         <div className="space-y-3">
-          {faqs.map((faq, i) => (
+          {messages.faq.items.map((faq, index) => (
             <div
-              key={i}
+              key={index}
               className={`bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl overflow-hidden hover:border-amber-200 dark:hover:border-amber-500/30 transition-all duration-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-              style={{ transitionDelay: `${200 + i * 80}ms` }}
+              style={{ transitionDelay: `${200 + index * 80}ms` }}
             >
               <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full flex items-center justify-between p-6 text-left"
               >
                 <span className="font-semibold text-slate-900 dark:text-white pr-4">{faq.q}</span>
-                <div className={`w-8 h-8 bg-amber-50 dark:bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 ${openIndex === i ? "rotate-180" : ""}`}>
+                <div className={`w-8 h-8 bg-amber-50 dark:bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 ${openIndex === index ? "rotate-180" : ""}`}>
                   <ChevronDown size={16} className="text-amber-600 dark:text-amber-400" />
                 </div>
               </button>
-              <div className={`overflow-hidden transition-all duration-300 ${openIndex === i ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
+              <div className={`overflow-hidden transition-all duration-300 ${openIndex === index ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
                 <div className="px-6 pb-6 -mt-2">
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{faq.a}</p>
                 </div>
@@ -181,10 +171,9 @@ export function FAQSection() {
   )
 }
 
-// ============ CTA BANNER (Client — for scroll reveal) ============
-export function CTABanner() {
+export function CTABanner({ messages }: { messages: HomeMessages }) {
   const { ref, isVisible } = useScrollReveal()
-  const { nextTwo } = getUpcomingMonths()
+  const { nextTwo } = getUpcomingMonths(messages.localeTag)
 
   return (
     <section id="contact" ref={ref} className={`py-20 md:py-28 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
@@ -194,13 +183,15 @@ export function CTABanner() {
       <div className="relative max-w-4xl mx-auto px-4 text-center">
         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-5 py-2 mb-6">
           <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-          <span className="text-white/90 text-sm font-medium">Planning for {nextTwo}? Ask about availability.</span>
+          <span className="text-white/90 text-sm font-medium">
+            {applyTemplate(messages.cta.urgencyTemplate, { months: nextTwo })}
+          </span>
         </div>
         <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-          Ready to Plan<br />Your Coverage?
+          {messages.cta.headingLine1}<br />{messages.cta.headingLine2}
         </h2>
         <p className="text-amber-100 text-lg md:text-xl mb-10 max-w-xl mx-auto">
-          Start with pricing or send us a WhatsApp message. We&apos;ll help you choose the right coverage with clear next steps.
+          {messages.cta.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
@@ -210,14 +201,14 @@ export function CTABanner() {
             className="group inline-flex items-center justify-center gap-3 bg-white text-amber-700 hover:bg-slate-900 hover:text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
           >
             <MessageCircle size={22} />
-            Ask on WhatsApp
+            {messages.cta.whatsappCta}
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <Link
-            href={buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "booking" })}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "booking" }), messages.locale)}
             className="inline-flex items-center justify-center border-2 border-white/40 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            Start Booking Request
+            {messages.cta.bookingCta}
           </Link>
         </div>
       </div>

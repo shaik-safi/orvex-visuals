@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import {
   Phone,
@@ -6,9 +8,17 @@ import {
   Instagram,
   Facebook,
 } from "lucide-react"
-import { EMAIL, PHONE_DISPLAY, SOCIAL_LINKS } from "@/lib/constants"
+import { BRAND_NAME, EMAIL, PHONE_DISPLAY, SOCIAL_LINKS } from "@/lib/constants"
+import { usePathname } from "next/navigation"
+import { extractLocaleFromPathname, withLocalePathname } from "@/lib/i18n/routing"
+import { DEFAULT_LOCALE } from "@/lib/i18n/config"
+import { getCommonMessages } from "@/lib/i18n/common"
 
 export default function Footer() {
+  const pathname = usePathname() || "/"
+  const locale = extractLocaleFromPathname(pathname) ?? DEFAULT_LOCALE
+  const messages = getCommonMessages(locale)
+
   return (
     <footer className="bg-slate-950 text-slate-300 pt-20 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,17 +29,17 @@ export default function Footer() {
               <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center">
                 <span className="text-white font-bold text-sm">OV</span>
               </div>
-              <span className="text-xl font-bold text-white">Orvex Visuals</span>
+              <span className="text-xl font-bold text-white">{BRAND_NAME}</span>
             </div>
             <p className="text-sm text-slate-300 leading-relaxed mb-6">
-              Premium photography & videography coordination in Bangalore.
-              Your moments, beautifully captured.
+              {messages.footer.brandLine1}
+              {` ${messages.footer.brandLine2}`}
             </p>
             <div className="flex gap-2">
-              <a aria-label="Visit Orvex Visuals on Instagram" href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+              <a aria-label={messages.footer.instagramAria} href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                 <Instagram size={16} />
               </a>
-              <a aria-label="Visit Orvex Visuals on Facebook" href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+              <a aria-label={messages.footer.facebookAria} href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 hover:bg-amber-500 rounded-xl flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
                 <Facebook size={16} />
               </a>
             </div>
@@ -37,17 +47,17 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h3 className="text-white font-semibold mb-5">Services</h3>
+            <h3 className="text-white font-semibold mb-5">{messages.footer.servicesTitle}</h3>
             <ul className="space-y-3 text-sm text-slate-300">
               {[
-                ["Wedding Photography", "/services/wedding-photography"],
-                ["Pre-Wedding Shoot", "/services/pre-wedding-photoshoot"],
-                ["Baby Photoshoot", "/services/baby-photoshoot"],
-                ["Event Photography", "/services"],
-                ["Drone Photography", "/services/drone-photography"],
+                [messages.footer.serviceLinks.wedding, "/services/wedding-photography"],
+                [messages.footer.serviceLinks.preWedding, "/services/pre-wedding-photoshoot"],
+                [messages.footer.serviceLinks.baby, "/services/baby-photoshoot"],
+                [messages.footer.serviceLinks.event, "/services"],
+                [messages.footer.serviceLinks.drone, "/services/drone-photography"],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <Link href={href} className="hover:text-amber-300 transition-colors">{label}</Link>
+                  <Link href={withLocalePathname(href, locale)} className="hover:text-amber-300 transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -55,17 +65,17 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-white font-semibold mb-5">Quick Links</h3>
+            <h3 className="text-white font-semibold mb-5">{messages.footer.quickLinksTitle}</h3>
             <ul className="space-y-3 text-sm text-slate-300">
               {[
-                ["Pricing", "/pricing"],
-                ["Gallery", "/gallery"],
-                ["Blog", "/blog"],
-                ["About Us", "/about"],
-                ["FAQs", "/#faq"],
+                [messages.footer.quickLinks.pricing, "/pricing"],
+                [messages.footer.quickLinks.gallery, "/gallery"],
+                [messages.footer.quickLinks.blog, "/blog"],
+                [messages.footer.quickLinks.about, "/about"],
+                [messages.footer.quickLinks.faqs, "/#faq"],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <Link href={href} className="hover:text-amber-300 transition-colors">{label}</Link>
+                  <Link href={href === "/#faq" ? withLocalePathname("/", locale) + "#faq" : withLocalePathname(href, locale)} className="hover:text-amber-300 transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -73,7 +83,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-white font-semibold mb-5">Contact</h3>
+            <h3 className="text-white font-semibold mb-5">{messages.footer.contactTitle}</h3>
             <ul className="space-y-4 text-sm text-slate-300">
               <li className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
@@ -91,7 +101,7 @@ export default function Footer() {
                 <div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
                   <MapPin size={14} className="text-amber-400" />
                 </div>
-                <span>Bangalore, Karnataka</span>
+                <span>{messages.footer.location}</span>
               </li>
             </ul>
           </div>
@@ -99,10 +109,10 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-400">
-          <p>&copy; 2026 Orvex Visuals. All rights reserved.</p>
+          <p>{messages.footer.copyright}</p>
           <div className="flex gap-6">
-            <Link href="/privacy-policy" className="text-slate-300 hover:text-amber-300 transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="text-slate-300 hover:text-amber-300 transition-colors">Terms of Service</Link>
+            <Link href={withLocalePathname("/privacy-policy", locale)} className="text-slate-300 hover:text-amber-300 transition-colors">{messages.footer.privacyPolicy}</Link>
+            <Link href={withLocalePathname("/terms", locale)} className="text-slate-300 hover:text-amber-300 transition-colors">{messages.footer.termsOfService}</Link>
           </div>
         </div>
       </div>

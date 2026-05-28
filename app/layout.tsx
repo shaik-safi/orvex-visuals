@@ -2,10 +2,12 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
+import { headers } from "next/headers"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import WhatsAppFloat from "@/components/WhatsAppFloat"
 import { DOMAIN, EMAIL, PHONE_DISPLAY, PHOTO_DELIVERY_DAYS, PRICE_RANGE, SOCIAL_LINKS, STARTING_PRICE } from "@/lib/constants"
+import { normalizeLocale } from "@/lib/i18n/config"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" })
@@ -74,11 +76,14 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const requestHeaders = await headers()
+  const locale = normalizeLocale(requestHeaders.get("x-locale"))
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -122,7 +127,7 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"

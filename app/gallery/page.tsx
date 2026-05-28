@@ -12,11 +12,14 @@ import {
   Camera,
   MessageCircle,
 } from "lucide-react"
+
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { useCurrentLocale } from "@/hooks/use-current-locale"
 import { getWhatsAppLink } from "@/lib/constants"
+import { getPageMessages } from "@/lib/i18n/pages"
+import { withLocaleHref } from "@/lib/i18n/routing"
 import { buildPricingHandoffHref, getGalleryPricingHandoff } from "@/lib/pricing-handoff"
 
-// ============ DATA ============
 type GalleryCategory = "all" | "wedding" | "pre-wedding" | "events" | "baby" | "portraits" | "cinematic"
 
 interface GalleryImage {
@@ -27,16 +30,6 @@ interface GalleryImage {
   width: number
   height: number
 }
-
-const galleryCategories: { id: GalleryCategory; label: string }[] = [
-  { id: "all", label: "All Work" },
-  { id: "wedding", label: "Weddings" },
-  { id: "pre-wedding", label: "Pre-Wedding" },
-  { id: "events", label: "Events" },
-  { id: "baby", label: "Baby & Family" },
-  { id: "portraits", label: "Portraits" },
-  { id: "cinematic", label: "Cinematic" },
-]
 
 const galleryImages: GalleryImage[] = [
   { src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80", alt: "Wedding ceremony couple exchange garlands", category: "wedding", aspect: "tall", width: 800, height: 1200 },
@@ -65,13 +58,17 @@ const galleryImages: GalleryImage[] = [
   { src: "https://images.unsplash.com/photo-1519741497674-611481863552?w=600&q=80", alt: "Traditional wedding rituals fire", category: "wedding", aspect: "square", width: 600, height: 600 },
 ]
 
-// ============ LIGHTBOX ============
-function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: {
+type GalleryMessages = ReturnType<typeof getPageMessages>["galleryPage"]
+
+const CATEGORY_ORDER: GalleryCategory[] = ["all", "wedding", "pre-wedding", "events", "baby", "portraits", "cinematic"]
+
+function Lightbox({ images, currentIndex, onClose, onPrev, onNext, messages }: {
   images: GalleryImage[]
   currentIndex: number
   onClose: () => void
   onPrev: () => void
   onNext: () => void
+  messages: GalleryMessages
 }) {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -88,6 +85,9 @@ function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: {
   }, [onClose, onPrev, onNext])
 
   const current = images[currentIndex]
+  const counter = messages.lightboxCounterTemplate
+    .replace("{current}", String(currentIndex + 1))
+    .replace("{total}", String(images.length))
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm flex items-center justify-center" onClick={onClose}>
@@ -96,7 +96,7 @@ function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: {
       </button>
 
       <div className="absolute top-5 left-5 text-white/60 text-sm font-medium">
-        {currentIndex + 1} / {images.length}
+        {counter}
       </div>
 
       <button onClick={(e) => { e.stopPropagation(); onPrev() }} className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all">
@@ -124,38 +124,38 @@ function Lightbox({ images, currentIndex, onClose, onPrev, onNext }: {
   )
 }
 
-// ============ HERO ============
-function GalleryHero() {
+function GalleryHero({ messages }: { messages: GalleryMessages }) {
   const { ref, isVisible } = useScrollReveal()
   return (
     <section className="pt-32 pb-10 md:pt-40 md:pb-14 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 relative overflow-hidden">
       <div className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
       <div ref={ref} className={`max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
         <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-          Style Reference Gallery
+          {messages.hero.badge}
         </span>
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white leading-[0.95] mb-6">
-          Visual{" "}
-          <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Direction</span>
+          {messages.hero.titleLine1}{" "}
+          <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">{messages.hero.titleHighlight}</span>
         </h1>
         <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
-          Representative references used to show the style and mood we can plan for your event while verified client work is being refreshed.
+          {messages.hero.description}
         </p>
         <p className="mt-4 text-sm text-slate-400 dark:text-slate-500 max-w-xl mx-auto">
-          These are style references, not presented as direct client proof.
+          {messages.hero.note}
         </p>
       </div>
     </section>
   )
 }
 
-// ============ GALLERY GRID ============
 function GalleryGrid({
   activeCategory,
   setActiveCategory,
+  messages,
 }: {
   activeCategory: GalleryCategory
   setActiveCategory: (category: GalleryCategory) => void
+  messages: GalleryMessages
 }) {
   const { ref, isVisible } = useScrollReveal()
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
@@ -173,31 +173,30 @@ function GalleryGrid({
     setLightboxIndex((prev) => (prev !== null ? (prev + 1) % filtered.length : null))
   }, [filtered.length])
 
+  const categoryLabel = (id: GalleryCategory) => messages.categories[id]
+
   return (
     <section className="py-8 md:py-12 bg-white dark:bg-slate-950 transition-colors">
       <div ref={ref} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Category Filters */}
         <div className={`mb-8 flex flex-wrap justify-center gap-2 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          {galleryCategories.map((cat) => (
+          {CATEGORY_ORDER.map((categoryId) => (
             <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${activeCategory === cat.id
+              key={categoryId}
+              onClick={() => setActiveCategory(categoryId)}
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${activeCategory === categoryId
                 ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/20"
                 : "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-amber-300 dark:hover:border-amber-500/30"
                 }`}
             >
-              {cat.label}
+              {categoryLabel(categoryId)}
             </button>
           ))}
         </div>
 
-        {/* Results count */}
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 text-center">
-          <strong className="text-slate-900 dark:text-white">{filtered.length}</strong> reference frames
+          <strong className="text-slate-900 dark:text-white">{messages.resultsTemplate.replace("{count}", String(filtered.length))}</strong>
         </p>
 
-        {/* Masonry Grid */}
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-3 space-y-3 [content-visibility:auto] [contain-intrinsic-block-size:500px]">
           {filtered.map((image, i) => (
             <div
@@ -221,11 +220,10 @@ function GalleryGrid({
                 blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjgwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZTJlOGYwIi8+PC9zdmc+"
               />
 
-              {/* Overlay on hover */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                 <div className="flex-1">
                   <p className="text-white text-sm font-medium line-clamp-1">{image.alt}</p>
-                  <p className="text-white/60 text-xs mt-0.5 capitalize">{image.category}</p>
+                  <p className="text-white/60 text-xs mt-0.5">{categoryLabel(image.category)}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
@@ -237,16 +235,14 @@ function GalleryGrid({
           ))}
         </div>
 
-        {/* No results */}
         {filtered.length === 0 && (
           <div className="text-center py-20">
             <Camera size={40} className="text-slate-300 dark:text-slate-600 mx-auto mb-4" />
-            <p className="text-slate-500 dark:text-slate-400">No reference frames in this category yet.</p>
+            <p className="text-slate-500 dark:text-slate-400">{messages.empty}</p>
           </div>
         )}
       </div>
 
-      {/* Lightbox */}
       {lightboxIndex !== null && (
         <Lightbox
           images={filtered}
@@ -254,16 +250,18 @@ function GalleryGrid({
           onClose={closeLightbox}
           onPrev={prevImage}
           onNext={nextImage}
+          messages={messages}
         />
       )}
     </section>
   )
 }
 
-// ============ CTA ============
-function GalleryCTA({ activeCategory }: { activeCategory: GalleryCategory }) {
+function GalleryCTA({ activeCategory, messages }: { activeCategory: GalleryCategory; messages: GalleryMessages }) {
   const { ref, isVisible } = useScrollReveal()
+  const locale = useCurrentLocale()
   const pricingHandoff = getGalleryPricingHandoff(activeCategory)
+  const pricingHref = withLocaleHref(buildPricingHandoffHref(pricingHandoff), locale)
 
   return (
     <section ref={ref} className={`py-20 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
@@ -272,17 +270,17 @@ function GalleryCTA({ activeCategory }: { activeCategory: GalleryCategory }) {
 
       <div className="relative max-w-3xl mx-auto px-4 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-          Want This Style for Your Event?
+          {messages.cta.title}
         </h2>
         <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
-          Build your package online or talk to us about the style you want, and we&apos;ll tailor the coverage around your event.
+          {messages.cta.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={buildPricingHandoffHref(pricingHandoff)}
+            href={pricingHref}
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            Build a Package <ArrowRight size={18} />
+            {messages.cta.build} <ArrowRight size={18} />
           </Link>
           <a
             href={getWhatsAppLink("Hi Orvex, I like the style on your gallery page. Can you suggest the right package for my event?")}
@@ -290,7 +288,7 @@ function GalleryCTA({ activeCategory }: { activeCategory: GalleryCategory }) {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            <MessageCircle size={20} /> Talk About This Style
+            <MessageCircle size={20} /> {messages.cta.talk}
           </a>
         </div>
       </div>
@@ -299,13 +297,15 @@ function GalleryCTA({ activeCategory }: { activeCategory: GalleryCategory }) {
 }
 
 export default function GalleryPage() {
+  const locale = useCurrentLocale()
+  const messages = getPageMessages(locale).galleryPage
   const [activeCategory, setActiveCategory] = useState<GalleryCategory>("all")
 
   return (
     <main>
-      <GalleryHero />
-      <GalleryGrid activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
-      <GalleryCTA activeCategory={activeCategory} />
+      <GalleryHero messages={messages} />
+      <GalleryGrid activeCategory={activeCategory} setActiveCategory={setActiveCategory} messages={messages} />
+      <GalleryCTA activeCategory={activeCategory} messages={messages} />
     </main>
   )
 }

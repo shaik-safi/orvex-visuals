@@ -2,6 +2,9 @@
 
 import { useEffect } from "react"
 
+import { useCurrentLocale } from "@/hooks/use-current-locale"
+import { getPageMessages } from "@/lib/i18n/pages"
+
 export default function Error({
   error,
   reset,
@@ -9,6 +12,9 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const locale = useCurrentLocale()
+  const messages = getPageMessages(locale).system.error
+
   useEffect(() => {
     console.error(error)
   }, [error])
@@ -22,16 +28,16 @@ export default function Error({
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
-          Something went wrong
+          {messages.title}
         </h2>
         <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">
-          An unexpected error occurred. Please try again.
+          {messages.description}
         </p>
         <button
           onClick={reset}
           className="inline-flex items-center justify-center bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/30"
         >
-          Try Again
+          {messages.tryAgain}
         </button>
       </div>
     </div>
