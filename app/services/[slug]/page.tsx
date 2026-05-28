@@ -6,8 +6,7 @@ import Image from "next/image"
 import {
   MessageCircle,
   ArrowRight,
-  ArrowLeft,
-  Check,
+    Check,
   Star,
   Shield,
   Clock,
@@ -52,18 +51,16 @@ function ServiceHero({ service }: { service: ServiceDetail }) {
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href={buildPricingHandoffHref({ from: "services", service: service.slug, intent: "view-packages" })}
+            href={buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" })}
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            Check Pricing &amp; Availability
+            <MessageCircle size={18} /> Check Pricing &amp; Availability
           </Link>
           <a
-            href={getWhatsAppLink(`Hi Orvex, I'm interested in your ${service.name} service.`)}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="#packages"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-1"
           >
-            <MessageCircle size={16} /> Ask About This Service
+            View Packages <ArrowRight size={16} />
           </a>
         </div>
 
@@ -184,7 +181,7 @@ function PackagesSection({ service }: { service: ServiceDetail }) {
               </ul>
 
               <a
-                href={getWhatsAppLink(`Hi Orvex, I'm interested in your ${pkg.name} package for ${service.name}.`)}
+                href={getWhatsAppLink(`Hi Orvex, I'm interested in the ${pkg.name} package for ${service.name}. Can you guide me on availability and next steps?`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
@@ -202,7 +199,7 @@ function PackagesSection({ service }: { service: ServiceDetail }) {
         <div className="text-center mt-10 pt-8 border-t border-slate-200 dark:border-slate-800">
           <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">Need something different? Mix & match services for your event.</p>
           <Link
-            href="/pricing#calculator"
+            href={buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "custom-package" })}
             className="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-sm hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
           >
             Build a Custom Package <ArrowRight size={15} />
@@ -335,22 +332,22 @@ function ServiceCTA({ service }: { service: ServiceDetail }) {
           Ready to Book Your {service.name}?
         </h2>
         <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
-          Start your booking request and we&apos;ll confirm the right coverage for your event.
+          Compare pricing online or talk with us to choose the right coverage for your event.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={buildPricingHandoffHref({ from: "services", service: service.slug, intent: "custom-package" })}
+            href={buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" })}
             className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            Check Pricing &amp; Availability
+            <ArrowRight size={20} /> Check Pricing &amp; Availability
           </Link>
           <a
-            href={getWhatsAppLink(`Hi Orvex, I want to know more about your ${service.name} service and booking details.`)}
+            href={getWhatsAppLink(`Hi Orvex, I'm interested in ${service.name}. Can you help me choose the right coverage?`)}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
-            <MessageCircle size={20} /> Talk on WhatsApp
+            <MessageCircle size={18} /> Talk on WhatsApp
           </a>
         </div>
       </div>

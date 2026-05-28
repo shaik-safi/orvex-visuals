@@ -5,6 +5,7 @@ import { BRAND_NAME, PHONE_DISPLAY, EMAIL, getWhatsAppLink } from "@/lib/constan
 import { Download, MessageCircle, ArrowLeft, Calendar, MapPin, User, Phone, Mail } from "lucide-react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
+import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 
 interface QuoteData {
   source: string
@@ -77,7 +78,7 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
       <div className="flex flex-col items-center justify-center bg-white dark:bg-slate-950 px-4">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Booking Not Found</h1>
         <p className="text-slate-500 dark:text-slate-400 mb-6">{error || "This booking does not exist or has expired."}</p>
-        <Link href="/pricing" className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
+        <Link href={buildPricingHandoffHref({ from: "quote", source: "Saved Booking", intent: "custom-package" })} className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
           ← Build a new package
         </Link>
       </div>
@@ -106,7 +107,7 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
       {/* ── Action bar — screen only ── */}
       <div className="print:hidden max-w-3xl mx-auto px-4 mb-6 flex items-center justify-between">
         <Link
-          href="/pricing"
+          href={buildPricingHandoffHref({ from: "quote", source: "Saved Booking", intent: "custom-package" })}
           className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
         >
           <ArrowLeft size={14} /> Back to Pricing

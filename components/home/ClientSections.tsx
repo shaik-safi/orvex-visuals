@@ -22,7 +22,6 @@ function getUpcomingMonths() {
 export function Hero() {
   const [currentImage, setCurrentImage] = useState(0)
   const images = IMAGES.hero
-  const currentHeroImage = images[currentImage] ?? images[0]
   const { next } = getUpcomingMonths()
 
   useEffect(() => {
@@ -55,18 +54,21 @@ export function Hero() {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-12">
-      <Image
-        key={currentHeroImage}
-        src={currentHeroImage}
-        alt="Orvex Visuals Photography"
-        fill
-        className="object-cover"
-        sizes="100vw"
-        priority={currentImage === 0}
-        quality={currentImage === 0 ? 85 : 75}
-        placeholder="blur"
-        blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiMxZTI5M2IiLz48L3N2Zz4="
-      />
+      {images.map((src, index) => (
+        <Image
+          key={src}
+          src={src}
+          alt="Orvex Visuals Photography"
+          fill
+          className={`object-cover transition-opacity duration-1000 ${index === currentImage ? "opacity-100" : "opacity-0"}`}
+          sizes="100vw"
+          priority={index === 0}
+          quality={index === 0 ? 85 : 75}
+          placeholder="blur"
+          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiMxZTI5M2IiLz48L3N2Zz4="
+          aria-hidden={index === currentImage ? undefined : true}
+        />
+      ))}
 
       <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/50 to-slate-900/80" />
 
@@ -95,10 +97,10 @@ export function Hero() {
 
         <div className="animate-fade-in-up animation-delay-600 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={buildPricingHandoffHref({ from: "home" })}
+            href={buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability" })}
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/30 hover:-translate-y-1"
           >
-            Check Pricing & Availability
+            Check Pricing &amp; Availability
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
@@ -213,7 +215,7 @@ export function CTABanner() {
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <Link
-            href="/pricing"
+            href={buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "booking" })}
             className="inline-flex items-center justify-center border-2 border-white/40 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
             Book Online — 2 Min Form

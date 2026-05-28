@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 // saveQuote is only called from /book — pricing page sends estimates only
 import { BOOKING_PLAN_STORAGE_KEY, PACKAGES, SERVICE_RATES, EVENT_ADDONS, GLOBAL_ADDONS, getWhatsAppLink, WA_MESSAGES, PHONE_NUMBER, computePackagePrice } from "@/lib/constants"
-import { parsePricingHandoff, getSourceDisplayName, type HandoffSource } from "@/lib/pricing-handoff"
 import {
   Camera,
   Video,
@@ -40,42 +39,241 @@ const packages = PACKAGES.map((pkg) => ({
   popular: pkg.name === "Signature",
 }))
 
-// ============ CONTEXT BANNER ============
-function PricingContextBanner({ from, source }: { from: HandoffSource | null; source: string | null }) {
-  if (!from) return null
-
-  const displaySource = getSourceDisplayName(from, source ?? undefined)
-  const bannerMessages: Record<HandoffSource, string> = {
-    home: "Coming from our homepage? We have pre-built packages to get you started.",
-    services: "Looking at a specific service? Our calculator lets you customize anything.",
-    gallery: "Loved the style in our gallery? Build a package with similar coverage.",
-    blog: "Found inspiration in our blog? Let's create something perfect for your event.",
-    contact: "Reached out to us? Here's the pricing transparency you asked for.",
-    quote: "Back to your saved booking? Pick up right where you left off.",
-    navbar: "Ready to explore pricing? Let's build your perfect package.",
+type BuilderPrefillRequest =
+  | {
+    key: string
+    type: "package"
+    packageName: string
+    sourceLabel: string
+    scrollToBuilder?: boolean
+  }
+  | {
+    key: string
+    type: "template"
+    templateName: string
+    sourceLabel: string
+    scrollToBuilder?: boolean
+  }
+  | {
+    key: string
+    type: "service"
+    serviceSlug: string
+    serviceName: string
+    sourceLabel: string
+    scrollToBuilder?: boolean
   }
 
+interface PricingHandoffContext {
+  sourceLabel: string
+  from: string
+  headline: string
+  description: string
+  prefillLabel?: string
+  prefill: BuilderPrefillRequest | null
+  prefillKey: string
+}
+
+interface ServicePrefillPreset {
+  label: string
+  events: EventPreset[]
+  globalAddOns: Record<string, number>
+}
+
+function sanitizeLabel(value: string | null, fallback: string) {
+  if (!value) return fallback
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed.slice(0, 120) : fallback
+}
+
+function getServicePrefill(serviceSlug: string, serviceName: string): ServicePrefillPreset | null {
+  const lookup = `${serviceSlug} ${serviceName}`.toLowerCase()
+
+  if (lookup.includes("pre-wedding") || lookup.includes("post-wedding") || lookup.includes("engagement") || lookup.includes("anniversary")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [
+        {
+          name: serviceName,
+          duration: "Half Day" as const,
+          services: { "candid-photo": 1 },
+          addOns: lookup.includes("pre-wedding") || lookup.includes("post-wedding") ? { drone: 1 } : {},
+        },
+      ],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("baby") || lookup.includes("maternity") || lookup.includes("newborn")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "candid-photo": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("corporate") || lookup.includes("conference") || lookup.includes("seminar") || lookup.includes("award")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Full Day" as const, services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("housewarming")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("birthday") || lookup.includes("naming") || lookup.includes("cradle") || lookup.includes("haldi") || lookup.includes("mehendi") || lookup.includes("sangeet") || lookup.includes("event")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("cinematic") || lookup.includes("videography") || lookup.includes("video")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { [lookup.includes("cinematic") ? "cinematic-video" : "traditional-video"]: 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("drone")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "candid-photo": 1 }, addOns: { drone: 1 } }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("portrait") || lookup.includes("portfolio") || lookup.includes("studio") || lookup.includes("product")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Half Day" as const, services: { "traditional-photo": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  if (lookup.includes("wedding")) {
+    return {
+      label: `${serviceName} starting point loaded`,
+      events: [{ name: serviceName, duration: "Full Day" as const, services: { "traditional-photo": 1, "candid-photo": 1 }, addOns: {} }],
+      globalAddOns: {} as Record<string, number>,
+    }
+  }
+
+  return null
+}
+
+function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>): PricingHandoffContext | null {
+  const from = searchParams.get("from")
+  if (!from) return null
+
+  const sourceLabel = sanitizeLabel(searchParams.get("source"), "your previous page")
+  const intent = searchParams.get("intent") || "availability"
+  const packageName = searchParams.get("package")
+  const templateName = searchParams.get("template")
+  const serviceSlug = searchParams.get("service")
+
+  let prefill: BuilderPrefillRequest | null = null
+  let prefillLabel = ""
+
+  if (packageName && PACKAGES.some((pkg) => pkg.name === packageName)) {
+    prefill = {
+      key: `package:${packageName}`,
+      type: "package",
+      packageName,
+      sourceLabel,
+      scrollToBuilder: false,
+    }
+    prefillLabel = `${packageName} package prefilled below`
+  } else if (templateName && templateName in eventTemplates) {
+    prefill = {
+      key: `template:${templateName}`,
+      type: "template",
+      templateName,
+      sourceLabel,
+      scrollToBuilder: false,
+    }
+    prefillLabel = `${templateName} template prefilled below`
+  } else if (serviceSlug) {
+    prefill = {
+      key: `service:${serviceSlug}:${sourceLabel}`,
+      type: "service",
+      serviceSlug,
+      serviceName: sourceLabel,
+      sourceLabel,
+      scrollToBuilder: false,
+    }
+    const servicePreset = getServicePrefill(serviceSlug, sourceLabel)
+    if (servicePreset) prefillLabel = servicePreset.label
+  }
+
+  const descriptions: Record<string, string> = {
+    booking: "All online bookings start here so you can compare coverage, pricing, and availability before you submit your request.",
+    availability: "This page is the pricing and availability step, so you can compare options before moving to booking.",
+    "custom-package": "You came here to build a custom package, so the builder below is the next step.",
+    style: "You came here to turn a style reference into a real event package with pricing and coverage clarity.",
+    quote: "You came here to turn what you saw into a real package, quote, and availability check.",
+  }
+
+  return {
+    from,
+    sourceLabel,
+    headline: `You came from ${sourceLabel}`,
+    description: descriptions[intent] || descriptions.availability,
+    prefillLabel: prefillLabel || undefined,
+    prefill,
+    prefillKey: `${from}:${sourceLabel}:${intent}:${packageName || ""}:${templateName || ""}:${serviceSlug || ""}`,
+  }
+}
+
+function PricingHandoffBanner({ handoff }: { handoff: PricingHandoffContext }) {
   return (
-    <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/15 rounded-2xl p-4 md:p-5 mb-8">
-      <div className="flex items-start gap-3">
-        <div className="w-5 h-5 rounded-full bg-amber-200 dark:bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400" />
-        </div>
-        <div>
-          <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
-            {bannerMessages[from]}
-          </p>
-          <p className="text-xs text-amber-800 dark:text-amber-200/70 mt-1">
-            You came from: <span className="font-semibold">{displaySource}</span>
-          </p>
+    <section className="-mt-8 pb-10 md:pb-14 bg-white dark:bg-slate-950">
+      <div className="max-w-4xl mx-auto px-6">
+        <div className="rounded-2xl border border-amber-200/70 dark:border-amber-500/20 bg-amber-50/70 dark:bg-amber-500/5 p-5 md:p-6 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
+              <MapPin size={12} />
+              {handoff.sourceLabel}
+            </span>
+            {handoff.prefillLabel && (
+              <span className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/20">
+                <Sparkles size={12} />
+                {handoff.prefillLabel}
+              </span>
+            )}
+          </div>
+          <h2 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white mb-2">{handoff.headline}</h2>
+          <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-4">{handoff.description}</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <a
+              href="#calculator"
+              className="inline-flex items-center justify-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:opacity-90"
+            >
+              Jump to Builder <ArrowRight size={15} />
+            </a>
+            <a
+              href="/pricing"
+              className="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600"
+            >
+              Stay on Pricing Overview
+            </a>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 
 // ============ HERO ============
-function PricingHero() {
+function PricingHero({ handoff }: { handoff?: PricingHandoffContext | null }) {
   const { ref, isVisible } = useScrollReveal()
 
   return (
@@ -99,6 +297,17 @@ function PricingHero() {
           While others say &ldquo;call for quote&rdquo; and surprise you with 18% GST later &mdash; we show the final number upfront.
         </p>
 
+        <div className="max-w-2xl mx-auto rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 px-5 py-4 mb-8 shadow-sm">
+          <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+            All online bookings start here so you can compare coverage, pricing, and availability before you submit your request.
+          </p>
+          {handoff && (
+            <p className="mt-2 text-sm font-medium text-amber-600 dark:text-amber-300">
+              We also used context from {handoff.sourceLabel} to make the builder a better starting point.
+            </p>
+          )}
+        </div>
+
         <div className="flex flex-wrap gap-3 justify-center">
           {["GST Included", "No Hidden Fees", "You Own Copyright", "5-Day Delivery"].map((tag) => (
             <span key={tag} className="flex items-center gap-2 text-slate-600 dark:text-slate-300 text-sm">
@@ -107,6 +316,19 @@ function PricingHero() {
             </span>
           ))}
         </div>
+
+        {handoff && (
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 dark:bg-amber-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300">
+              From {handoff.sourceLabel}
+            </span>
+            {handoff.prefillLabel && (
+              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-300">
+                {handoff.prefillLabel}
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </section>
   )
@@ -323,7 +545,7 @@ function generateEventId() {
 }
 
 // ============ INTERACTIVE PRICE CALCULATOR ============
-function PriceCalculator({ prefilledPackage, handoffFrom, handoffService }: { prefilledPackage?: string | null; handoffFrom?: HandoffSource | null; handoffService?: string | null }) {
+function PriceCalculator({ prefill, handoff }: { prefill?: BuilderPrefillRequest | null; handoff?: PricingHandoffContext | null }) {
   const { ref, isVisible } = useScrollReveal()
   const router = useRouter()
   const [events, setEvents] = useState<EventBlock[]>([])
@@ -349,13 +571,7 @@ function PriceCalculator({ prefilledPackage, handoffFrom, handoffService }: { pr
   const calculatorRef = useRef<HTMLDivElement>(null)
   const summaryRef = useRef<HTMLDivElement>(null)
 
-  // Pre-fill from package when clicked — reads preset from PACKAGES constant
-  useEffect(() => {
-    if (!prefilledPackage) return
-    const pkg = PACKAGES.find((p) => p.name === prefilledPackage)
-    if (!pkg || !pkg.builderPreset) return
-
-    const presets = pkg.builderPreset.events
+  const applyEventPresets = (presets: EventPreset[], globalAddOns: Record<string, number> = {}, packageName?: string | null, scrollToBuilder = false) => {
     const newEvents = presets.map((preset) => ({
       id: generateEventId(),
       name: preset.name,
@@ -364,12 +580,39 @@ function PriceCalculator({ prefilledPackage, handoffFrom, handoffService }: { pr
       addOns: { ...preset.addOns } as Record<string, number>,
     }))
     setEvents(newEvents)
-    setExpandedEvents(newEvents.map((e) => e.id))
-    setGlobalAddOnQty({ ...pkg.builderPreset.globalAddOns } as Record<string, number>)
-    setActivePackage(prefilledPackage)
+    setExpandedEvents(newEvents.map((event) => event.id))
+    setGlobalAddOnQty({ ...globalAddOns })
+    setActivePackage(packageName || null)
     setShowTemplates(false)
-    setTimeout(() => calculatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100)
-  }, [prefilledPackage])
+    if (scrollToBuilder) {
+      setTimeout(() => calculatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100)
+    }
+  }
+
+  // Pre-fill from pricing handoff or package clicks.
+  useEffect(() => {
+    if (!prefill) return
+
+    if (prefill.type === "package") {
+      const pkg = PACKAGES.find((item) => item.name === prefill.packageName)
+      if (!pkg || !pkg.builderPreset) return
+      applyEventPresets(pkg.builderPreset.events, pkg.builderPreset.globalAddOns as Record<string, number>, prefill.packageName, prefill.scrollToBuilder)
+      return
+    }
+
+    if (prefill.type === "template") {
+      const presets = eventTemplates[prefill.templateName]
+      if (!presets) return
+      applyEventPresets(presets, {}, null, prefill.scrollToBuilder)
+      return
+    }
+
+    if (prefill.type === "service") {
+      const servicePreset = getServicePrefill(prefill.serviceSlug, prefill.serviceName)
+      if (!servicePreset) return
+      applyEventPresets(servicePreset.events, servicePreset.globalAddOns, null, prefill.scrollToBuilder)
+    }
+  }, [prefill])
 
   const addEvent = (name: string) => {
     const newEvent: EventBlock = {
@@ -630,6 +873,15 @@ function PriceCalculator({ prefilledPackage, handoffFrom, handoffService }: { pr
           <p className="text-slate-500 dark:text-slate-400 mt-4 max-w-lg mx-auto">
             Pick your event type below — we&apos;ll suggest the right team. Add or remove anything you want.
           </p>
+          {handoff && (
+            <div className="mt-6 max-w-2xl mx-auto rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-5 py-4 text-left shadow-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-400 mb-2">From {handoff.sourceLabel}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{handoff.description}</p>
+              {handoff.prefillLabel && (
+                <p className="mt-2 text-sm font-medium text-emerald-600 dark:text-emerald-300">{handoff.prefillLabel}. Change anything below.</p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -1176,20 +1428,30 @@ function PricingCTA() {
 
 // ============ MAIN ============
 export default function PricingPage() {
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null)
   const searchParams = useSearchParams()
-  
-  // Parse handoff context from URL
-  const handoffContext = parsePricingHandoff(searchParams)
+  const handoff = getPricingHandoff(searchParams)
+  const [prefillRequest, setPrefillRequest] = useState<BuilderPrefillRequest | null>(handoff?.prefill || null)
+
+  useEffect(() => {
+    setPrefillRequest(handoff?.prefill || null)
+  }, [handoff?.prefillKey])
 
   return (
     <main>
-      <PricingHero />
-      <div className="max-w-6xl mx-auto px-6 pt-8">
-        <PricingContextBanner from={handoffContext.from} source={handoffContext.source} />
-      </div>
-      <PackagesSection onCustomize={(pkg) => setSelectedPackage(pkg)} />
-      <PriceCalculator prefilledPackage={selectedPackage} handoffFrom={handoffContext.from} handoffService={handoffContext.service} />
+      <PricingHero handoff={handoff} />
+      {handoff && <PricingHandoffBanner handoff={handoff} />}
+      <PackagesSection
+        onCustomize={(pkg) =>
+          setPrefillRequest({
+            key: `manual-package:${pkg}:${Date.now()}`,
+            type: "package",
+            packageName: pkg,
+            sourceLabel: "Pricing Packages",
+            scrollToBuilder: true,
+          })
+        }
+      />
+      <PriceCalculator prefill={prefillRequest} handoff={handoff} />
       <ComparisonSection />
       <PricingCTA />
     </main>

@@ -18,7 +18,7 @@ const homepageLinks = [
   { label: "Services", href: "#services" },
   { label: "Why Us", href: "#why-us" },
   { label: "Gallery", href: "/gallery" },
-  { label: "Pricing", href: buildPricingHandoffHref({ from: "navbar", source: "Pricing Navigation", intent: "view-packages" }) },
+  { label: "Pricing", href: buildPricingHandoffHref({ from: "navbar-pricing", source: "Pricing Navigation", intent: "availability" }) },
   { label: "FAQ", href: "#faq" },
   { label: "Contact", href: "#contact" },
 ]
@@ -26,7 +26,7 @@ const homepageLinks = [
 const siteLinks = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },
-  { label: "Pricing", href: buildPricingHandoffHref({ from: "navbar", source: "Pricing Navigation", intent: "view-packages" }) },
+  { label: "Pricing", href: buildPricingHandoffHref({ from: "navbar-pricing", source: "Pricing Navigation", intent: "availability" }) },
   { label: "Gallery", href: "/gallery" },
   { label: "Blog", href: "/blog" },
   { label: "About", href: "/about" },
@@ -40,9 +40,6 @@ export default function Navbar() {
   const pathname = usePathname()
   const isHomepage = pathname === "/"
 
-  // Normalize href by removing query params and anchors for active link detection
-  const normalizeHref = (href: string) => href.split("?")[0].split("#")[0]
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener("scroll", handleScroll)
@@ -51,11 +48,12 @@ export default function Navbar() {
 
   const links = isHomepage ? homepageLinks : siteLinks
 
+  const normalizeHref = (href: string) => href.split("?")[0].split("#")[0]
+
   const isActiveLink = (href: string) => {
     const normalizedHref = normalizeHref(href)
-    const normalizedPathname = normalizeHref(pathname)
-    if (normalizedHref === "/") return normalizedPathname === "/"
-    return normalizedPathname.startsWith(normalizedHref)
+    if (normalizedHref === "/") return pathname === "/"
+    return pathname.startsWith(normalizedHref)
   }
 
   const getLinkClasses = (href: string) => {
@@ -143,7 +141,7 @@ export default function Navbar() {
             </button>
 
             <Link
-              href={buildPricingHandoffHref({ from: "navbar" })}
+              href={buildPricingHandoffHref({ from: "navbar", source: "Site Navigation", intent: "booking" })}
               className="hidden sm:inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0"
             >
               <MessageCircle size={16} />
@@ -186,7 +184,7 @@ export default function Navbar() {
               )
             )}
             <Link
-              href={buildPricingHandoffHref({ from: "navbar" })}
+              href={buildPricingHandoffHref({ from: "navbar", source: "Site Navigation", intent: "booking" })}
               onClick={() => setIsOpen(false)}
               className="block mt-4 text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white px-4 py-3 rounded-xl font-semibold text-sm"
             >

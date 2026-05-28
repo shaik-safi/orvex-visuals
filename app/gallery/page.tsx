@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import Link from "next/link"
 import Image from "next/image"
 import {
   ArrowRight,
@@ -263,6 +264,7 @@ function GalleryGrid({
 function GalleryCTA({ activeCategory }: { activeCategory: GalleryCategory }) {
   const { ref, isVisible } = useScrollReveal()
   const pricingHandoff = getGalleryPricingHandoff(activeCategory)
+
   return (
     <section ref={ref} className={`py-20 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
@@ -273,18 +275,17 @@ function GalleryCTA({ activeCategory }: { activeCategory: GalleryCategory }) {
           Want This Style for Your Event?
         </h2>
         <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
-          Build your package or start a booking request and we&apos;ll tailor the coverage around your event.
+          Build your package online or talk to us about the style you want, and we&apos;ll tailor the coverage around your event.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
+          <Link
             href={buildPricingHandoffHref(pricingHandoff)}
-            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
           >
-            Build a Package
-            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </a>
+            Build a Package <ArrowRight size={18} />
+          </Link>
           <a
-            href={getWhatsAppLink("Hi Orvex, I love this style! Can you help me book similar coverage for my event?")}
+            href={getWhatsAppLink("Hi Orvex, I like the style on your gallery page. Can you suggest the right package for my event?")}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
