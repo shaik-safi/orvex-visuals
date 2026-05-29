@@ -12,6 +12,7 @@ import { getLocaleTag } from "@/lib/i18n/config"
 import { applyTemplate } from "@/lib/i18n/home"
 import { withLocaleHref } from "@/lib/i18n/routing"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
+import { localizeQuoteListValue, localizeQuoteValue } from "@/lib/quote-localization"
 
 interface QuoteData {
   source: string
@@ -98,6 +99,21 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
   const venue = quote.city && quote.venue && quote.city.trim() === quote.venue.trim()
     ? quote.city
     : [quote.city, quote.venue].filter(Boolean).join(" - ")
+  const localizedService = localizeQuoteListValue(quote.service, locale)
+  const localizedTimeSlot = localizeQuoteValue(quote.timeSlot, locale)
+  const localizedEvents = (quote.events ?? []).map((event) => ({
+    ...event,
+    name: localizeQuoteValue(event.name, locale) || event.name,
+    duration: localizeQuoteValue(event.duration, locale) || event.duration,
+    selections: event.selections.map((item) => ({
+      ...item,
+      name: localizeQuoteValue(item.name, locale) || item.name,
+    })),
+  }))
+  const localizedGlobalAddOns = (quote.globalAddOns ?? []).map((addon) => ({
+    ...addon,
+    name: localizeQuoteValue(addon.name, locale) || addon.name,
+  }))
 
   const pricingHref = withLocaleHref(buildPricingHandoffHref({ from: "quote", source: messages.savedPackageSource, intent: "custom-package" }), locale)
 
@@ -129,61 +145,61 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 print:px-0">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow print:shadow-none print:border-0 overflow-hidden">
-          <div className="bg-slate-900 text-white px-6 py-8 sm:px-8 print:bg-white print:text-slate-900 print:px-0 print:pb-4 print:border-b print:border-slate-300">
+      <div id="quote-pdf" className="max-w-3xl mx-auto px-4 print:px-0">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow print:shadow-none print:border-0 overflow-hidden print-card">
+          <div className="bg-slate-900 text-white px-6 py-8 sm:px-8 print:bg-white print:text-slate-900 print:px-0 print:pb-4 print:border-b print:border-slate-300 print-section">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <h1 className="text-2xl font-bold">{BRAND_NAME}</h1>
-                <p className="text-sm opacity-80">{PHONE_DISPLAY} · {EMAIL}</p>
+                <p className="text-sm opacity-80 print-meta">{PHONE_DISPLAY} · {EMAIL}</p>
               </div>
               <div className="text-left sm:text-right">
-                <p className="font-semibold">#{id}</p>
-                <p className="text-sm opacity-80">{createdDate}</p>
+                <p className="font-semibold print-booking-id">#{id}</p>
+                <p className="text-sm opacity-80 print-meta">{createdDate}</p>
               </div>
             </div>
           </div>
 
-          <section className="px-6 py-6 border-b border-slate-100 dark:border-slate-800 sm:px-8 print:px-0">
-            <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-3">{messages.headings.customer}</h2>
+          <section className="px-6 py-6 border-b border-slate-100 dark:border-slate-800 sm:px-8 print:px-0 print-section">
+            <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-3 print-section-label">{messages.headings.customer}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-slate-700 dark:text-slate-300">
-              <div className="flex items-center gap-2"><User size={14} className="text-slate-400" />{quote.customerName}</div>
-              <div className="flex items-center gap-2"><Phone size={14} className="text-slate-400" />{quote.customerPhone}</div>
-              {quote.customerEmail && <div className="flex items-center gap-2"><Mail size={14} className="text-slate-400" />{quote.customerEmail}</div>}
-              {quote.date && <div className="flex items-center gap-2"><Calendar size={14} className="text-slate-400" />{quote.date}{quote.timeSlot ? ` · ${quote.timeSlot}` : ""}</div>}
-              {venue && <div className="flex items-center gap-2 sm:col-span-2"><MapPin size={14} className="text-slate-400" />{venue}</div>}
+              <div className="flex items-start gap-2"><User size={14} className="text-slate-400 mt-0.5 print:hidden" /><div><span className="hidden print:block print-field-label">{messages.labels.name}</span><span className="print-field-value">{quote.customerName}</span></div></div>
+              <div className="flex items-start gap-2"><Phone size={14} className="text-slate-400 mt-0.5 print:hidden" /><div><span className="hidden print:block print-field-label">{messages.labels.phone}</span><span className="print-field-value">{quote.customerPhone}</span></div></div>
+              {quote.customerEmail && <div className="flex items-start gap-2"><Mail size={14} className="text-slate-400 mt-0.5 print:hidden" /><div><span className="hidden print:block print-field-label">{messages.labels.email}</span><span className="print-field-value">{quote.customerEmail}</span></div></div>}
+              {quote.date && <div className="flex items-start gap-2"><Calendar size={14} className="text-slate-400 mt-0.5 print:hidden" /><div><span className="hidden print:block print-field-label">{messages.labels.eventDate}</span><span className="print-field-value">{quote.date}{localizedTimeSlot ? ` · ${localizedTimeSlot}` : ""}</span></div></div>}
+              {venue && <div className="flex items-start gap-2 sm:col-span-2"><MapPin size={14} className="text-slate-400 mt-0.5 print:hidden" /><div><span className="hidden print:block print-field-label">{messages.labels.venue}</span><span className="print-field-value">{venue}</span></div></div>}
             </div>
           </section>
 
           {(quote.service || quote.budget) && !quote.events?.length && (
-            <section className="px-6 py-6 border-b border-slate-100 dark:border-slate-800 sm:px-8 print:px-0">
-              <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-3">{messages.headings.bookingDetails}</h2>
+            <section className="px-6 py-6 border-b border-slate-100 dark:border-slate-800 sm:px-8 print:px-0 print-section">
+              <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-3 print-section-label">{messages.headings.bookingDetails}</h2>
               <div className="space-y-2 text-sm">
-                {quote.service && <div className="flex justify-between"><span className="text-slate-500">{messages.labels.service}</span><span className="text-slate-900 dark:text-white font-medium">{quote.service}</span></div>}
-                {quote.budget && <div className="flex justify-between"><span className="text-slate-500">{messages.labels.budget}</span><span className="text-slate-900 dark:text-white font-medium">{quote.budget}</span></div>}
+                {localizedService && <div className="flex justify-between gap-4"><span className="text-slate-500">{messages.labels.service}</span><span className="text-slate-900 dark:text-white font-medium print:text-slate-900 text-right">{localizedService}</span></div>}
+                {quote.budget && <div className="flex justify-between gap-4"><span className="text-slate-500">{messages.labels.budget}</span><span className="text-slate-900 dark:text-white font-medium print:text-slate-900 text-right">{quote.budget}</span></div>}
               </div>
             </section>
           )}
 
-          {quote.events && quote.events.length > 0 && (
-            <section className="px-6 py-6 border-b border-slate-100 dark:border-slate-800 sm:px-8 print:px-0">
-              <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-4">{messages.headings.eventCoverage}</h2>
+          {localizedEvents.length > 0 && (
+            <section className="px-6 py-6 border-b border-slate-100 dark:border-slate-800 sm:px-8 print:px-0 print-section">
+              <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-4 print-section-label">{messages.headings.eventCoverage}</h2>
               <div className="space-y-4">
-                {quote.events.map((event, index) => (
-                  <div key={index} className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4">
+                {localizedEvents.map((event, index) => (
+                  <div key={index} className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 print-section avoid-break">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="font-semibold text-slate-900 dark:text-white">{event.name}</p>
-                        <p className="text-xs text-slate-500">{event.duration}</p>
+                        <p className="font-semibold text-slate-900 dark:text-white print-event-title">{event.name}</p>
+                        <p className="text-xs text-slate-500"><span className="print:event-duration">{event.duration}</span></p>
                       </div>
-                      <p className="font-semibold text-slate-900 dark:text-white">₹{event.price.toLocaleString("en-IN")}</p>
+                      <p className="font-semibold text-slate-900 dark:text-white print:event-price">₹{event.price.toLocaleString("en-IN")}</p>
                     </div>
                     {event.selections.length > 0 && (
                       <ul className="space-y-1 text-xs text-slate-500 dark:text-slate-400">
                         {event.selections.map((item, itemIndex) => (
                           <li key={itemIndex} className="flex justify-between">
-                            <span>{item.name}{item.qty > 1 ? ` x${item.qty}` : ""}</span>
-                            <span>₹{(item.qty * item.unitPrice).toLocaleString("en-IN")}</span>
+                            <span className="print:deliverable-name">{item.name}{item.qty > 1 ? ` x${item.qty}` : ""}</span>
+                            <span className="print:deliverable-price">₹{(item.qty * item.unitPrice).toLocaleString("en-IN")}</span>
                           </li>
                         ))}
                       </ul>
@@ -194,14 +210,14 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
             </section>
           )}
 
-          {quote.globalAddOns && quote.globalAddOns.length > 0 && (
-            <section className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 print:px-0">
-              <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-3">{messages.headings.extras}</h2>
+          {localizedGlobalAddOns.length > 0 && (
+            <section className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 print:px-0 print-section">
+              <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-3 print-section-label">{messages.headings.extras}</h2>
               <div className="space-y-2 text-sm">
-                {quote.globalAddOns.map((addon, index) => (
+                {localizedGlobalAddOns.map((addon, index) => (
                   <div key={index} className="flex justify-between">
-                    <span className="text-slate-700 dark:text-slate-300">{addon.name}{addon.qty > 1 ? ` x${addon.qty}` : ""}</span>
-                    <span className="text-slate-900 dark:text-white font-medium">₹{addon.price.toLocaleString("en-IN")}</span>
+                    <span className="text-slate-700 dark:text-slate-300 print:deliverable-name">{addon.name}{addon.qty > 1 ? ` x${addon.qty}` : ""}</span>
+                    <span className="text-slate-900 dark:text-white font-medium print:deliverable-price">₹{addon.price.toLocaleString("en-IN")}</span>
                   </div>
                 ))}
               </div>
@@ -209,29 +225,29 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
           )}
 
           {quote.notes && (
-            <section className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 print:px-0">
-              <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-2">{messages.headings.notes}</h2>
-              <p className="text-sm text-slate-600 dark:text-slate-300">{quote.notes}</p>
+            <section className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 print:px-0 print-section avoid-break">
+              <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-2 print-section-label">{messages.headings.notes}</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-300 print-field-value">{quote.notes}</p>
             </section>
           )}
 
           {quote.total && (
-            <section className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 print:px-0">
+            <section className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 print:px-0 print-section">
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-lg font-bold text-slate-900 dark:text-white">{messages.headings.total}</p>
-                  <p className="text-xs text-slate-500">{messages.metaLine}</p>
+                  <p className="text-lg font-bold text-slate-900 dark:text-white print:text-slate-900">{messages.headings.total}</p>
+                  <p className="text-xs text-slate-500 print-meta">{messages.metaLine}</p>
                 </div>
-                <p className="text-2xl font-bold text-amber-600">₹{quote.total.toLocaleString("en-IN")}</p>
+                <p className="text-2xl font-bold text-amber-600 print:print-total-amount">₹{quote.total.toLocaleString("en-IN")}</p>
               </div>
             </section>
           )}
 
-          <section className="px-8 py-6 bg-slate-50 dark:bg-slate-800/40 print:px-0">
-            <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-3">{messages.headings.terms}</h2>
+          <section className="px-8 py-6 bg-slate-50 dark:bg-slate-800/40 print:px-0 print-section avoid-break">
+            <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-3 print-section-label">{messages.headings.terms}</h2>
             <ul className="space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
               {messages.terms.map((term) => (
-                <li key={term}>• {term}</li>
+                <li key={term}><span className="print-term-text">• {term}</span></li>
               ))}
             </ul>
           </section>

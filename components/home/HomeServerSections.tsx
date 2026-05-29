@@ -2,7 +2,7 @@ import { Clock, Shield, Receipt, Smartphone, ArrowRight } from "lucide-react"
 import Link from "next/link"
 
 import { services as allServices } from "@/app/services/data"
-import { homeServices } from "@/components/home/home-data"
+import { getHomeServices } from "@/components/home/home-data"
 import type { HomeMessages } from "@/lib/i18n/home"
 import { withLocalePathname } from "@/lib/i18n/routing"
 
@@ -29,6 +29,8 @@ export function TrustBar({ messages }: { messages: HomeMessages }) {
 }
 
 export function ServicesSection({ messages }: { messages: HomeMessages }) {
+  const homeServices = getHomeServices(messages.locale)
+
   return (
     <section id="services" className="py-24 md:py-32 bg-white dark:bg-slate-950 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -78,7 +80,7 @@ export function ServicesSection({ messages }: { messages: HomeMessages }) {
 
         <div className="text-center mt-10">
           <Link href={withLocalePathname("/services", messages.locale)} className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5">
-            {messages.services.viewAllPrefix} {allServices.length}+ Services <ArrowRight size={16} />
+            {messages.services.viewAllPrefix} {allServices.length}+ {messages.services.viewAllSuffix} <ArrowRight size={16} />
           </Link>
         </div>
       </div>

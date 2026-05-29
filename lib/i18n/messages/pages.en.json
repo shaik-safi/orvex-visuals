@@ -123,6 +123,7 @@
     "overview": {
       "badge": "About This Service",
       "title": "What We Offer",
+      "galleryAltTemplate": "{service} gallery image {index}",
       "note": "Representative visual references while the verified client portfolio is being refreshed."
     },
     "packages": {

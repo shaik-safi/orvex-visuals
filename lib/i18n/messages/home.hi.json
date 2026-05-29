@@ -25,7 +25,8 @@
     "headingHighlight": "हर खास पल",
     "description": "वेडिंग्स, बेबी शूट्स, कॉर्पोरेट इवेंट्स और बहुत कुछ. एक ही भरोसेमंद क्वालिटी के साथ व्यापक कवरेज.",
     "pricePrefix": "शुरुआत",
-    "viewAllPrefix": "सभी देखें"
+    "viewAllPrefix": "सभी देखें",
+    "viewAllSuffix": "सेवाएं"
   },
   "why": {
     "badge": "क्यों Orvex",
@@ -34,7 +35,7 @@
     "description": "शुरू से ही स्पष्ट कीमतें, भरोसेमंद डिलीवरी टाइमलाइन और सीधी ओनरशिप.",
     "features": [
       {
-        "title": "{PHOTO_DELIVERY_DAYS}-Day फोटो डिलीवरी",
+        "title": "{PHOTO_DELIVERY_DAYS}-दिन फोटो डिलीवरी",
         "desc": "एडिटेड फोटोज़ {PHOTO_DELIVERY_DAYS} कार्यदिवसों में एक स्पष्ट टर्नअराउंड प्रॉमिस के साथ डिलीवर की जाती हैं.",
         "stat": "{PHOTO_DELIVERY_DAYS} दिन"
       },
@@ -102,7 +103,7 @@
     ]
   },
   "faq": {
-    "badge": "FAQ",
+    "badge": "सवाल-जवाब",
     "heading": "सामान्य सवाल",
     "items": [
       {

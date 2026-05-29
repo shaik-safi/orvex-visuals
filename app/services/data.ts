@@ -32,6 +32,7 @@ import {
   Building,
 } from "lucide-react"
 import { SERVICE_RATES, EVENT_ADDONS, GLOBAL_ADDONS, MISC_SERVICE_RATES } from "@/lib/constants"
+import type { AppLocale } from "@/lib/i18n/config"
 
 // ============ COMPUTED STARTING PRICES (from global rates) ============
 // Change rates in lib/constants.ts → these update automatically
@@ -662,6 +663,419 @@ export const serviceDetails: Record<string, ServiceDetail> = {
     ],
     relatedSlugs: ["newborn-photography", "maternity-photography", "birthday-photography"],
   },
+}
+
+const SERVICE_NAME_HI: Record<string, string> = {
+  "wedding-photography": "वेडिंग फोटोग्राफी",
+  "candid-wedding-photography": "कैंडिड वेडिंग फोटोग्राफी",
+  "christian-wedding-photography": "क्रिश्चियन वेडिंग फोटोग्राफी",
+  "muslim-wedding-photography": "मुस्लिम वेडिंग फोटोग्राफी",
+  "pre-wedding-photoshoot": "प्री-वेडिंग फोटोशूट",
+  "post-wedding-photoshoot": "पोस्ट-वेडिंग फोटोशूट",
+  "engagement-photography": "एंगेजमेंट फोटोग्राफी",
+  "anniversary-photoshoot": "एनिवर्सरी फोटोशूट",
+  "birthday-photography": "बर्थडे फोटोग्राफी",
+  "baby-shower-photography": "बेबी शॉवर फोटोग्राफी",
+  "haldi-mehendi-photography": "हल्दी और मेहंदी फोटोग्राफी",
+  "sangeet-photography": "संगीत फोटोग्राफी",
+  "naming-ceremony-photography": "नामकरण समारोह फोटोग्राफी",
+  "cradle-ceremony-photography": "झूला समारोह फोटोग्राफी",
+  "housewarming-photography": "गृहप्रवेश फोटोग्राफी",
+  "upanayana-photography": "उपनयन / थ्रेड सेरेमनी फोटोग्राफी",
+  "shastipurthi-photography": "षष्टिपूर्ति फोटोग्राफी",
+  "puberty-ceremony-photography": "प्यूबर्टी फंक्शन फोटोग्राफी",
+  "holy-communion-photography": "होली कम्यूनियन और बैप्टिज़्म फोटोग्राफी",
+  "events-photography": "इवेंट फोटोग्राफी",
+  "baby-photoshoot": "बेबी फोटोशूट",
+  "newborn-photography": "न्यूबॉर्न फोटोग्राफी",
+  "maternity-photography": "मैटरनिटी फोटोग्राफी",
+  "indoor-maternity-photoshoot": "इंडोर मैटरनिटी फोटोशूट",
+  "family-photoshoot": "फैमिली फोटोशूट",
+  "wedding-videography": "वेडिंग वीडियोग्राफी",
+  "cinematic-videography": "सिनेमैटिक वीडियोग्राफी",
+  "candid-videography": "कैंडिड वीडियोग्राफी",
+  "drone-photography": "ड्रोन फोटोग्राफी और वीडियो",
+  "video-editing-services": "वीडियो एडिटिंग सेवाएं",
+  "corporate-video-production": "कॉर्पोरेट वीडियो प्रोडक्शन",
+  "corporate-photography": "कॉर्पोरेट इवेंट फोटोग्राफी",
+  "portrait-photography": "पोर्ट्रेट फोटोग्राफी",
+  "portfolio-photography": "पोर्टफोलियो शूट",
+  "fashion-photography": "फैशन फोटोग्राफी",
+  "product-ecommerce-photography": "प्रोडक्ट और ई-कॉमर्स फोटोग्राफी",
+  "digital-photo-studio": "डिजिटल फोटो स्टूडियो",
+  "album-design-printing": "एल्बम डिजाइन और प्रिंटिंग",
+  "photo-frames": "फोटो फ्रेम्स और कैनवस प्रिंट्स",
+  "photo-restoration": "फोटो रिस्टोरेशन सर्विस",
+  "personalized-gifts-printing": "पर्सनलाइज़्ड गिफ्ट्स और मग प्रिंटिंग",
+}
+
+const SERVICE_CARD_DESCRIPTION_HI: Partial<Record<string, string>> = {
+  "wedding-photography": "आपके बड़े दिन की कैंडिड और पारंपरिक कवरेज, ताकि हर एहसास खूबसूरती से कैद हो.",
+  "pre-wedding-photoshoot": "खूबसूरत लोकेशंस, आउटफिट गाइडेंस और कपल पोर्ट्रेट्स के साथ प्री-वेडिंग शूट.",
+  "engagement-photography": "रिंग सेरेमनी और एंगेजमेंट सेलिब्रेशन की खूबसूरत कवरेज.",
+  "anniversary-photoshoot": "आपकी साथ की यात्रा को यादगार बनाने वाला कपल फोटोशूट.",
+  "birthday-photography": "बर्थडे सेलिब्रेशन की कैंडिड और पारंपरिक कवरेज.",
+  "baby-shower-photography": "आने वाले नन्हे मेहमान की खुशी को खूबसूरती से कैद करने वाली कवरेज.",
+  "haldi-mehendi-photography": "रंग, रिवाज़ और खुशी से भरे पलों की जीवंत कवरेज.",
+  "sangeet-photography": "डांस, मस्ती और जश्न से भरी संगीत नाइट की कवरेज.",
+  "naming-ceremony-photography": "आपके बेबी के खास नामकरण दिवस की प्यारी और साफ कवरेज.",
+  "corporate-photography": "कॉन्फ्रेंस, लॉन्च और टीम इवेंट्स की प्रोफेशनल कवरेज.",
+  "drone-photography": "इवेंट्स और वेन्यूज़ के लिए शानदार एरियल फोटो और वीडियो.",
+  "baby-photoshoot": "थीम-आधारित बेबी फोटोशूट, सुरक्षित सेटअप और प्यारे पोर्ट्रेट्स के साथ.",
+  "newborn-photography": "न्यूबॉर्न के शुरुआती दिनों की नाजुक और खूबसूरत फोटोग्राफी.",
+  "maternity-photography": "प्रेग्नेंसी के इस खास दौर को एलीगेंट पोर्ट्रेट्स में कैद करें.",
+  "wedding-videography": "पूरे वेडिंग डे की वीडियो कवरेज, पारंपरिक और सिनेमैटिक दोनों स्टाइल में.",
+}
+
+const GENERIC_HI_TAGLINES: Record<Exclude<Category, "all">, string> = {
+  wedding: "हर रस्म और हर एहसास खूबसूरती से कैद",
+  "pre-wedding": "आपकी कहानी, खूबसूरती से फ्रेम की गई",
+  events: "हर जश्न की साफ और संपूर्ण कवरेज",
+  "baby-kids": "नन्हे पलों की प्यारी यादें",
+  videography: "चलते-फिरते पलों को सिनेमैटिक अंदाज में",
+  corporate: "ब्रांड, प्रोफाइल और इवेंट्स की प्रोफेशनल कवरेज",
+  products: "डिजाइन, प्रिंट और फिनिश एक ही जगह",
+}
+
+const PACKAGE_NAME_HI: Record<string, string> = {
+  Essential: "एसेंशियल",
+  Premium: "प्रीमियम",
+  Luxury: "लक्ज़री",
+  Silver: "सिल्वर",
+  Gold: "गोल्ड",
+  Platinum: "प्लैटिनम",
+  Basic: "बेसिक",
+  Standard: "स्टैंडर्ड",
+}
+
+const DURATION_HI: Record<string, string> = {
+  "Half Day (5 hrs)": "आधा दिन (5 घंटे)",
+  "Full Day (10 hrs)": "पूरा दिन (10 घंटे)",
+  "3 hours": "3 घंटे",
+  "5 hours": "5 घंटे",
+  "8 hours": "8 घंटे",
+  "1-2 hours": "1-2 घंटे",
+  "2-3 hours": "2-3 घंटे",
+  "3+ hours": "3+ घंटे",
+  Standard: "स्टैंडर्ड",
+  Premium: "प्रीमियम",
+  Luxury: "लक्ज़री",
+}
+
+type ManualServiceTranslation = {
+  tagline: string
+  description: string
+  longDescription: string
+  packages: Array<{ features: string[] }>
+  includes: string[]
+  process: { step: string; description: string }[]
+  faqs: ServiceFAQ[]
+}
+
+const MANUAL_SERVICE_TRANSLATIONS_HI: Record<string, ManualServiceTranslation> = {
+  "wedding-photography": {
+    tagline: "हर एहसास, हर रस्म, हमेशा के लिए",
+    description: "कैंडिड और पारंपरिक स्टाइल के संतुलन के साथ आपकी वेडिंग सेलिब्रेशन की प्रोफेशनल कवरेज.",
+    longDescription: "आपकी शादी जिंदगी का एक बार आने वाला दिन है, और उसका हर पल खूबसूरती से कैद होना चाहिए. हमारी वेडिंग फोटोग्राफी टीम कैंडिड स्टोरीटेलिंग और पारंपरिक पोर्ट्रेट्स दोनों में विशेषज्ञ है, ताकि आपको पूरे दिन की एक संपूर्ण विजुअल कहानी मिले. ब्राइडल प्रेप से बिदाई तक, साझा मुस्कानों से लेकर भव्य जश्न तक — हम सब कुछ दस्तावेज़ करते हैं.",
+    packages: [
+      {
+        features: ["1 फोटोग्राफर", "पारंपरिक फोटोग्राफी", "200+ एडिटेड फोटोज़", "ऑनलाइन गैलरी", "5 दिनों में फोटो डिलीवरी"],
+      },
+      {
+        features: ["2 फोटोग्राफर", "कैंडिड + पारंपरिक कवरेज", "500+ एडिटेड फोटोज़", "ऑनलाइन गैलरी", "प्री-वेडिंग कंसल्टेशन", "उसी दिन टीज़र", "25-शीट फोटो एल्बम"],
+      },
+      {
+        features: ["2+ फोटोग्राफर", "कैंडिड + पारंपरिक + ड्रोन", "1000+ एडिटेड फोटोज़", "ऑनलाइन गैलरी", "प्री-वेडिंग फोटोशूट", "उसी दिन टीज़र वीडियो", "40-शीट प्रीमियम एल्बम", "कैनवस प्रिंट (20x30)", "सभी फंक्शन कवर"],
+      },
+    ],
+    includes: [
+      "प्रोफेशनल कलर-करेक्टेड और एडिटेड फोटोज़",
+      "क्लाउड के जरिए हाई-रिज़ॉल्यूशन डिजिटल डिलीवरी",
+      "इवेंट से पहले कंसल्टेशन और प्लानिंग",
+      "ऑन-साइट बैकअप इक्विपमेंट",
+      "48 घंटों के भीतर क्विक प्रीव्यू",
+      "शेयर करने के लिए प्राइवेट ऑनलाइन गैलरी",
+    ],
+    process: [
+      { step: "परामर्श", description: "हम कॉल या मुलाकात में आपकी शादी का शेड्यूल, पसंदीदा स्टाइल और जरूरी शॉट्स समझते हैं." },
+      { step: "प्लानिंग", description: "ज़रूरत होने पर हमारी टीम वेन्यू देखती है, टाइमलाइन बनाती है और दूसरे वेंडर्स से तालमेल करती है." },
+      { step: "शूट डे", description: "हमारी टीम समय से पहले पहुंचकर सुबह की तैयारियों से लेकर अंतिम विदाई तक हर अहम पल कैद करती है." },
+      { step: "डिलीवरी", description: "फोटोज़ को प्रोफेशनली एडिट करके 5 दिनों में प्राइवेट ऑनलाइन गैलरी से शेयर किया जाता है. वीडियो 15 दिनों में दिए जाते हैं." },
+    ],
+    faqs: [
+      { q: "हमें कितनी फोटोज़ मिलेंगी?", a: "पैकेज के अनुसार आपको 200 से 1000+ प्रोफेशनली एडिटेड फोटोज़ मिलेंगी." },
+      { q: "क्या आप डेस्टिनेशन वेडिंग भी कवर करते हैं?", a: "हाँ. हम पूरे भारत में वेडिंग कवर करते हैं. आउटस्टेशन बुकिंग पर ट्रैवल और स्टे चार्ज अलग लागू होते हैं." },
+      { q: "क्या पैकेज कस्टमाइज़ किए जा सकते हैं?", a: "बिल्कुल. WhatsApp पर संपर्क करें और हम आपकी जरूरत और बजट के अनुसार कस्टम पैकेज बनाएंगे." },
+      { q: "क्या कीमतों में GST शामिल है?", a: "हाँ, हमारी सभी कीमतें GST-समेत हैं. कोई छिपा चार्ज नहीं." },
+      { q: "क्या आप रॉ / अनएडिटेड फोटोज़ देते हैं?", a: "हम एडिटेड फोटोज़ देते हैं. रॉ फाइल्स ऐड-ऑन के रूप में उपलब्ध हैं." },
+      { q: "कैंसिलेशन पॉलिसी क्या है?", a: "7 दिन या उससे पहले कैंसिल करने पर मुफ्त. 3-7 दिन के बीच आंशिक रिफंड. 3 दिन के भीतर रिफंड नहीं." },
+    ],
+  },
+  "pre-wedding-photoshoot": {
+    tagline: "आपकी लव स्टोरी, खूबसूरती से फ्रेम की गई",
+    description: "बेंगलुरु की खूबसूरत लोकेशंस पर प्रोफेशनल स्टाइल गाइडेंस के साथ रोमांटिक कपल फोटोग्राफी.",
+    longDescription: "प्री-वेडिंग फोटोशूट आपकी साथ की यात्रा को बड़े दिन से पहले सेलिब्रेट करने का खूबसूरत तरीका है. हमारी टीम बेंगलुरु के बेस्ट लोकेशंस चुनने में मदद करती है — हरे-भरे गार्डन्स, हेरिटेज स्पॉट्स, अर्बन रूफटॉप्स और आरामदायक कैफे तक. हम आउटफिट, पोज़ और सही टाइमिंग में आपकी मदद करते हैं ताकि आपको मैगज़ीन-स्टाइल कपल पोर्ट्रेट्स मिलें.",
+    packages: [
+      {
+        features: ["1 लोकेशन", "2 आउटफिट चेंज", "50+ एडिटेड फोटोज़", "1 फोटोग्राफर", "ऑनलाइन गैलरी", "7 दिनों में डिलीवरी"],
+      },
+      {
+        features: ["2 लोकेशन", "4 आउटफिट चेंज", "100+ एडिटेड फोटोज़", "1 फोटोग्राफर + असिस्टेंट", "ऑनलाइन गैलरी", "लोकेशन स्काउटिंग", "स्टाइलिंग गाइड"],
+      },
+      {
+        features: ["3 लोकेशन", "6 आउटफिट चेंज", "200+ एडिटेड फोटोज़", "2 फोटोग्राफर", "सिनेमैटिक वीडियो (3 मिनट)", "ड्रोन शॉट्स", "प्रॉप्स और स्टाइलिंग", "उसी दिन स्नीक पीक"],
+      },
+    ],
+    includes: [
+      "प्रोफेशनल पोज़िंग गाइडेंस",
+      "लोकेशन रिकमेंडेशन और स्काउटिंग",
+      "आउटफिट और स्टाइलिंग कंसल्टेशन",
+      "प्रोफेशनल एडिटिंग और कलर ग्रेडिंग",
+      "हाई-रिज़ॉल्यूशन क्लाउड डिलीवरी",
+      "प्राइवेट शेयर करने योग्य गैलरी",
+    ],
+    process: [
+      { step: "परामर्श", description: "हम आपके रिश्ते, पसंदीदा मूड और विजुअल स्टाइल को समझते हैं ताकि शूट सही तरीके से प्लान हो सके." },
+      { step: "प्लानिंग", description: "लोकेशन फाइनलाइजेशन, आउटफिट गाइडेंस, मूड बोर्ड और शेड्यूल की तैयारी की जाती है." },
+      { step: "शूट डे", description: "आरामदायक और मजेदार सेशन में हम नैचुरल और खूबसूरत कपल मोमेंट्स कैद करते हैं." },
+      { step: "डिलीवरी", description: "प्रोफेशनली एडिटेड फोटोज़ आपकी प्राइवेट ऑनलाइन गैलरी में 7 दिनों के भीतर दे दी जाती हैं." },
+    ],
+    faqs: [
+      { q: "बेंगलुरु में प्री-वेडिंग के लिए अच्छी लोकेशंस कौन-सी हैं?", a: "Cubbon Park, Nandi Hills, Lal Bagh, Palace Grounds, Hesaraghatta Lake और कुछ हेरिटेज प्रॉपर्टीज लोकप्रिय विकल्प हैं. हम आपकी स्टाइल के हिसाब से सुझाव देते हैं." },
+      { q: "हमें क्या पहनना चाहिए?", a: "हम स्टाइलिंग गाइड देते हैं. आम तौर पर कोऑर्डिनेटेड रंग, सॉलिड शेड्स और आरामदायक आउटफिट सबसे अच्छे लगते हैं." },
+      { q: "क्या हम प्रॉप्स ला सकते हैं?", a: "हाँ, बिल्कुल. हमारे पास भी कुछ लाइट्स और बेसिक स्टाइल प्रॉप्स उपलब्ध हैं." },
+      { q: "अगर बारिश हो जाए तो?", a: "हम एक फ्री रीशेड्यूल देते हैं. अगर आप चाहें तो रेन-शूट भी बहुत खूबसूरत लग सकता है." },
+      { q: "बुकिंग कितने समय पहले करनी चाहिए?", a: "खासतौर पर वेडिंग सीज़न में 2-4 हफ्ते पहले बुक करना बेहतर रहता है." },
+    ],
+  },
+  "baby-photoshoot": {
+    tagline: "नन्हे पल, बड़ी यादें",
+    description: "थीम-आधारित बेबी फोटोग्राफी, प्रोफेशनल प्रॉप्स, सेटअप और सुरक्षित माहौल के साथ.",
+    longDescription: "बच्चे बहुत जल्दी बड़े होते हैं — हर हफ्ते नए एक्सप्रेशन और नए माइलस्टोन्स आते हैं. हमारी बेबी फोटोग्राफी सेशंस मजेदार, सुरक्षित और आरामदायक रखी जाती हैं. हम सॉफ्ट लाइटिंग, बेबी-सेफ प्रॉप्स और थीम्ड सेटअप्स का इस्तेमाल करते हैं ताकि आपको ऐसी तस्वीरें मिलें जिन्हें आप लंबे समय तक संजो कर रखें.",
+    packages: [
+      {
+        features: ["1 थीम सेटअप", "10+ एडिटेड फोटोज़", "होम विजिट", "बेसिक प्रॉप्स", "डिजिटल डिलीवरी"],
+      },
+      {
+        features: ["2 थीम सेटअप", "25+ एडिटेड फोटोज़", "होम / स्टूडियो", "प्रीमियम प्रॉप्स और कॉस्ट्यूम्स", "ऑनलाइन गैलरी", "फैमिली पोर्ट्रेट्स शामिल"],
+      },
+      {
+        features: ["3+ थीम सेटअप", "50+ एडिटेड फोटोज़", "स्टूडियो सेशन", "सभी प्रॉप्स और कॉस्ट्यूम्स", "फैमिली पोर्ट्रेट्स", "कैनवस प्रिंट (12x18)", "उसी हफ्ते डिलीवरी"],
+      },
+    ],
+    includes: [
+      "बेबी-सेफ प्रॉप्स और सेटअप्स",
+      "अनुभवी और धैर्यवान फोटोग्राफर",
+      "बेबी के शेड्यूल के अनुसार लचीला टाइमिंग",
+      "एक से ज्यादा आउटफिट / थीम चेंज",
+      "पेरेंट्स / फैमिली फोटोज़ शामिल",
+      "हाई-रिज़ॉल्यूशन डिजिटल डिलीवरी",
+    ],
+    process: [
+      { step: "परामर्श", description: "हम आपके बेबी की उम्र, पसंदीदा थीम और फीड / नैप शेड्यूल के अनुसार टाइमिंग तय करते हैं." },
+      { step: "सेटअप", description: "हमारी टीम बेबी-सेफ तरीके से बैकड्रॉप, प्रॉप्स और लाइटिंग तैयार करती है." },
+      { step: "सेशन", description: "आरामदायक और ब्रेक्स के साथ धैर्यपूर्ण सेशन किया जाता है. बेबी की कम्फर्ट सबसे पहले रहती है." },
+      { step: "डिलीवरी", description: "प्रोफेशनली एडिटेड फोटोज़ 5-7 दिनों के भीतर डिलीवर की जाती हैं." },
+    ],
+    faqs: [
+      { q: "बेबी फोटोशूट के लिए कौन-सी उम्र सबसे अच्छी है?", a: "लोकप्रिय माइलस्टोन्स में न्यूबॉर्न, 3 महीने, 6 महीने, 9 महीने और 1 साल शामिल हैं." },
+      { q: "क्या सेटअप बच्चों के लिए सुरक्षित होता है?", a: "हाँ. हम केवल बेबी-सेफ और नॉन-टॉक्सिक प्रॉप्स का ही इस्तेमाल करते हैं." },
+      { q: "अगर बेबी फसी हो जाए तो?", a: "यह बिल्कुल सामान्य है. हम ब्रेक्स के साथ बहुत आराम से सेशन करते हैं." },
+      { q: "क्या आप कॉस्ट्यूम्स भी देते हैं?", a: "हाँ, हमारे पास बेबी-सेफ कॉस्ट्यूम्स का चयन है. आप चाहें तो अपने कपड़े भी ला सकते हैं." },
+      { q: "क्या माता-पिता भी फोटो में शामिल हो सकते हैं?", a: "हाँ, Standard और Premium पैकेज में फैमिली पोर्ट्रेट्स शामिल हैं." },
+    ],
+  },
+}
+
+const GENERIC_HI_INCLUDES = [
+  "प्रोफेशनल एडिटिंग और साफ-सुथरी डिलीवरी",
+  "हाई-रिज़ॉल्यूशन डिजिटल फाइल्स",
+  "इवेंट / सेशन से पहले कंसल्टेशन",
+  "बैकअप इक्विपमेंट और तैयारी",
+  "समय पर प्रीव्यू और अपडेट्स",
+  "शेयर करने के लिए प्राइवेट ऑनलाइन गैलरी",
+]
+
+const GENERIC_HI_PROCESS = [
+  { step: "परामर्श", description: "हम आपकी जरूरत, पसंद और टाइमिंग को समझकर सही कवरेज प्लान करते हैं." },
+  { step: "प्लानिंग", description: "टीम, सेटअप, लोकेशन और कवरेज का व्यावहारिक प्लान तैयार किया जाता है." },
+  { step: "कवरेज", description: "शूट या इवेंट के दिन प्रोफेशनल और साफ तरीके से पूरी कवरेज की जाती है." },
+  { step: "डिलीवरी", description: "एडिटेड फाइनल फाइल्स समय पर आपकी प्राइवेट गैलरी या तय डिलीवरी चैनल से साझा की जाती हैं." },
+]
+
+function getServiceCard(slug: string) {
+  return services.find((service) => service.slug === slug)
+}
+
+function cloneServiceDetail(detail: ServiceDetail): ServiceDetail {
+  return {
+    ...detail,
+    gallery: [...detail.gallery],
+    packages: detail.packages.map((pkg) => ({ ...pkg, features: [...pkg.features] })),
+    includes: [...detail.includes],
+    process: detail.process.map((step) => ({ ...step })),
+    faqs: detail.faqs.map((faq) => ({ ...faq })),
+    relatedSlugs: [...detail.relatedSlugs],
+  }
+}
+
+function getServiceCategory(slug: string): Exclude<Category, "all"> {
+  const category = getServiceCard(slug)?.category
+  return category && category !== "all" ? category : "events"
+}
+
+function getGenericHindiCardDescription(name: string, category: Exclude<Category, "all">): string {
+  switch (category) {
+    case "wedding":
+      return `${name} के लिए कैंडिड और पारंपरिक स्टाइल में प्रोफेशनल कवरेज, ताकि हर अहम पल साफ-सुथरे तरीके से कैद हो.`
+    case "pre-wedding":
+      return `${name} के लिए लोकेशन प्लानिंग, पोज़ गाइडेंस और खूबसूरत कपल कवरेज के साथ प्रोफेशनल फोटोशूट.`
+    case "events":
+      return `${name} के लिए रस्मों, मेहमानों और खास पलों की प्रोफेशनल कवरेज.`
+    case "baby-kids":
+      return `${name} के लिए सुरक्षित, आरामदायक और खूबसूरत फोटो कवरेज, जिसे आप लंबे समय तक संजो सकें.`
+    case "videography":
+      return `${name} के लिए प्रोफेशनल वीडियो कवरेज, साफ एडिटिंग और सिनेमैटिक प्रेजेंटेशन.`
+    case "corporate":
+      return `${name} के लिए प्रोफेशनल, ब्रांड-फ्रेंडली और साफ विजुअल कवरेज.`
+    case "products":
+      return `${name} के लिए साफ डिजाइन, प्रिंट और फिनिशिंग के साथ प्रोफेशनल आउटपुट.`
+  }
+}
+
+function getGenericHindiLongDescription(name: string, category: Exclude<Category, "all">): string {
+  switch (category) {
+    case "wedding":
+      return `${name} के लिए Orvex Visuals ऐसी कवरेज देता है जिसमें रस्में, एक्सप्रेशंस और परिवार के अहम पल संतुलित तरीके से कैद हों. हमारी टीम प्लानिंग, टाइमिंग और डिलीवरी पर ध्यान देती है ताकि आपको साफ और भरोसेमंद विजुअल रिकॉर्ड मिले.`
+    case "pre-wedding":
+      return `${name} के लिए हम लोकेशन, टाइमिंग, आउटफिट और विजुअल मूड को ध्यान में रखकर ऐसा सेशन प्लान करते हैं जो कैमरे पर नैचुरल और खूबसूरत लगे. उद्देश्य सिर्फ तस्वीरें लेना नहीं, बल्कि आपकी कहानी को साफ तरीके से फ्रेम करना है.`
+    case "events":
+      return `${name} के लिए हमारी टीम ऐसे मोमेंट्स कैद करती है जो इवेंट की असली ऊर्जा, परिवार की मौजूदगी और रस्मों की अहमियत को साफ तरीके से दिखाएं. हम व्यावहारिक कवरेज, समय पर काम और साफ डिलीवरी पर ध्यान देते हैं.`
+    case "baby-kids":
+      return `${name} के लिए हम आरामदायक, सुरक्षित और धैर्यपूर्ण सेशन प्लान करते हैं ताकि बच्चे और परिवार बिना तनाव के कैमरे के सामने सहज महसूस करें. हमारा फोकस प्यारे एक्सप्रेशंस और ऐसे फ्रेम्स पर रहता है जिन्हें आप लंबे समय तक संजो सकें.`
+    case "videography":
+      return `${name} के लिए Orvex Visuals ऐसी वीडियो कवरेज देता है जिसमें इवेंट या सेशन की पूरी फील, मूवमेंट और भावनात्मक प्रवाह साफ दिखाई दे. सही प्लानिंग, साफ एडिटिंग और भरोसेमंद डिलीवरी हमारी प्रक्रिया का हिस्सा है.`
+    case "corporate":
+      return `${name} के लिए हम साफ, प्रोफेशनल और ब्रांड-उपयुक्त विजुअल्स तैयार करते हैं जो आपकी टीम, इवेंट या प्रोफाइल को भरोसेमंद तरीके से प्रस्तुत करें. हमारा फोकस स्पष्ट कम्युनिकेशन, समय पर कवरेज और उपयोगी आउटपुट पर रहता है.`
+    case "products":
+      return `${name} के लिए हम डिजाइन, फिनिश और उपयोगिता पर ध्यान देकर ऐसा आउटपुट तैयार करते हैं जो साफ, प्रैक्टिकल और पेशेवर लगे. चाहे प्रिंट हो या गिफ्ट प्रोडक्ट, उद्देश्य यही है कि अंतिम परिणाम उपयोगी और देखने में बेहतर हो.`
+  }
+}
+
+function getGenericHindiPackageFeatures(packageName: string, category: Exclude<Category, "all">): string[] {
+  const normalized = packageName.toLowerCase()
+
+  if (category === "products") {
+    if (normalized === "basic") {
+      return ["स्टैंडर्ड क्वालिटी", "डिजिटल डिलीवरी", "1 रिविजन"]
+    }
+
+    if (normalized === "premium" || normalized === "standard") {
+      return ["प्रीमियम क्वालिटी", "डिजिटल + फिजिकल डिलीवरी", "3 रिविजन", "तेज़ प्रोसेसिंग"]
+    }
+
+    return ["लक्ज़री क्वालिटी", "डिजिटल + फिजिकल डिलीवरी", "अनलिमिटेड रिविजन", "प्रायोरिटी प्रोसेसिंग", "कस्टम डिजाइन"]
+  }
+
+  if (normalized === "essential" || normalized === "basic" || normalized === "silver") {
+    return ["1 प्रोफेशनल", "प्रोफेशनल कवरेज", "एडिटेड डिलीवरी", "ऑनलाइन शेयरिंग", "समय पर डिलीवरी"]
+  }
+
+  if (normalized === "premium" || normalized === "standard" || normalized === "gold") {
+    return ["2 प्रोफेशनल", "विस्तृत कवरेज", "एडिटेड डिलीवरी", "ऑनलाइन गैलरी", "तेज़ प्रीव्यू", "कस्टम प्लानिंग"]
+  }
+
+  return ["2+ प्रोफेशनल", "पूरी कवरेज", "प्रीमियम एडिटिंग", "क्रिएटिव ऐंगल्स", "प्राथमिकता डिलीवरी", "कस्टम आउटपुट"]
+}
+
+function getGenericHindiFaqs(name: string): ServiceFAQ[] {
+  return [
+    { q: "इस सेवा में क्या डिलीवर किया जाता है?", a: `${name} के लिए डिलीवेरेबल्स पैकेज पर निर्भर करते हैं, लेकिन इसमें प्रोफेशनल कवरेज और एडिटेड फाइनल आउटपुट शामिल रहता है.` },
+    { q: "क्या कीमतों में GST शामिल है?", a: "हाँ. हमारी दिखाई गई कीमतें GST-समेत हैं और कोई छिपा शुल्क नहीं रखा जाता." },
+    { q: "क्या पैकेज कस्टमाइज़ किए जा सकते हैं?", a: "हाँ, आप WhatsApp पर अपनी जरूरत बताकर कस्टम पैकेज बनवा सकते हैं." },
+    { q: "बुकिंग / तारीख कैसे कन्फर्म होती है?", a: "उपलब्धता और कवरेज की पुष्टि आपकी रिक्वेस्ट और बातचीत के बाद की जाती है." },
+    { q: "क्या आप बेंगलुरु के बाहर भी काम करते हैं?", a: "हाँ, आउटस्टेशन और ट्रैवल-आधारित कवरेज उपलब्ध है. जरूरत के अनुसार अतिरिक्त ट्रैवल चार्ज लग सकते हैं." },
+  ]
+}
+
+function translatePackageName(name: string, locale: AppLocale): string {
+  if (locale === "en") return name
+  return PACKAGE_NAME_HI[name] ?? name
+}
+
+function translateDuration(duration: string, locale: AppLocale): string {
+  if (locale === "en") return duration
+  return DURATION_HI[duration] ?? duration
+}
+
+export function getLocalizedServiceName(slug: string, locale: AppLocale): string {
+  const baseName = getServiceCard(slug)?.name || getServiceDetail(slug).name
+  if (locale === "en") return baseName
+  return SERVICE_NAME_HI[slug] ?? baseName
+}
+
+function getLocalizedServiceDescription(slug: string, locale: AppLocale): string {
+  const card = getServiceCard(slug)
+  const baseDescription = card?.description || getServiceDetail(slug).description
+
+  if (locale === "en") return baseDescription
+
+  return SERVICE_CARD_DESCRIPTION_HI[slug] ?? getGenericHindiCardDescription(getLocalizedServiceName(slug, locale), getServiceCategory(slug))
+}
+
+export function getLocalizedServices(locale: AppLocale): ServiceCard[] {
+  if (locale === "en") return services
+
+  return services.map((service) => ({
+    ...service,
+    name: getLocalizedServiceName(service.slug, locale),
+    description: getLocalizedServiceDescription(service.slug, locale),
+  }))
+}
+
+export function getLocalizedServiceDetail(slug: string, locale: AppLocale): ServiceDetail {
+  if (locale === "en") return getServiceDetail(slug)
+
+  const detail = cloneServiceDetail(getServiceDetail(slug))
+  const category = getServiceCategory(slug)
+  const manualTranslation = MANUAL_SERVICE_TRANSLATIONS_HI[slug]
+  const localizedName = getLocalizedServiceName(slug, locale)
+
+  if (manualTranslation) {
+    return {
+      ...detail,
+      name: localizedName,
+      tagline: manualTranslation.tagline,
+      description: manualTranslation.description,
+      longDescription: manualTranslation.longDescription,
+      packages: detail.packages.map((pkg, index) => ({
+        ...pkg,
+        name: translatePackageName(pkg.name, locale),
+        duration: translateDuration(pkg.duration, locale),
+        features: [...(manualTranslation.packages[index]?.features ?? getGenericHindiPackageFeatures(pkg.name, category))],
+      })),
+      includes: [...manualTranslation.includes],
+      process: manualTranslation.process.map((step) => ({ ...step })),
+      faqs: manualTranslation.faqs.map((faq) => ({ ...faq })),
+    }
+  }
+
+  return {
+    ...detail,
+    name: localizedName,
+    tagline: GENERIC_HI_TAGLINES[category],
+    description: getLocalizedServiceDescription(slug, locale),
+    longDescription: getGenericHindiLongDescription(localizedName, category),
+    packages: detail.packages.map((pkg) => ({
+      ...pkg,
+      name: translatePackageName(pkg.name, locale),
+      duration: translateDuration(pkg.duration, locale),
+      features: getGenericHindiPackageFeatures(pkg.name, category),
+    })),
+    includes: [...GENERIC_HI_INCLUDES],
+    process: GENERIC_HI_PROCESS.map((step) => ({ ...step })),
+    faqs: getGenericHindiFaqs(localizedName),
+  }
 }
 
 // ============ HELPER ============

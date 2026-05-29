@@ -1,6 +1,7 @@
-import { services as allServices } from "@/app/services/data"
+import { getLocalizedServices } from "@/app/services/data"
+import type { AppLocale } from "@/lib/i18n/config"
 
-const homepageSlugs = [
+export const homepageSlugs = [
   "wedding-photography",
   "wedding-videography",
   "pre-wedding-photoshoot",
@@ -15,15 +16,19 @@ const homepageSlugs = [
   "drone-photography",
 ]
 
-export const homeServices = homepageSlugs.flatMap((slug) => {
-  const service = allServices.find((item) => item.slug === slug)
-  if (!service) return []
+export function getHomeServices(locale: AppLocale) {
+  const services = getLocalizedServices(locale)
 
-  return [{
-    name: service.name,
-    icon: service.icon,
-    price: `₹${service.startingPrice.toLocaleString("en-IN")}`,
-    desc: service.description,
-    slug: service.slug,
-  }]
-})
+  return homepageSlugs.flatMap((slug) => {
+    const service = services.find((item) => item.slug === slug)
+    if (!service) return []
+
+    return [{
+      name: service.name,
+      icon: service.icon,
+      price: `₹${service.startingPrice.toLocaleString("en-IN")}`,
+      desc: service.description,
+      slug: service.slug,
+    }]
+  })
+}

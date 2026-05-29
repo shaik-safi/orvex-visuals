@@ -15,7 +15,7 @@ import { useCurrentLocale } from "@/hooks/use-current-locale"
 import { getPageMessages } from "@/lib/i18n/pages"
 import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
-import { categories, services, type Category } from "./data"
+import { categories, getLocalizedServices, services, type Category } from "./data"
 
 type ServicesPageMessages = ReturnType<typeof getPageMessages>["servicesPage"]
 
@@ -43,8 +43,9 @@ function ServicesHero({ messages }: { messages: ServicesPageMessages }) {
 function ServicesGrid({ locale, messages }: { locale: ReturnType<typeof useCurrentLocale>; messages: ServicesPageMessages }) {
   const [activeCategory, setActiveCategory] = useState<Category>("all")
   const [searchQuery, setSearchQuery] = useState("")
+  const localizedServices = getLocalizedServices(locale)
 
-  const filtered = services.filter((s) => {
+  const filtered = localizedServices.filter((s) => {
     const matchesCategory = activeCategory === "all" || s.category === activeCategory
     const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.description.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch

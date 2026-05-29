@@ -16,7 +16,7 @@ import {
 
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { useCurrentLocale } from "@/hooks/use-current-locale"
-import { getServiceDetail, type ServiceDetail } from "../data"
+import { getLocalizedServiceDetail, getLocalizedServiceName, type ServiceDetail } from "../data"
 import { PHOTO_DELIVERY_DAYS, getWhatsAppLink } from "@/lib/constants"
 import { applyTemplate } from "@/lib/i18n/home"
 import { getPageMessages } from "@/lib/i18n/pages"
@@ -117,7 +117,7 @@ function OverviewSection({ service, messages }: { service: ServiceDetail; messag
             </div>
             {service.gallery.map((img, i) => (
               <div key={i} className={`rounded-2xl overflow-hidden ${i === 0 ? "col-span-2 h-48" : "h-32"}`}>
-                <Image src={img} alt={`${service.name} gallery ${i + 1}`} width={i === 0 ? 600 : 300} height={i === 0 ? 400 : 200} className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-300" sizes="(max-width: 640px) 100vw, 50vw" loading="lazy" quality={75} />
+                <Image src={img} alt={applyTemplate(messages.overview.galleryAltTemplate, { service: service.name, index: String(i + 1) })} width={i === 0 ? 600 : 300} height={i === 0 ? 400 : 200} className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-300" sizes="(max-width: 640px) 100vw, 50vw" loading="lazy" quality={75} />
               </div>
             ))}
           </div>
@@ -289,7 +289,7 @@ function RelatedServices({ service, locale, messages }: { service: ServiceDetail
 
   const relatedNames = service.relatedSlugs.map((slug) => ({
     slug,
-    name: slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
+    name: getLocalizedServiceName(slug, locale),
   }))
 
   return (
@@ -359,7 +359,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
   const locale = useCurrentLocale()
   const messages = getPageMessages(locale).serviceDetailPage
   const { slug } = use(params)
-  const service = getServiceDetail(slug)
+  const service = getLocalizedServiceDetail(slug, locale)
 
   const serviceSchema = {
     "@context": "https://schema.org",
@@ -373,7 +373,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
     },
     areaServed: {
       "@type": "City",
-      name: "Bangalore",
+      name: locale === "hi" ? "बेंगलुरु" : "Bangalore",
     },
     offers: service.packages.map((pkg) => ({
       "@type": "Offer",
@@ -383,7 +383,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
       availability: "https://schema.org/InStock",
     })),
     image: service.heroImage,
-    url: `https://orvexvisuals.com/services/${slug}`,
+    url: `https://orvexvisuals.com${withLocalePathname(`/services/${slug}`, locale)}`,
   }
 
   const faqSchema = {

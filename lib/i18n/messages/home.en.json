@@ -25,7 +25,8 @@
     "headingHighlight": "Every Milestone",
     "description": "Weddings, baby shoots, corporate events, and more. Wide-ranging coverage with one consistent standard of care.",
     "pricePrefix": "From",
-    "viewAllPrefix": "View All"
+    "viewAllPrefix": "View All",
+    "viewAllSuffix": "Services"
   },
   "why": {
     "badge": "Why Orvex",

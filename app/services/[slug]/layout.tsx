@@ -3,7 +3,7 @@ import type React from "react"
 import { PHOTO_DELIVERY_DAYS } from "@/lib/constants"
 import { buildLocalizedMetadata } from "@/lib/i18n/metadata"
 import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
-import { getServiceDetail, services } from "../data"
+import { getLocalizedServiceDetail, services } from "../data"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -13,7 +13,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = await resolveRequestLocale()
   const { slug } = await params
-  const service = getServiceDetail(slug)
+  const service = getLocalizedServiceDetail(slug, locale)
   const startingPrice = service.packages[0]?.price.toLocaleString("en-IN") || "7,999"
 
   const title = locale === "hi"
@@ -24,19 +24,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `${service.description} Orvex Visuals द्वारा बेंगलुरु में प्रोफेशनल ${service.name} सेवाएं। ${service.packages.length} पैकेज ₹${startingPrice} से शुरू। ${PHOTO_DELIVERY_DAYS}-दिन की फोटो डिलीवरी और GST शामिल।`
     : `${service.description} Professional ${service.name.toLowerCase()} services in Bangalore by Orvex Visuals. ${service.packages.length} packages starting ₹${startingPrice}. ${PHOTO_DELIVERY_DAYS}-day photo delivery, GST inclusive.`
 
+  const keywords = locale === "hi"
+    ? [
+        `${service.name} बेंगलुरु`,
+        `${service.name} मेरे पास`,
+        `${service.name} कीमत`,
+        `${service.name} पैकेज`,
+        "बेंगलुरु फोटोग्राफर",
+        "Orvex Visuals",
+      ]
+    : [
+        `${service.name.toLowerCase()} Bangalore`,
+        `${service.name.toLowerCase()} near me`,
+        `best ${service.name.toLowerCase()}`,
+        `${service.name.toLowerCase()} price`,
+        `${service.name.toLowerCase()} packages`,
+        "photographer Bangalore",
+        "Orvex Visuals",
+      ]
+
   return buildLocalizedMetadata(locale, {
     pathname: `/services/${slug}`,
     title,
     description,
-    keywords: [
-      `${service.name.toLowerCase()} Bangalore`,
-      `${service.name.toLowerCase()} near me`,
-      `best ${service.name.toLowerCase()}`,
-      `${service.name.toLowerCase()} price`,
-      `${service.name.toLowerCase()} packages`,
-      "photographer Bangalore",
-      "Orvex Visuals",
-    ],
+    keywords,
     openGraph: {
       type: "website",
       title: locale === "hi" ? `${service.name} - Orvex Visuals बेंगलुरु` : `${service.name} - Orvex Visuals Bangalore`,
