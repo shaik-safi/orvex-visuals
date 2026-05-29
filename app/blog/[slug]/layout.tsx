@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import type React from "react"
 import { getBlogPost, blogPosts } from "../data"
+import { buildLocalizedMetadata } from "@/lib/i18n/metadata"
+import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -8,20 +10,25 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const locale = await resolveRequestLocale()
   const { slug } = await params
   const post = getBlogPost(slug)
 
   if (!post) {
-    return {
-      title: "Post Not Found",
-      description: "The blog post you are looking for does not exist.",
-    }
+    return buildLocalizedMetadata(locale, {
+      pathname: `/blog/${slug}`,
+      title: locale === "hi" ? "पोस्ट नहीं मिली" : "Post Not Found",
+      description: locale === "hi"
+        ? "आप जिस ब्लॉग पोस्ट को खोज रहे हैं वह उपलब्ध नहीं है।"
+        : "The blog post you are looking for does not exist.",
+    })
   }
 
   const title = post.title
   const description = post.excerpt
 
-  return {
+  return buildLocalizedMetadata(locale, {
+    pathname: `/blog/${slug}`,
     title,
     description,
     keywords: [
@@ -31,15 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       "Orvex Visuals",
     ],
     authors: [{ name: post.author }],
-    alternates: {
-      canonical: `/blog/${slug}`,
-    },
     openGraph: {
       type: "article",
-      title,
-      description,
-      url: `https://orvexvisuals.com/blog/${slug}`,
-      siteName: "Orvex Visuals",
       publishedTime: post.date,
       authors: [post.author],
       tags: post.tags,
@@ -53,12 +53,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
     },
     twitter: {
-      card: "summary_large_image",
-      title,
-      description,
       images: [post.image],
     },
-  }
+  })
 }
 
 export async function generateStaticParams() {

@@ -1,16 +1,23 @@
+import type { ReactNode } from "react"
 import type { Metadata } from "next"
+import { buildLocalizedMetadata, getMetadataCopy } from "@/lib/i18n/metadata"
+import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
 
-export const metadata: Metadata = {
-  title: "About — Premium Photography Coordination in Bangalore",
-  description:
-    "Learn about Orvex Visuals — Bangalore's modern photography coordination brand. Transparent pricing, fast delivery, you own every photo. Meet our team.",
-  openGraph: {
-    title: "About Orvex Visuals | Photography Coordination Bangalore",
-    description: "Modern photography brand built on transparency, speed, and client ownership.",
-    type: "website",
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await resolveRequestLocale()
+  const copy = getMetadataCopy("about", locale)
+
+  return buildLocalizedMetadata(locale, {
+    pathname: "/about",
+    title: copy.title,
+    description: copy.description,
+    openGraph: {
+      title: copy.openGraphTitle,
+      description: copy.openGraphDescription,
+    },
+  })
 }
 
-export default function AboutLayout({ children }: { children: React.ReactNode }) {
+export default function AboutLayout({ children }: { children: ReactNode }) {
   return children
 }

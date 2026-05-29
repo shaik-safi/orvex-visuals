@@ -1,40 +1,46 @@
 "use client"
 
-import { useState, useEffect, use } from "react"
+import { useState, use } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import {
   MessageCircle,
   ArrowRight,
-    Check,
+  Check,
   Star,
   Shield,
   Clock,
   MapPin,
   ChevronDown,
 } from "lucide-react"
+
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
+import { useCurrentLocale } from "@/hooks/use-current-locale"
 import { getServiceDetail, type ServiceDetail } from "../data"
 import { PHOTO_DELIVERY_DAYS, getWhatsAppLink } from "@/lib/constants"
+import { applyTemplate } from "@/lib/i18n/home"
+import { getPageMessages } from "@/lib/i18n/pages"
+import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 
+type ServiceDetailMessages = ReturnType<typeof getPageMessages>["serviceDetailPage"]
 
-// ============ SERVICE HERO ============
-function ServiceHero({ service }: { service: ServiceDetail }) {
-  const { ref, isVisible } = useScrollReveal()
+function ServiceHero({ service, locale, messages }: { service: ServiceDetail; locale: ReturnType<typeof useCurrentLocale>; messages: ServiceDetailMessages }) {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
   const Icon = service.icon
+
   return (
-    <section className="relative pt-28 pb-12 md:pt-36 md:pb-16 overflow-hidden">
+    <section className="relative pt-28 pb-12 sm:pt-32 md:pt-36 md:pb-16 overflow-hidden">
       <div className="absolute inset-0">
         <Image src={service.heroImage} alt={service.name} fill className="object-cover" sizes="100vw" priority quality={75} placeholder="blur" blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyMCIgaGVpZ2h0PSIxMDgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiMxZTI5M2IiLz48L3N2Zz4=" />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/70 to-slate-900/90" />
       </div>
 
-      <div ref={ref} className={`relative max-w-4xl mx-auto px-4 text-center transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+      <div ref={ref} className={`relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
         <div className="flex items-center justify-center gap-2 text-sm text-white/60 mb-6">
-          <Link href="/" className="hover:text-white transition-colors">Home</Link>
+          <Link href={withLocalePathname("/", locale)} className="hover:text-white transition-colors">{messages.breadcrumbs.home}</Link>
           <span>/</span>
-          <Link href="/services" className="hover:text-white transition-colors">Services</Link>
+          <Link href={withLocalePathname("/services", locale)} className="hover:text-white transition-colors">{messages.breadcrumbs.services}</Link>
           <span>/</span>
           <span className="text-amber-400">{service.name}</span>
         </div>
@@ -43,7 +49,7 @@ function ServiceHero({ service }: { service: ServiceDetail }) {
           <Icon className="w-8 h-8 text-amber-400" />
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[0.95] mb-4">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[0.95] mb-4">
           {service.name}
         </h1>
         <p className="text-lg md:text-xl text-amber-300 font-medium mb-3">{service.tagline}</p>
@@ -51,43 +57,43 @@ function ServiceHero({ service }: { service: ServiceDetail }) {
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href={buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" })}
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" }), locale)}
+            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
           >
-            <MessageCircle size={18} /> Check Pricing &amp; Availability
+            {messages.hero.checkPricing}
+            <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
           </Link>
           <a
             href="#packages"
-            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-bold transition-all duration-300 hover:-translate-y-1"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-semibold transition-colors duration-300"
           >
-            View Packages <ArrowRight size={16} />
+            {messages.hero.viewPackages} <ArrowRight size={16} />
           </a>
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm text-white/70">
-          <span className="flex items-center gap-1.5"><Shield size={14} className="text-green-400" /> GST Inclusive</span>
-          <span className="flex items-center gap-1.5"><Clock size={14} className="text-blue-400" /> {PHOTO_DELIVERY_DAYS}-Day Photo Delivery</span>
-          <span className="flex items-center gap-1.5"><MapPin size={14} className="text-amber-400" /> Bangalore & Beyond</span>
-          <span className="flex items-center gap-1.5"><Star size={14} className="text-yellow-400" /> Booking Summary Included</span>
+          <span className="flex items-center gap-1.5"><Shield size={14} className="text-green-400" /> {messages.hero.badgeGst}</span>
+          <span className="flex items-center gap-1.5"><Clock size={14} className="text-blue-400" /> {messages.hero.badgeDeliveryTemplate.replace("{PHOTO_DELIVERY_DAYS}", String(PHOTO_DELIVERY_DAYS))}</span>
+          <span className="flex items-center gap-1.5"><MapPin size={14} className="text-amber-400" /> {messages.hero.badgeArea}</span>
+          <span className="flex items-center gap-1.5"><Star size={14} className="text-yellow-400" /> {messages.hero.badgeSummary}</span>
         </div>
       </div>
     </section>
   )
 }
 
-// ============ OVERVIEW ============
-function OverviewSection({ service }: { service: ServiceDetail }) {
+function OverviewSection({ service, messages }: { service: ServiceDetail; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
   return (
-    <section ref={ref} className={`py-16 bg-white dark:bg-slate-950 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+    <section ref={ref} className={`py-16 bg-white dark:bg-slate-950 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+        <div className="grid gap-8 items-start lg:grid-cols-2 lg:gap-12">
           <div>
             <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-              About This Service
+              {messages.overview.badge}
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-              What We Offer
+              {messages.overview.title}
             </h2>
             <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed mb-6">
               {service.longDescription}
@@ -107,11 +113,11 @@ function OverviewSection({ service }: { service: ServiceDetail }) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2 rounded-2xl border border-amber-200/60 dark:border-amber-500/20 bg-amber-50/70 dark:bg-amber-500/5 p-4 text-sm text-slate-600 dark:text-slate-300">
-              Representative visual references while the verified client portfolio is being refreshed.
+              {messages.overview.note}
             </div>
             {service.gallery.map((img, i) => (
               <div key={i} className={`rounded-2xl overflow-hidden ${i === 0 ? "col-span-2 h-48" : "h-32"}`}>
-                <Image src={img} alt={`${service.name} gallery ${i + 1}`} width={i === 0 ? 600 : 300} height={i === 0 ? 400 : 200} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, 50vw" loading="lazy" quality={75} />
+                <Image src={img} alt={`${service.name} gallery ${i + 1}`} width={i === 0 ? 600 : 300} height={i === 0 ? 400 : 200} className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-300" sizes="(max-width: 640px) 100vw, 50vw" loading="lazy" quality={75} />
               </div>
             ))}
           </div>
@@ -121,38 +127,36 @@ function OverviewSection({ service }: { service: ServiceDetail }) {
   )
 }
 
-// ============ PACKAGES ============
-function PackagesSection({ service }: { service: ServiceDetail }) {
+function PackagesSection({ service, locale, messages }: { service: ServiceDetail; locale: ReturnType<typeof useCurrentLocale>; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
   return (
-    <section id="packages" ref={ref} className={`py-16 bg-slate-50 dark:bg-slate-900 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+    <section id="packages" ref={ref} className={`py-16 bg-slate-50 dark:bg-slate-900 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            {service.name} Pricing
+            {messages.packages.pricingTemplate.replace("{service}", service.name)}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">
-            {service.name} Packages
+            {messages.packages.titleTemplate.replace("{service}", service.name)}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-            For this service only. All prices GST-inclusive, no hidden charges.
+            {messages.packages.description}
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-5">
-          {service.packages.map((pkg, i) => (
+          {service.packages.map((pkg) => (
             <div
               key={pkg.name}
-              className={`relative rounded-2xl p-6 transition-all duration-300 hover:-translate-y-2 ${pkg.popular
-                ? "bg-gradient-to-b from-amber-500 to-amber-600 text-white shadow-2xl shadow-amber-500/20 scale-[1.02]"
-                : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:shadow-xl"
+              className={`relative rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 ${pkg.popular
+                ? "bg-gradient-to-b from-amber-500 to-amber-600 text-white shadow-xl shadow-amber-500/15"
+                : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:shadow-lg"
                 }`}
-              style={{ transitionDelay: `${i * 100}ms` }}
             >
               {pkg.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="bg-white text-amber-600 text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                    MOST POPULAR
+                    {messages.packages.mostPopular}
                   </span>
                 </div>
               )}
@@ -167,7 +171,7 @@ function PackagesSection({ service }: { service: ServiceDetail }) {
                   </span>
                 </div>
                 <p className={`text-sm mt-1 ${pkg.popular ? "text-white/80" : "text-slate-500 dark:text-slate-400"}`}>
-                  Duration: {pkg.duration}
+                  {messages.packages.durationPrefix} {pkg.duration}
                 </p>
               </div>
 
@@ -181,28 +185,27 @@ function PackagesSection({ service }: { service: ServiceDetail }) {
               </ul>
 
               <a
-                href={getWhatsAppLink(`Hi Orvex, I'm interested in the ${pkg.name} package for ${service.name}. Can you guide me on availability and next steps?`)}
+                href={getWhatsAppLink(applyTemplate(messages.packages.whatsappTemplate, { package: pkg.name, service: service.name }))}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
-                  ? "bg-white text-amber-600 hover:bg-amber-50 shadow-lg"
-                  : "bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/20"
+                className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-colors duration-300 ${pkg.popular
+                  ? "bg-white text-amber-600 hover:bg-amber-50"
+                  : "bg-amber-500 hover:bg-amber-600 text-white"
                   }`}
               >
-                Ask About {pkg.name}
+                {messages.packages.askTemplate.replace("{package}", pkg.name)}
               </a>
             </div>
           ))}
         </div>
 
-        {/* Customize CTA */}
         <div className="text-center mt-10 pt-8 border-t border-slate-200 dark:border-slate-800">
-          <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">Need something different? Mix & match services for your event.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">{messages.packages.customize}</p>
           <Link
-            href={buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "custom-package" })}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "custom-package" }), locale)}
             className="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-sm hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
           >
-            Build a Custom Package <ArrowRight size={15} />
+            {messages.packages.buildCustom} <ArrowRight size={15} />
           </Link>
         </div>
       </div>
@@ -210,18 +213,17 @@ function PackagesSection({ service }: { service: ServiceDetail }) {
   )
 }
 
-// ============ PROCESS ============
-function ProcessSection({ service }: { service: ServiceDetail }) {
+function ProcessSection({ service, messages }: { service: ServiceDetail; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
   return (
-    <section ref={ref} className={`py-16 bg-white dark:bg-slate-950 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+    <section ref={ref} className={`py-16 bg-white dark:bg-slate-950 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            How It Works
+            {messages.process.badge}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-            Our Process
+            {messages.process.title}
           </h2>
         </div>
 
@@ -243,20 +245,19 @@ function ProcessSection({ service }: { service: ServiceDetail }) {
   )
 }
 
-// ============ FAQ ============
-function FAQSection({ service }: { service: ServiceDetail }) {
+function FAQSection({ service, messages }: { service: ServiceDetail; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <section ref={ref} className={`py-16 bg-slate-50 dark:bg-slate-900 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+    <section ref={ref} className={`py-16 bg-slate-50 dark:bg-slate-900 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            FAQ
+            {messages.faq.badge}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
-            Common Questions
+            {messages.faq.title}
           </h2>
         </div>
 
@@ -283,8 +284,7 @@ function FAQSection({ service }: { service: ServiceDetail }) {
   )
 }
 
-// ============ RELATED SERVICES ============
-function RelatedServices({ service }: { service: ServiceDetail }) {
+function RelatedServices({ service, locale, messages }: { service: ServiceDetail; locale: ReturnType<typeof useCurrentLocale>; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
 
   const relatedNames = service.relatedSlugs.map((slug) => ({
@@ -293,23 +293,23 @@ function RelatedServices({ service }: { service: ServiceDetail }) {
   }))
 
   return (
-    <section ref={ref} className={`py-16 bg-white dark:bg-slate-950 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+    <section ref={ref} className={`py-16 bg-white dark:bg-slate-950 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 text-center">
-          Related Services
+          {messages.related.title}
         </h2>
         <div className="grid sm:grid-cols-3 gap-4">
           {relatedNames.map((related) => (
             <Link
               key={related.slug}
-              href={`/services/${related.slug}`}
-              className="group bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg text-center"
+              href={withLocalePathname(`/services/${related.slug}`, locale)}
+              className="group bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/40 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md text-center"
             >
               <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                 {related.name}
               </h3>
               <span className="flex items-center justify-center gap-1 text-sm text-amber-600 dark:text-amber-400 mt-2 font-medium">
-                Learn More <ArrowRight size={14} />
+                {messages.related.learnMore} <ArrowRight size={14} />
               </span>
             </Link>
           ))}
@@ -319,35 +319,35 @@ function RelatedServices({ service }: { service: ServiceDetail }) {
   )
 }
 
-// ============ CTA ============
-function ServiceCTA({ service }: { service: ServiceDetail }) {
+function ServiceCTA({ service, locale, messages }: { service: ServiceDetail; locale: ReturnType<typeof useCurrentLocale>; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
   return (
-    <section ref={ref} className={`py-16 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+    <section ref={ref} className={`py-16 md:py-20 relative overflow-hidden transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(245,158,11,0.1),transparent)]" />
 
       <div className="relative max-w-3xl mx-auto px-4 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-          Ready to Book Your {service.name}?
+          {messages.cta.titleTemplate.replace("{service}", service.name)}
         </h2>
-        <p className="text-slate-400 text-lg mb-8 max-w-lg mx-auto">
-          Compare pricing online or talk with us to choose the right coverage for your event.
+        <p className="text-slate-400 text-base md:text-lg mb-7 max-w-xl mx-auto leading-relaxed">
+          {messages.cta.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" })}
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1"
+            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" }), locale)}
+            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
           >
-            <ArrowRight size={20} /> Check Pricing &amp; Availability
+            {messages.cta.checkPricing}
+            <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
           </Link>
           <a
-            href={getWhatsAppLink(`Hi Orvex, I'm interested in ${service.name}. Can you help me choose the right coverage?`)}
+            href={getWhatsAppLink(applyTemplate(messages.cta.whatsappTemplate, { service: service.name }))}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:-translate-y-0.5"
           >
-            <MessageCircle size={18} /> Talk on WhatsApp
+            <MessageCircle size={18} /> {messages.cta.whatsapp}
           </a>
         </div>
       </div>
@@ -355,8 +355,9 @@ function ServiceCTA({ service }: { service: ServiceDetail }) {
   )
 }
 
-// ============ MAIN PAGE ============
 export default function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
+  const locale = useCurrentLocale()
+  const messages = getPageMessages(locale).serviceDetailPage
   const { slug } = use(params)
   const service = getServiceDetail(slug)
 
@@ -408,13 +409,13 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <ServiceHero service={service} />
-      <OverviewSection service={service} />
-      <PackagesSection service={service} />
-      <ProcessSection service={service} />
-      <FAQSection service={service} />
-      <RelatedServices service={service} />
-      <ServiceCTA service={service} />
+      <ServiceHero service={service} locale={locale} messages={messages} />
+      <OverviewSection service={service} messages={messages} />
+      <PackagesSection service={service} locale={locale} messages={messages} />
+      <ProcessSection service={service} messages={messages} />
+      <FAQSection service={service} messages={messages} />
+      <RelatedServices service={service} locale={locale} messages={messages} />
+      <ServiceCTA service={service} locale={locale} messages={messages} />
     </main>
   )
 }

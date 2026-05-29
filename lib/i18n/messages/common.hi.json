@@ -1,0 +1,51 @@
+{
+  "navbar": {
+    "home": "होम",
+    "services": "सेवाएं",
+    "whyUs": "क्यों Orvex",
+    "gallery": "गैलरी",
+    "pricing": "प्राइसिंग",
+    "faq": "FAQ",
+    "contact": "संपर्क",
+    "blog": "ब्लॉग",
+    "about": "हमारे बारे में",
+    "bookNow": "अनुमान पाएं",
+    "whatsapp": "WhatsApp पर बात करें",
+    "whatsappTemplate": "Hi Orvex, मैं अपने इवेंट के लिए उपलब्धता जांचना चाहता/चाहती हूं और सही कवरेज पर बात करना चाहता/चाहती हूं.",
+    "call": "अभी कॉल करें",
+    "themeToggle": "थीम बदलें",
+    "openMenu": "नेविगेशन मेनू खोलें",
+    "closeMenu": "नेविगेशन मेनू बंद करें"
+  },
+  "footer": {
+    "brandLine1": "बेंगलुरु में प्रीमियम फोटोग्राफी और वीडियोग्राफी कोऑर्डिनेशन.",
+    "brandLine2": "आपके पलों को खूबसूरती से संजोया गया.",
+    "servicesTitle": "सेवाएं",
+    "quickLinksTitle": "क्विक लिंक्स",
+    "contactTitle": "संपर्क",
+    "location": "बेंगलुरु, कर्नाटक",
+    "copyright": "(c) 2026 Orvex Visuals. सर्वाधिकार सुरक्षित.",
+    "privacyPolicy": "प्राइवेसी पॉलिसी",
+    "termsOfService": "सेवा की शर्तें",
+    "instagramAria": "Instagram पर Orvex Visuals देखें",
+    "facebookAria": "Facebook पर Orvex Visuals देखें",
+    "serviceLinks": {
+      "wedding": "वेडिंग फोटोग्राफी",
+      "preWedding": "प्री-वेडिंग शूट",
+      "baby": "बेबी फोटोशूट",
+      "event": "इवेंट फोटोग्राफी",
+      "drone": "ड्रोन फोटोग्राफी"
+    },
+    "quickLinks": {
+      "pricing": "प्राइसिंग",
+      "gallery": "गैलरी",
+      "blog": "ब्लॉग",
+      "about": "हमारे बारे में",
+      "faqs": "अक्सर पूछे जाने वाले सवाल"
+    }
+  },
+  "floatingWhatsapp": {
+    "ariaLabel": "WhatsApp पर बात करें",
+    "message": "Hi Orvex, मुझे प्राइसिंग, कवरेज या उपलब्धता के बारे में एक सवाल है."
+  }
+}

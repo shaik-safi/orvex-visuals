@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 
+import { ADMIN_API_SESSION_COOKIE_NAME, ADMIN_SESSION_COOKIE_NAME, isValidAdminSession } from "@/lib/admin-auth"
 import { adminDb } from "@/lib/firebase-admin"
 import { decryptQuotePayload } from "@/lib/quote-security"
 import type { QuotePayload } from "@/lib/save-quote"
 
 function checkAdminAuth(request: NextRequest): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD
-  if (!adminPassword) return false
-  const key = request.headers.get("x-admin-key")
-  return key === adminPassword
+  const sessionValue = request.cookies.get(ADMIN_API_SESSION_COOKIE_NAME)?.value ?? request.cookies.get(ADMIN_SESSION_COOKIE_NAME)?.value
+  return isValidAdminSession(sessionValue)
 }
 
 type QuoteDocument = {

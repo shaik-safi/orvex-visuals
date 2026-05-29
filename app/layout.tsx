@@ -5,92 +5,76 @@ import { Analytics } from "@vercel/analytics/next"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import WhatsAppFloat from "@/components/WhatsAppFloat"
-import { DOMAIN, EMAIL, PHONE_DISPLAY, PHOTO_DELIVERY_DAYS, PRICE_RANGE, SOCIAL_LINKS, STARTING_PRICE } from "@/lib/constants"
+import { DOMAIN, EMAIL, PHONE_DISPLAY, PRICE_RANGE, SOCIAL_LINKS } from "@/lib/constants"
+import { buildLocalizedMetadata, getAbsoluteUrl, getLocalizedPathname, getMetadataCopy } from "@/lib/i18n/metadata"
+import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
+import { getLocaleTag } from "@/lib/i18n/config"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-heading" })
 
-export const metadata: Metadata = {
-  title: {
-    default: "Orvex Visuals — Premium Photography & Videography in Bangalore",
-    template: "%s | Orvex Visuals",
-  },
-  description:
-    `Professional photography & videography in Bangalore. Transparent pricing, ${PHOTO_DELIVERY_DAYS}-day photo delivery, 100% copyright yours. Wedding, pre-wedding, baby shoots, events & more. Starting ₹${STARTING_PRICE.toLocaleString("en-IN")}.`,
-  keywords: [
-    "photography in Bangalore",
-    "wedding photographer Bangalore",
-    "pre-wedding photoshoot Bangalore",
-    "baby photoshoot Bangalore",
-    "event photography Bangalore",
-    "candid wedding photography",
-    "videography Bangalore",
-    "best photographer in Bangalore",
-    "affordable photography Bangalore",
-    "Orvex Visuals",
-  ],
-  authors: [{ name: "Orvex Visuals" }],
-  creator: "Orvex Visuals",
-  publisher: "Orvex Visuals",
-  metadataBase: new URL(DOMAIN),
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_IN",
-    url: DOMAIN,
-    siteName: "Orvex Visuals",
-    title: "Orvex Visuals — Premium Photography & Videography in Bangalore",
-    description:
-      `Professional photography & videography in Bangalore. Transparent pricing, ${PHOTO_DELIVERY_DAYS}-day photo delivery, 100% copyright yours. Starting ₹${STARTING_PRICE.toLocaleString("en-IN")}.`,
-    images: [
-      {
-        url: `${DOMAIN}/placeholder.jpg`,
-        width: 1200,
-        height: 630,
-        alt: "Orvex Visuals",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Orvex Visuals — Premium Photography & Videography in Bangalore",
-    description:
-      `Professional photography & videography in Bangalore. Transparent pricing, ${PHOTO_DELIVERY_DAYS}-day photo delivery, 100% copyright yours.`,
-    images: [`${DOMAIN}/placeholder.jpg`],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await resolveRequestLocale()
+  const copy = getMetadataCopy("root", locale)
+
+  return {
+    metadataBase: new URL(DOMAIN),
+    title: {
+      default: copy.title,
+      template: "%s | Orvex Visuals",
     },
-  },
+    creator: "Orvex Visuals",
+    publisher: "Orvex Visuals",
+    ...buildLocalizedMetadata(locale, {
+      pathname: "/",
+      title: copy.title,
+      description: copy.description,
+      keywords: copy.keywords,
+      authors: [{ name: "Orvex Visuals" }],
+      robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          "max-video-preview": -1,
+          "max-image-preview": "large",
+          "max-snippet": -1,
+        },
+      },
+      openGraph: {
+        title: copy.openGraphTitle,
+        description: copy.openGraphDescription,
+      },
+      twitter: {
+        title: copy.openGraphTitle,
+        description: copy.openGraphDescription,
+      },
+    }),
+  }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const locale = await resolveRequestLocale()
+  const copy = getMetadataCopy("root", locale)
+  const localizedHomeUrl = getAbsoluteUrl(getLocalizedPathname("/", locale))
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    "@id": "https://orvexvisuals.com/#business",
+    "@id": `${DOMAIN}/#business`,
     name: "Orvex Visuals",
-    description:
-      `Professional photography & videography studio in Bangalore. Wedding, pre-wedding, baby shoots, events & more. ${PHOTO_DELIVERY_DAYS}-day photo delivery, transparent pricing.`,
-    url: DOMAIN,
+    description: copy.description,
+    url: localizedHomeUrl,
     telephone: PHONE_DISPLAY,
     email: EMAIL,
-    image: `${DOMAIN}/placeholder.jpg`,
-    logo: `${DOMAIN}/placeholder-logo.png`,
+    image: getAbsoluteUrl("/orvex-logo-new.png"),
+    logo: getAbsoluteUrl("/orvex-logo-new.png"),
     priceRange: PRICE_RANGE,
     address: {
       "@type": "PostalAddress",
@@ -122,14 +106,14 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={getLocaleTag(locale)} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased overflow-x-hidden`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <Navbar />
         {children}
         <Footer />

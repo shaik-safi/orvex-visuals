@@ -1,29 +1,43 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 export function useDarkMode() {
   const [isDark, setIsDark] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem("theme")
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-    if (stored === "dark" || (!stored && prefersDark)) {
-      setIsDark(true)
-      document.documentElement.classList.add("dark")
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+
+    const applyTheme = (nextIsDark: boolean) => {
+      setIsDark(nextIsDark)
+      document.documentElement.classList.toggle("dark", nextIsDark)
     }
+
+    const stored = localStorage.getItem("theme")
+    if (stored === "dark" || stored === "light") {
+      applyTheme(stored === "dark")
+      return
+    }
+
+    applyTheme(mediaQuery.matches)
+
+    const handleChange = (event: MediaQueryListEvent) => {
+      if (localStorage.getItem("theme")) return
+      applyTheme(event.matches)
+    }
+
+    mediaQuery.addEventListener("change", handleChange)
+    return () => mediaQuery.removeEventListener("change", handleChange)
   }, [])
 
-  const toggle = () => {
-    setIsDark(!isDark)
-    if (!isDark) {
-      document.documentElement.classList.add("dark")
-      localStorage.setItem("theme", "dark")
-    } else {
-      document.documentElement.classList.remove("dark")
-      localStorage.setItem("theme", "light")
-    }
-  }
+  const toggle = useCallback(() => {
+    setIsDark((current) => {
+      const nextIsDark = !current
+      document.documentElement.classList.toggle("dark", nextIsDark)
+      localStorage.setItem("theme", nextIsDark ? "dark" : "light")
+      return nextIsDark
+    })
+  }, [])
 
   return { isDark, toggle }
 }

@@ -1,7 +1,10 @@
-import { NextResponse } from "next/server"
-
 import { adminDb } from "@/lib/firebase-admin"
+import { guardPublicWriteRequest } from "@/lib/public-write-guard"
 import { encryptQuotePayload } from "@/lib/quote-security"
+
+const INQUIRY_MAX_BYTES = 8 * 1024
+const INQUIRY_RATE_LIMIT = 5
+const INQUIRY_RATE_WINDOW_MS = 10 * 60 * 1000
 
 type InquiryPayload = {
   name: string
@@ -50,15 +53,26 @@ function generateInquiryId() {
 
 export async function POST(request: Request) {
   if (!adminDb) {
-    return NextResponse.json({ error: "Inquiry system not configured" }, { status: 503 })
+    return Response.json({ error: "Inquiry system not configured" }, { status: 503 })
   }
 
   try {
-    const body = await request.json()
+    const guardedRequest = await guardPublicWriteRequest(request, {
+      routeKey: "inquiries",
+      maxBytes: INQUIRY_MAX_BYTES,
+      limit: INQUIRY_RATE_LIMIT,
+      windowMs: INQUIRY_RATE_WINDOW_MS,
+    })
+
+    if (!guardedRequest.ok) {
+      return guardedRequest.response
+    }
+
+    const body = guardedRequest.body
     const payload = sanitizeInquiryPayload(body)
 
     if (!payload) {
-      return NextResponse.json({ error: "Invalid inquiry details" }, { status: 400 })
+      return Response.json({ error: "Invalid inquiry details" }, { status: 400 })
     }
 
     const inquiryId = generateInquiryId()
@@ -69,8 +83,8 @@ export async function POST(request: Request) {
       encryptedPayload: encryptQuotePayload(payload),
     })
 
-    return NextResponse.json({ inquiryId })
+    return Response.json({ inquiryId })
   } catch {
-    return NextResponse.json({ error: "Failed to save inquiry" }, { status: 500 })
+    return Response.json({ error: "Failed to save inquiry" }, { status: 500 })
   }
 }

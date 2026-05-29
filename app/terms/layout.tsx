@@ -1,8 +1,17 @@
+import type React from "react"
 import type { Metadata } from "next"
+import { buildLocalizedMetadata, getMetadataCopy } from "@/lib/i18n/metadata"
+import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: "Terms and conditions for Orvex Visuals photography services. Booking policies, cancellations, usage rights, and service agreements.",
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await resolveRequestLocale()
+  const copy = getMetadataCopy("terms", locale)
+
+  return buildLocalizedMetadata(locale, {
+    pathname: "/terms",
+    title: copy.title,
+    description: copy.description,
+  })
 }
 
 export default function TermsLayout({ children }: { children: React.ReactNode }) {

@@ -1,0 +1,139 @@
+{
+  "hero": {
+    "urgencyTemplate": "Planning for {month}? Start with clear pricing and next steps.",
+    "headingLine1": "Cinematic Photography & Films",
+    "headingHighlight": "for Weddings, Families & Events",
+    "description": "Premium coverage for weddings, family celebrations, and meaningful events, with clear pricing, fast delivery, and calm guidance from first inquiry to final gallery.",
+    "primaryCta": "Get Estimate",
+    "secondaryCta": "Talk on WhatsApp",
+    "whatsappTemplate": "Hi Orvex, I'd like to check availability and discuss the right coverage for my event.",
+    "stats": [
+      { "number": "500+ Weddings", "label": "Delivered across intimate and large celebrations" },
+      { "number": "4.9 Google Rating", "label": "Trusted reviews from recent clients" },
+      { "number": "{PHOTO_DELIVERY_DAYS}-Day Photo Delivery", "label": "A clear turnaround promise from the start" }
+    ]
+  },
+  "trustBar": [
+    { "strong": "GST", "label": "included pricing" },
+    { "strong": "{RESPONSE_TIME_PROMISE}", "label": "WhatsApp replies" },
+    { "strong": "Bangalore +", "label": "travel coverage" },
+    { "strong": "100%", "label": "copyright yours" }
+  ],
+  "services": {
+    "badge": "Our Services",
+    "headingPrefix": "One Studio,",
+    "headingHighlight": "Every Milestone",
+    "description": "Weddings, baby shoots, corporate events, and more. Wide-ranging coverage with one consistent standard of care.",
+    "pricePrefix": "From",
+    "viewAllPrefix": "View All"
+  },
+  "why": {
+    "badge": "Why Orvex",
+    "headingPrefix": "What You Can",
+    "headingHighlight": "Count On",
+    "description": "Clear pricing, dependable delivery timelines, and straightforward ownership from the start.",
+    "features": [
+      {
+        "title": "{PHOTO_DELIVERY_DAYS}-Day Photo Delivery",
+        "desc": "Edited photos are delivered in {PHOTO_DELIVERY_DAYS} working days with a clear turnaround promise.",
+        "stat": "{PHOTO_DELIVERY_DAYS} days"
+      },
+      {
+        "title": "Copyright Stays With You",
+        "desc": "Copyright stays with you from day one. No watermarks, usage restrictions, or recurring fees.",
+        "stat": "100% yours"
+      },
+      {
+        "title": "Honest, Final Pricing",
+        "desc": "The price you see already includes GST, so you can plan with confidence and avoid last-minute surprises.",
+        "stat": "Zero hidden fees"
+      },
+      {
+        "title": "Start Online",
+        "desc": "Build an estimate online, then move to booking when you're ready. We'll guide you from there, usually {RESPONSE_TIME_PROMISE}.",
+        "stat": "{RESPONSE_TIME_PROMISE}"
+      }
+    ]
+  },
+  "how": {
+    "badge": "Simple Process",
+    "headingPrefix": "How It",
+    "headingHighlight": "Works",
+    "steps": [
+      {
+        "step": "01",
+        "title": "Tell Us About Your Event",
+        "desc": "Share your details through the builder or booking form. We'll respond {RESPONSE_TIME_PROMISE} with clear options and next steps."
+      },
+      {
+        "step": "02",
+        "title": "Plan the Coverage",
+        "desc": "We help shape the right coverage, timeline, and team for your event."
+      },
+      {
+        "step": "03",
+        "title": "Coverage on the Day",
+        "desc": "Our team works with a calm presence, backup equipment, and attention to the moments that matter."
+      },
+      {
+        "step": "04",
+        "title": "Gallery in {PHOTO_DELIVERY_DAYS} Days",
+        "desc": "Edited photos are delivered digitally within {PHOTO_DELIVERY_DAYS} working days, and copyright stays with you."
+      }
+    ]
+  },
+  "testimonials": {
+    "badge": "Booking Standards",
+    "headingPrefix": "What You Can",
+    "headingHighlight": "Expect",
+    "expectations": [
+      {
+        "title": "Fast, clear communication",
+        "text": "You hear from us {RESPONSE_TIME_PROMISE} with clear options and an easy next step."
+      },
+      {
+        "title": "Transparent booking flow",
+        "text": "See pricing first, then choose how you want to proceed. No hidden add-ons and no vague package promises."
+      },
+      {
+        "title": "Clear delivery promises",
+        "text": "Edited photos arrive in {PHOTO_DELIVERY_DAYS} working days, with copyright staying with you."
+      }
+    ]
+  },
+  "faq": {
+    "badge": "FAQ",
+    "heading": "Common Questions",
+    "items": [
+      {
+        "q": "How quickly will I get my photos?",
+        "a": "Edited photos are delivered within 5 days. Cinematic video arrives within 15 days."
+      },
+      {
+        "q": "Do I own the copyright to my photos?",
+        "a": "Yes. 100% copyright belongs to you. All photos and videos are fully yours."
+      },
+      {
+        "q": "Are your prices inclusive of GST?",
+        "a": "Yes. All prices shown are final. No hidden charges, no surprise 18% add-on."
+      },
+      {
+        "q": "How do I book?",
+        "a": "Start with pricing, the booking form, or WhatsApp. We usually confirm availability within 2 hours."
+      },
+      {
+        "q": "What is included in packages?",
+        "a": "Professional photographer(s), all edited photos (digital), highlight reel, backup equipment, and pre-event planning call."
+      }
+    ]
+  },
+  "cta": {
+    "urgencyTemplate": "Planning for {months}? Ask about availability.",
+    "headingLine1": "Ready to Plan",
+    "headingLine2": "Your Coverage?",
+    "description": "Start with pricing or send us a WhatsApp message. We'll help you choose the right coverage with clear next steps.",
+    "whatsappCta": "Talk on WhatsApp",
+    "whatsappTemplate": "Hi Orvex, I'd like to check availability and discuss the right coverage for my event.",
+    "bookingCta": "Request Availability"
+  }
+}

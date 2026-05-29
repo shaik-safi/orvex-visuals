@@ -1,8 +1,11 @@
-import { NextResponse } from "next/server"
-
 import { adminDb } from "@/lib/firebase-admin"
+import { guardPublicWriteRequest } from "@/lib/public-write-guard"
 import { encryptQuotePayload, generateAccessToken, generateQuoteId, hashAccessToken } from "@/lib/quote-security"
 import type { QuotePayload } from "@/lib/save-quote"
+
+const QUOTE_MAX_BYTES = 64 * 1024
+const QUOTE_RATE_LIMIT = 4
+const QUOTE_RATE_WINDOW_MS = 10 * 60 * 1000
 
 function normalizeString(value: unknown, maxLength: number): string | undefined {
   if (typeof value !== "string") return undefined
@@ -117,11 +120,22 @@ function sanitizeQuotePayload(input: unknown): QuotePayload {
 
 export async function POST(request: Request) {
   if (!adminDb) {
-    return NextResponse.json({ error: "Booking system not configured" }, { status: 503 })
+    return Response.json({ error: "Booking system not configured" }, { status: 503 })
   }
 
   try {
-    const payload = sanitizeQuotePayload(await request.json())
+    const guardedRequest = await guardPublicWriteRequest(request, {
+      routeKey: "quotes",
+      maxBytes: QUOTE_MAX_BYTES,
+      limit: QUOTE_RATE_LIMIT,
+      windowMs: QUOTE_RATE_WINDOW_MS,
+    })
+
+    if (!guardedRequest.ok) {
+      return guardedRequest.response
+    }
+
+    const payload = sanitizeQuotePayload(guardedRequest.body)
     const quoteId = generateQuoteId()
     const accessToken = generateAccessToken()
 
@@ -132,9 +146,9 @@ export async function POST(request: Request) {
       encryptedPayload: encryptQuotePayload(payload),
     })
 
-    return NextResponse.json({ quoteId, accessToken })
+    return Response.json({ quoteId, accessToken })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to create booking"
-    return NextResponse.json({ error: message }, { status: 400 })
+    return Response.json({ error: message }, { status: 400 })
   }
 }

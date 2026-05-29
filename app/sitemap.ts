@@ -1,38 +1,51 @@
 import type { MetadataRoute } from "next"
-import { services } from "./services/data"
-import { blogPosts } from "./blog/data"
+
+import { blogPosts } from "@/app/blog/data"
+import { services } from "@/app/services/data"
+import { DOMAIN } from "@/lib/constants"
+import { SUPPORTED_LOCALES } from "@/lib/i18n/config"
+import { withLocalePathname } from "@/lib/i18n/routing"
+
+const STATIC_PATHS = [
+  "/",
+  "/about",
+  "/blog",
+  "/book",
+  "/contact",
+  "/gallery",
+  "/pricing",
+  "/privacy",
+  "/services",
+  "/terms",
+] as const
+
+function toAbsoluteUrl(pathname: string) {
+  return new URL(pathname, DOMAIN).toString()
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://orvexvisuals.com"
+  const lastModified = new Date()
 
-  // Static pages
-  const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1.0 },
-    { url: `${baseUrl}/services`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    { url: `${baseUrl}/pricing`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    { url: `${baseUrl}/gallery`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${baseUrl}/privacy-policy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-    { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-  ]
+  const localizedStaticRoutes = SUPPORTED_LOCALES.flatMap((locale) =>
+    STATIC_PATHS.map((pathname) => ({
+      url: toAbsoluteUrl(withLocalePathname(pathname, locale)),
+      lastModified,
+    }))
+  )
 
-  // Service pages — dynamically pulled from data.ts (always in sync)
-  const servicePages: MetadataRoute.Sitemap = services.map((s) => ({
-    url: `${baseUrl}/services/${s.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly",
-    priority: 0.8,
-  }))
+  const localizedBlogRoutes = SUPPORTED_LOCALES.flatMap((locale) =>
+    blogPosts.map((post) => ({
+      url: toAbsoluteUrl(withLocalePathname(`/blog/${post.slug}`, locale)),
+      lastModified: new Date(post.date),
+    }))
+  )
 
-  // Blog posts — dynamically pulled from blog data.ts
-  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }))
+  const localizedServiceRoutes = SUPPORTED_LOCALES.flatMap((locale) =>
+    services.map((service) => ({
+      url: toAbsoluteUrl(withLocalePathname(`/services/${service.slug}`, locale)),
+      lastModified,
+    }))
+  )
 
-  return [...staticPages, ...servicePages, ...blogPages]
+  return [...localizedStaticRoutes, ...localizedBlogRoutes, ...localizedServiceRoutes]
 }

@@ -1,18 +1,22 @@
+import type React from "react"
 import type { Metadata } from "next"
+import { buildLocalizedMetadata, getMetadataCopy } from "@/lib/i18n/metadata"
+import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
 
-export const metadata: Metadata = {
-  title: "Portfolio Gallery — Wedding & Event Photography",
-  description:
-    "Browse our photography portfolio. Wedding, pre-wedding, baby, events & portrait photography in Bangalore. See our best work and get inspired.",
-  keywords: ["photography portfolio Bangalore", "wedding photo gallery", "candid photography samples", "pre-wedding shoot gallery"],
-  alternates: { canonical: "/gallery" },
-  openGraph: {
-    title: "Photography Portfolio Gallery | Orvex Visuals Bangalore",
-    description: "Stunning wedding, pre-wedding & event photography portfolio. Candid moments, artistic portraits.",
-    url: "https://orvexvisuals.com/gallery",
-    type: "website",
-    images: [{ url: "/og-default.webp", width: 1200, height: 630 }],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await resolveRequestLocale()
+  const copy = getMetadataCopy("gallery", locale)
+
+  return buildLocalizedMetadata(locale, {
+    pathname: "/gallery",
+    title: copy.title,
+    description: copy.description,
+    keywords: copy.keywords,
+    openGraph: {
+      title: copy.openGraphTitle,
+      description: copy.openGraphDescription,
+    },
+  })
 }
 
 export default function GalleryLayout({ children }: { children: React.ReactNode }) {

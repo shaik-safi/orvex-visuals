@@ -89,6 +89,12 @@ html {
   scroll-behavior: smooth;
 }
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -234,7 +240,7 @@ body {
   }
 
   /* ── Isolate the document ── */
-  body > * {
+  body>* {
     visibility: hidden;
   }
 
@@ -314,7 +320,8 @@ body {
     font-size: 8.5px !important;
     letter-spacing: 0.28em !important;
     text-transform: uppercase !important;
-    color: #94a3b8 !important;  /* slate-400 */
+    color: #94a3b8 !important;
+    /* slate-400 */
     display: block !important;
     margin-bottom: 4px !important;
     font-weight: 400 !important;
@@ -325,7 +332,8 @@ body {
     font-size: 16px !important;
     font-weight: 600 !important;
     letter-spacing: 0.06em !important;
-    color: #92400e !important;  /* amber-800 — reads on paper */
+    color: #92400e !important;
+    /* amber-800 — reads on paper */
     display: block !important;
   }
 
@@ -334,7 +342,8 @@ body {
     font-size: 8.5px !important;
     letter-spacing: 0.28em !important;
     text-transform: uppercase !important;
-    color: #64748b !important;  /* slate-500 — readable, not invisible */
+    color: #64748b !important;
+    /* slate-500 — readable, not invisible */
     display: block !important;
     font-weight: 500 !important;
   }
@@ -353,7 +362,8 @@ body {
   /* Field values — customer name, phone, etc. */
   .print-field-value {
     font-size: 12px !important;
-    color: #0f172a !important;  /* near-black */
+    color: #0f172a !important;
+    /* near-black */
     font-weight: 500 !important;
     display: block !important;
     line-height: 1.4 !important;
@@ -385,7 +395,7 @@ body {
   */
 
   /* Event duration badge — e.g. "HALF DAY" */
-  #quote-pdf .print-section > div > div > div > div > span:nth-child(2),
+  #quote-pdf .print-section>div>div>div>div>span:nth-child(2),
   span.print\:event-duration {
     font-size: 9px !important;
     letter-spacing: 0.12em !important;
@@ -408,7 +418,8 @@ body {
   */
   span.print\:deliverable-name {
     font-size: 11px !important;
-    color: #475569 !important;   /* slate-600 — visible but secondary */
+    color: #475569 !important;
+    /* slate-600 — visible but secondary */
     font-weight: 400 !important;
     letter-spacing: 0 !important;
   }
@@ -422,7 +433,8 @@ body {
   */
   span.print\:deliverable-price {
     font-size: 10.5px !important;
-    color: #94a3b8 !important;   /* slate-400 — very quiet */
+    color: #94a3b8 !important;
+    /* slate-400 — very quiet */
     font-weight: 400 !important;
   }
 
@@ -440,7 +452,8 @@ body {
   /* Number — 01, 02 ... */
   .print-term-num {
     font-size: 9px !important;
-    color: #cbd5e1 !important;   /* slate-300 — barely there, structural only */
+    color: #cbd5e1 !important;
+    /* slate-300 — barely there, structural only */
     font-weight: 500 !important;
     letter-spacing: 0.05em !important;
     display: block !important;
@@ -451,8 +464,10 @@ body {
   /* Term text — the actual clause */
   .print-term-text {
     font-size: 10.5px !important;
-    color: #475569 !important;   /* slate-600 — readable, not black */
-    line-height: 1.65 !important;  /* generous — no cramping */
+    color: #475569 !important;
+    /* slate-600 — readable, not black */
+    line-height: 1.65 !important;
+    /* generous — no cramping */
     font-weight: 400 !important;
   }
 
@@ -466,10 +481,27 @@ body {
   }
 
   /* ── Explicit border color fixes ── */
-  #quote-pdf .print\:border-slate-900  { border-color: #0f172a !important; }
-  #quote-pdf .print\:border-slate-200  { border-color: #e2e8f0 !important; }
-  #quote-pdf .print\:border-slate-100  { border-color: #f1f5f9 !important; }
-  #quote-pdf .print\:border-b-2        { border-bottom-width: 2px !important; }
-  #quote-pdf .print\:border-t-\[1\.5px\] { border-top-width: 1.5px !important; }
-  #quote-pdf .print\:border-b-\[1\.5px\] { border-bottom-width: 1.5px !important; }
+  #quote-pdf .print\:border-slate-900 {
+    border-color: #0f172a !important;
+  }
+
+  #quote-pdf .print\:border-slate-200 {
+    border-color: #e2e8f0 !important;
+  }
+
+  #quote-pdf .print\:border-slate-100 {
+    border-color: #f1f5f9 !important;
+  }
+
+  #quote-pdf .print\:border-b-2 {
+    border-bottom-width: 2px !important;
+  }
+
+  #quote-pdf .print\:border-t-\[1\.5px\] {
+    border-top-width: 1.5px !important;
+  }
+
+  #quote-pdf .print\:border-b-\[1\.5px\] {
+    border-bottom-width: 1.5px !important;
+  }
 }
