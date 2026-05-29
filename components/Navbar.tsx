@@ -17,8 +17,8 @@ import { useDarkMode } from "@/hooks/use-dark-mode"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 import { BRAND_NAME, getWhatsAppLink, PHONE_NUMBER } from "@/lib/constants"
 import type { AppLocale } from "@/lib/i18n/config"
-import { DEFAULT_LOCALE } from "@/lib/i18n/config"
-import { extractLocaleFromPathname, stripLocaleFromPathname, withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
+import { useLocaleSync } from "@/lib/i18n/locale-sync"
+import { stripLocaleFromPathname, withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
 import { getCommonMessages } from "@/lib/i18n/common"
 
 const localeOptions: { value: AppLocale; label: string }[] = [
@@ -26,17 +26,16 @@ const localeOptions: { value: AppLocale; label: string }[] = [
   { value: "hi", label: "HI" },
 ]
 
-export default function Navbar({ locale: renderedLocale }: { locale: AppLocale }) {
+export default function Navbar() {
   const { isDark, toggle } = useDarkMode()
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const router = useRouter()
   const pathname = usePathname() || "/"
   const searchParams = useSearchParams()
+  const { renderedLocale, routeLocale, isPending: isLocaleSyncPending } = useLocaleSync()
 
-  const routeLocale = extractLocaleFromPathname(pathname) ?? DEFAULT_LOCALE
   const currentLocale = renderedLocale
-  const isLocaleSyncPending = routeLocale !== currentLocale
   const messages = getCommonMessages(currentLocale)
   const basePath = stripLocaleFromPathname(pathname)
   const isHomepage = basePath === "/"
@@ -46,6 +45,16 @@ export default function Navbar({ locale: renderedLocale }: { locale: AppLocale }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  useEffect(() => {
+    console.log("[Navbar]", {
+      pathname,
+      routeLocale,
+      renderedLocale,
+      isPending: isLocaleSyncPending,
+      targetLocale: null,
+    })
+  }, [pathname, routeLocale, renderedLocale, isLocaleSyncPending])
 
   const normalizeHref = (href: string) => stripLocaleFromPathname(href.split("?")[0].split("#")[0] || "/")
 
@@ -80,7 +89,7 @@ export default function Navbar({ locale: renderedLocale }: { locale: AppLocale }
 
   const links = primaryLinks.map((link) => ({
     ...link,
-    href: withLocaleHref(link.href, currentLocale),
+    href: withLocaleHref(link.href, routeLocale),
   }))
 
   const navBg = isHomepage
@@ -105,7 +114,22 @@ export default function Navbar({ locale: renderedLocale }: { locale: AppLocale }
   const localeHref = (targetLocale: AppLocale) => withLocaleHref(pathWithQuery, targetLocale)
 
   const handleLocaleChange = (targetLocale: AppLocale) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+    console.log("[Navbar.handleLocaleChange]", {
+      pathname,
+      routeLocale,
+      renderedLocale,
+      isPending: isLocaleSyncPending,
+      targetLocale,
+    })
+
     if (isLocaleSyncPending || targetLocale === routeLocale) {
+      console.log("[Navbar.handleLocaleChange:block]", {
+        pathname,
+        routeLocale,
+        renderedLocale,
+        isPending: isLocaleSyncPending,
+        targetLocale,
+      })
       event.preventDefault()
       setIsOpen(false)
       return
@@ -120,7 +144,7 @@ export default function Navbar({ locale: renderedLocale }: { locale: AppLocale }
 
   const estimateHref = withLocaleHref(
     buildPricingHandoffHref({ from: "navbar", source: "Site Navigation", intent: "availability" }),
-    currentLocale
+    routeLocale
   )
   const whatsappHref = getWhatsAppLink(messages.navbar.whatsappTemplate)
   const callHref = `tel:+${PHONE_NUMBER}`
@@ -151,7 +175,7 @@ export default function Navbar({ locale: renderedLocale }: { locale: AppLocale }
               />
             </a>
           ) : (
-            <Link href={withLocalePathname("/", currentLocale)} className="group flex min-w-0 items-center">
+            <Link href={withLocalePathname("/", routeLocale)} className="group flex min-w-0 items-center">
               <Image
                 src="/orvex-logo-new.png"
                 alt={BRAND_NAME}

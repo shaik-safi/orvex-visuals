@@ -7,6 +7,7 @@ import { ArrowRight, ChevronDown, MessageCircle } from "lucide-react"
 
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getWhatsAppLink, IMAGES } from "@/lib/constants"
+import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 import { applyTemplate, type HomeMessages } from "@/lib/i18n/home"
 import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
@@ -26,6 +27,7 @@ function getUpcomingMonths(localeTag: string) {
 export function Hero({ messages }: { messages: HomeMessages }) {
   const heroImage = IMAGES.hero[0]
   const { next } = getUpcomingMonths(messages.localeTag)
+  const { routeLocale } = useLocaleSync()
 
   return (
     <section id="home" className="relative flex min-h-svh items-start justify-center overflow-hidden pt-28 pb-20 sm:pt-32 md:pt-36 md:pb-24 lg:items-center lg:pt-40">
@@ -68,7 +70,7 @@ export function Hero({ messages }: { messages: HomeMessages }) {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability" }), messages.locale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability" }), routeLocale)}
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-3.5 rounded-2xl font-semibold text-base transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/30 hover:-translate-y-1 sm:px-8 sm:py-4 sm:text-lg"
           >
             {messages.hero.primaryCta}
@@ -144,6 +146,7 @@ export function FAQSection({ messages }: { messages: HomeMessages }) {
 export function CTABanner({ messages }: { messages: HomeMessages }) {
   const { ref, isVisible } = useScrollReveal()
   const { nextTwo } = getUpcomingMonths(messages.localeTag)
+  const { routeLocale } = useLocaleSync()
 
   return (
     <section id="contact" ref={ref} className={`py-20 md:py-28 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
@@ -175,7 +178,7 @@ export function CTABanner({ messages }: { messages: HomeMessages }) {
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "availability" }), messages.locale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "availability" }), routeLocale)}
             className="inline-flex items-center justify-center border-2 border-white/40 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
             {messages.cta.bookingCta}

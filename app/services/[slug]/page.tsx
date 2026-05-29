@@ -15,7 +15,8 @@ import {
 } from "lucide-react"
 
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
-import { useCurrentLocale } from "@/hooks/use-current-locale"
+import type { AppLocale } from "@/lib/i18n/config"
+import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { getLocalizedServiceDetail, getLocalizedServiceName, type ServiceDetail } from "../data"
 import { PHOTO_DELIVERY_DAYS, getWhatsAppLink } from "@/lib/constants"
 import { applyTemplate } from "@/lib/i18n/home"
@@ -25,7 +26,7 @@ import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 
 type ServiceDetailMessages = ReturnType<typeof getPageMessages>["serviceDetailPage"]
 
-function ServiceHero({ service, locale, messages }: { service: ServiceDetail; locale: ReturnType<typeof useCurrentLocale>; messages: ServiceDetailMessages }) {
+function ServiceHero({ service, routeLocale, messages }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
   const Icon = service.icon
 
@@ -38,9 +39,9 @@ function ServiceHero({ service, locale, messages }: { service: ServiceDetail; lo
 
       <div ref={ref} className={`relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
         <div className="flex items-center justify-center gap-2 text-sm text-white/60 mb-6">
-          <Link href={withLocalePathname("/", locale)} className="hover:text-white transition-colors">{messages.breadcrumbs.home}</Link>
+          <Link href={withLocalePathname("/", routeLocale)} className="hover:text-white transition-colors">{messages.breadcrumbs.home}</Link>
           <span>/</span>
-          <Link href={withLocalePathname("/services", locale)} className="hover:text-white transition-colors">{messages.breadcrumbs.services}</Link>
+          <Link href={withLocalePathname("/services", routeLocale)} className="hover:text-white transition-colors">{messages.breadcrumbs.services}</Link>
           <span>/</span>
           <span className="text-amber-400">{service.name}</span>
         </div>
@@ -57,7 +58,7 @@ function ServiceHero({ service, locale, messages }: { service: ServiceDetail; lo
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" }), locale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" }), routeLocale)}
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
           >
             {messages.hero.checkPricing}
@@ -127,7 +128,7 @@ function OverviewSection({ service, messages }: { service: ServiceDetail; messag
   )
 }
 
-function PackagesSection({ service, locale, messages }: { service: ServiceDetail; locale: ReturnType<typeof useCurrentLocale>; messages: ServiceDetailMessages }) {
+function PackagesSection({ service, routeLocale, messages }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
   return (
     <section id="packages" ref={ref} className={`py-16 bg-slate-50 dark:bg-slate-900 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
@@ -202,7 +203,7 @@ function PackagesSection({ service, locale, messages }: { service: ServiceDetail
         <div className="text-center mt-10 pt-8 border-t border-slate-200 dark:border-slate-800">
           <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">{messages.packages.customize}</p>
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "custom-package" }), locale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "custom-package" }), routeLocale)}
             className="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-sm hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
           >
             {messages.packages.buildCustom} <ArrowRight size={15} />
@@ -284,12 +285,12 @@ function FAQSection({ service, messages }: { service: ServiceDetail; messages: S
   )
 }
 
-function RelatedServices({ service, locale, messages }: { service: ServiceDetail; locale: ReturnType<typeof useCurrentLocale>; messages: ServiceDetailMessages }) {
+function RelatedServices({ service, renderedLocale, routeLocale, messages }: { service: ServiceDetail; renderedLocale: AppLocale; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
 
   const relatedNames = service.relatedSlugs.map((slug) => ({
     slug,
-    name: getLocalizedServiceName(slug, locale),
+    name: getLocalizedServiceName(slug, renderedLocale),
   }))
 
   return (
@@ -302,7 +303,7 @@ function RelatedServices({ service, locale, messages }: { service: ServiceDetail
           {relatedNames.map((related) => (
             <Link
               key={related.slug}
-              href={withLocalePathname(`/services/${related.slug}`, locale)}
+              href={withLocalePathname(`/services/${related.slug}`, routeLocale)}
               className="group bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/40 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md text-center"
             >
               <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
@@ -319,7 +320,7 @@ function RelatedServices({ service, locale, messages }: { service: ServiceDetail
   )
 }
 
-function ServiceCTA({ service, locale, messages }: { service: ServiceDetail; locale: ReturnType<typeof useCurrentLocale>; messages: ServiceDetailMessages }) {
+function ServiceCTA({ service, routeLocale, messages }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
   return (
     <section ref={ref} className={`py-16 md:py-20 relative overflow-hidden transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
@@ -335,7 +336,7 @@ function ServiceCTA({ service, locale, messages }: { service: ServiceDetail; loc
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" }), locale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" }), routeLocale)}
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
           >
             {messages.cta.checkPricing}
@@ -356,10 +357,10 @@ function ServiceCTA({ service, locale, messages }: { service: ServiceDetail; loc
 }
 
 export default function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
-  const locale = useCurrentLocale()
-  const messages = getPageMessages(locale).serviceDetailPage
+  const { renderedLocale, routeLocale } = useLocaleSync()
+  const messages = getPageMessages(renderedLocale).serviceDetailPage
   const { slug } = use(params)
-  const service = getLocalizedServiceDetail(slug, locale)
+  const service = getLocalizedServiceDetail(slug, renderedLocale)
 
   const serviceSchema = {
     "@context": "https://schema.org",
@@ -373,7 +374,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
     },
     areaServed: {
       "@type": "City",
-      name: locale === "hi" ? "बेंगलुरु" : "Bangalore",
+      name: renderedLocale === "hi" ? "बेंगलुरु" : "Bangalore",
     },
     offers: service.packages.map((pkg) => ({
       "@type": "Offer",
@@ -383,7 +384,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
       availability: "https://schema.org/InStock",
     })),
     image: service.heroImage,
-    url: `https://orvexvisuals.com${withLocalePathname(`/services/${slug}`, locale)}`,
+    url: `https://orvexvisuals.com${withLocalePathname(`/services/${slug}`, renderedLocale)}`,
   }
 
   const faqSchema = {
@@ -409,13 +410,13 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <ServiceHero service={service} locale={locale} messages={messages} />
+      <ServiceHero service={service} routeLocale={routeLocale} messages={messages} />
       <OverviewSection service={service} messages={messages} />
-      <PackagesSection service={service} locale={locale} messages={messages} />
+      <PackagesSection service={service} routeLocale={routeLocale} messages={messages} />
       <ProcessSection service={service} messages={messages} />
       <FAQSection service={service} messages={messages} />
-      <RelatedServices service={service} locale={locale} messages={messages} />
-      <ServiceCTA service={service} locale={locale} messages={messages} />
+      <RelatedServices service={service} renderedLocale={renderedLocale} routeLocale={routeLocale} messages={messages} />
+      <ServiceCTA service={service} routeLocale={routeLocale} messages={messages} />
     </main>
   )
 }

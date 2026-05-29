@@ -9,15 +9,13 @@ import {
   Facebook,
 } from "lucide-react"
 import { BRAND_NAME, EMAIL, PHONE_DISPLAY, SOCIAL_LINKS } from "@/lib/constants"
-import { usePathname } from "next/navigation"
-import { extractLocaleFromPathname, withLocalePathname } from "@/lib/i18n/routing"
-import { DEFAULT_LOCALE } from "@/lib/i18n/config"
+import { useLocaleSync } from "@/lib/i18n/locale-sync"
+import { withLocalePathname } from "@/lib/i18n/routing"
 import { getCommonMessages } from "@/lib/i18n/common"
 
 export default function Footer() {
-  const pathname = usePathname() || "/"
-  const locale = extractLocaleFromPathname(pathname) ?? DEFAULT_LOCALE
-  const messages = getCommonMessages(locale)
+  const { renderedLocale, routeLocale } = useLocaleSync()
+  const messages = getCommonMessages(renderedLocale)
 
   return (
     <footer className="bg-slate-950 text-slate-300 pt-20 pb-8">
@@ -57,7 +55,7 @@ export default function Footer() {
                 [messages.footer.serviceLinks.drone, "/services/drone-photography"],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <Link href={withLocalePathname(href, locale)} className="hover:text-amber-300 transition-colors">{label}</Link>
+                  <Link href={withLocalePathname(href, routeLocale)} className="hover:text-amber-300 transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -75,7 +73,7 @@ export default function Footer() {
                 [messages.footer.quickLinks.faqs, "/#faq"],
               ].map(([label, href]) => (
                 <li key={label}>
-                  <Link href={href === "/#faq" ? withLocalePathname("/", locale) + "#faq" : withLocalePathname(href, locale)} className="hover:text-amber-300 transition-colors">{label}</Link>
+                  <Link href={href === "/#faq" ? withLocalePathname("/", routeLocale) + "#faq" : withLocalePathname(href, routeLocale)} className="hover:text-amber-300 transition-colors">{label}</Link>
                 </li>
               ))}
             </ul>
@@ -111,8 +109,8 @@ export default function Footer() {
         <div className="pt-8 flex flex-col gap-4 text-center text-sm text-slate-400 md:flex-row md:items-center md:justify-between md:text-left">
           <p>{messages.footer.copyright}</p>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 md:justify-end">
-            <Link href={withLocalePathname("/privacy-policy", locale)} className="text-slate-300 hover:text-amber-300 transition-colors">{messages.footer.privacyPolicy}</Link>
-            <Link href={withLocalePathname("/terms", locale)} className="text-slate-300 hover:text-amber-300 transition-colors">{messages.footer.termsOfService}</Link>
+            <Link href={withLocalePathname("/privacy-policy", routeLocale)} className="text-slate-300 hover:text-amber-300 transition-colors">{messages.footer.privacyPolicy}</Link>
+            <Link href={withLocalePathname("/terms", routeLocale)} className="text-slate-300 hover:text-amber-300 transition-colors">{messages.footer.termsOfService}</Link>
           </div>
         </div>
       </div>

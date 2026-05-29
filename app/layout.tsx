@@ -1,5 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { headers } from "next/headers"
 import { Inter, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import Navbar from "@/components/Navbar"
@@ -7,6 +8,7 @@ import Footer from "@/components/Footer"
 import WhatsAppFloat from "@/components/WhatsAppFloat"
 import { DOMAIN, EMAIL, PHONE_DISPLAY, PRICE_RANGE, SOCIAL_LINKS } from "@/lib/constants"
 import { buildLocalizedMetadata, getAbsoluteUrl, getLocalizedPathname, getMetadataCopy } from "@/lib/i18n/metadata"
+import { LocaleSyncProvider } from "@/lib/i18n/locale-sync"
 import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
 import { getLocaleTag } from "@/lib/i18n/config"
 import "./globals.css"
@@ -60,9 +62,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const requestHeaders = await headers()
+  const pathname = requestHeaders.get("next-url") ?? requestHeaders.get("x-invoke-path") ?? requestHeaders.get("x-matched-path")
   const locale = await resolveRequestLocale()
   const copy = getMetadataCopy("root", locale)
   const localizedHomeUrl = getAbsoluteUrl(getLocalizedPathname("/", locale))
+
+  console.log("[RootLayout]", {
+    pathname,
+    routeLocale: null,
+    renderedLocale: locale,
+    isPending: null,
+    targetLocale: null,
+  })
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -114,11 +126,13 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
-        <Navbar locale={locale} />
-        {children}
-        <Footer />
-        <WhatsAppFloat />
-        <Analytics />
+        <LocaleSyncProvider renderedLocale={locale}>
+          <Navbar />
+          {children}
+          <Footer />
+          <WhatsAppFloat />
+          <Analytics />
+        </LocaleSyncProvider>
       </body>
     </html>
   )

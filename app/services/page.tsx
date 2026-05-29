@@ -11,7 +11,8 @@ import {
 } from "lucide-react"
 
 import { getWhatsAppLink } from "@/lib/constants"
-import { useCurrentLocale } from "@/hooks/use-current-locale"
+import type { AppLocale } from "@/lib/i18n/config"
+import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { getPageMessages } from "@/lib/i18n/pages"
 import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
@@ -40,10 +41,10 @@ function ServicesHero({ messages }: { messages: ServicesPageMessages }) {
   )
 }
 
-function ServicesGrid({ locale, messages }: { locale: ReturnType<typeof useCurrentLocale>; messages: ServicesPageMessages }) {
+function ServicesGrid({ renderedLocale, routeLocale, messages }: { renderedLocale: AppLocale; routeLocale: AppLocale; messages: ServicesPageMessages }) {
   const [activeCategory, setActiveCategory] = useState<Category>("all")
   const [searchQuery, setSearchQuery] = useState("")
-  const localizedServices = getLocalizedServices(locale)
+  const localizedServices = getLocalizedServices(renderedLocale)
 
   const filtered = localizedServices.filter((s) => {
     const matchesCategory = activeCategory === "all" || s.category === activeCategory
@@ -98,7 +99,7 @@ function ServicesGrid({ locale, messages }: { locale: ReturnType<typeof useCurre
             return (
               <Link
                 key={service.slug}
-                href={withLocalePathname(`/services/${service.slug}`, locale)}
+                href={withLocalePathname(`/services/${service.slug}`, routeLocale)}
                 className="group relative bg-slate-50 dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/5"
               >
                 <div className="relative h-48 overflow-hidden">
@@ -172,7 +173,7 @@ function ServicesGrid({ locale, messages }: { locale: ReturnType<typeof useCurre
   )
 }
 
-function ServicesCTA({ locale, messages }: { locale: ReturnType<typeof useCurrentLocale>; messages: ServicesPageMessages }) {
+function ServicesCTA({ routeLocale, messages }: { routeLocale: AppLocale; messages: ServicesPageMessages }) {
   return (
     <section className="py-16 md:py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
@@ -187,7 +188,7 @@ function ServicesCTA({ locale, messages }: { locale: ReturnType<typeof useCurren
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "services", source: "Services Page", intent: "custom-package" }), locale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "services", source: "Services Page", intent: "custom-package" }), routeLocale)}
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
           >
             {messages.cta.build}
@@ -209,14 +210,14 @@ function ServicesCTA({ locale, messages }: { locale: ReturnType<typeof useCurren
 }
 
 export default function ServicesPage() {
-  const locale = useCurrentLocale()
-  const messages = getPageMessages(locale).servicesPage
+  const { renderedLocale, routeLocale } = useLocaleSync()
+  const messages = getPageMessages(renderedLocale).servicesPage
 
   return (
     <main>
       <ServicesHero messages={messages} />
-      <ServicesGrid locale={locale} messages={messages} />
-      <ServicesCTA locale={locale} messages={messages} />
+      <ServicesGrid renderedLocale={renderedLocale} routeLocale={routeLocale} messages={messages} />
+      <ServicesCTA routeLocale={routeLocale} messages={messages} />
     </main>
   )
 }

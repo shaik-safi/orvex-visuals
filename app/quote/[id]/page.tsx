@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation"
 import { ArrowLeft, Calendar, Download, Mail, MapPin, MessageCircle, Phone, User } from "lucide-react"
 
 import { BRAND_NAME, EMAIL, PHONE_DISPLAY, getWhatsAppLink } from "@/lib/constants"
-import { useCurrentLocale } from "@/hooks/use-current-locale"
+import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { getPageMessages } from "@/lib/i18n/pages"
 import { getLocaleTag } from "@/lib/i18n/config"
 import { applyTemplate } from "@/lib/i18n/home"
@@ -39,8 +39,8 @@ interface QuoteData {
 }
 
 export default function QuotePage({ params }: { params: Promise<{ id: string }> }) {
-  const locale = useCurrentLocale()
-  const messages = getPageMessages(locale).quotePage
+  const { renderedLocale, routeLocale } = useLocaleSync()
+  const messages = getPageMessages(renderedLocale).quotePage
   const { id } = use(params)
   const searchParams = useSearchParams()
 
@@ -86,7 +86,7 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
       <div className="pt-32 pb-20 text-center px-4">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{messages.notFoundTitle}</h1>
         <p className="text-slate-500 dark:text-slate-400 mb-6">{error || messages.notFoundDescription}</p>
-        <Link href={withLocaleHref(buildPricingHandoffHref({ from: "quote", source: messages.savedPackageSource, intent: "custom-package" }), locale)} className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
+        <Link href={withLocaleHref(buildPricingHandoffHref({ from: "quote", source: messages.savedPackageSource, intent: "custom-package" }), routeLocale)} className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
           {messages.newPackage}
         </Link>
       </div>
@@ -94,28 +94,28 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
   }
 
   const createdDate = quote.createdAt
-    ? new Date(quote.createdAt).toLocaleDateString(getLocaleTag(locale), { day: "numeric", month: "long", year: "numeric" })
+    ? new Date(quote.createdAt).toLocaleDateString(getLocaleTag(renderedLocale), { day: "numeric", month: "long", year: "numeric" })
     : messages.placeholders.na
   const venue = quote.city && quote.venue && quote.city.trim() === quote.venue.trim()
     ? quote.city
     : [quote.city, quote.venue].filter(Boolean).join(" - ")
-  const localizedService = localizeQuoteListValue(quote.service, locale)
-  const localizedTimeSlot = localizeQuoteValue(quote.timeSlot, locale)
+  const localizedService = localizeQuoteListValue(quote.service, renderedLocale)
+  const localizedTimeSlot = localizeQuoteValue(quote.timeSlot, renderedLocale)
   const localizedEvents = (quote.events ?? []).map((event) => ({
     ...event,
-    name: localizeQuoteValue(event.name, locale) || event.name,
-    duration: localizeQuoteValue(event.duration, locale) || event.duration,
+    name: localizeQuoteValue(event.name, renderedLocale) || event.name,
+    duration: localizeQuoteValue(event.duration, renderedLocale) || event.duration,
     selections: event.selections.map((item) => ({
       ...item,
-      name: localizeQuoteValue(item.name, locale) || item.name,
+      name: localizeQuoteValue(item.name, renderedLocale) || item.name,
     })),
   }))
   const localizedGlobalAddOns = (quote.globalAddOns ?? []).map((addon) => ({
     ...addon,
-    name: localizeQuoteValue(addon.name, locale) || addon.name,
+    name: localizeQuoteValue(addon.name, renderedLocale) || addon.name,
   }))
 
-  const pricingHref = withLocaleHref(buildPricingHandoffHref({ from: "quote", source: messages.savedPackageSource, intent: "custom-package" }), locale)
+  const pricingHref = withLocaleHref(buildPricingHandoffHref({ from: "quote", source: messages.savedPackageSource, intent: "custom-package" }), routeLocale)
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950 min-h-svh pt-28 pb-16 print:pt-0 print:bg-white">

@@ -2,12 +2,12 @@
 
 import { MessageCircle } from "lucide-react"
 import { getWhatsAppLink } from "@/lib/constants"
-import { useCurrentLocale } from "@/hooks/use-current-locale"
+import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { getCommonMessages } from "@/lib/i18n/common"
 
 export default function WhatsAppFloat() {
-  const locale = useCurrentLocale()
-  const messages = getCommonMessages(locale)
+  const { renderedLocale } = useLocaleSync()
+  const messages = getCommonMessages(renderedLocale)
 
   return (
     <a
