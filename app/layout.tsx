@@ -114,7 +114,7 @@ export default async function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
-        <Navbar />
+        <Navbar locale={locale} />
         {children}
         <Footer />
         <WhatsAppFloat />

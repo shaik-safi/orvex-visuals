@@ -653,6 +653,20 @@
       "foundViaLabel": "Found via:",
       "notes": "Notes"
     },
+    "shareLink": {
+      "title": "Share Link Recovery",
+      "description": "Generate a fresh customer link when you need to reopen or resend this quote.",
+      "generate": "Generate Link",
+      "regenerate": "Generate New Link",
+      "generating": "Generating...",
+      "copy": "Copy Link",
+      "copied": "Copied",
+      "open": "Open Link",
+      "empty": "No generated link yet.",
+      "replacementNotice": "Generating a new link replaces the previous customer link.",
+      "generateFail": "Could not generate a share link. Please try again.",
+      "copyFail": "Could not copy the link. Please try again."
+    },
     "emptyValue": "-",
     "unknownCustomer": "Unknown customer",
     "totalQuotesHeader": "All Quotes ({count})",

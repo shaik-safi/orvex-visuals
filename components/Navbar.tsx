@@ -26,7 +26,7 @@ const localeOptions: { value: AppLocale; label: string }[] = [
   { value: "hi", label: "HI" },
 ]
 
-export default function Navbar() {
+export default function Navbar({ locale: renderedLocale }: { locale: AppLocale }) {
   const { isDark, toggle } = useDarkMode()
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -34,7 +34,9 @@ export default function Navbar() {
   const pathname = usePathname() || "/"
   const searchParams = useSearchParams()
 
-  const currentLocale = extractLocaleFromPathname(pathname) ?? DEFAULT_LOCALE
+  const routeLocale = extractLocaleFromPathname(pathname) ?? DEFAULT_LOCALE
+  const currentLocale = renderedLocale
+  const isLocaleSyncPending = routeLocale !== currentLocale
   const messages = getCommonMessages(currentLocale)
   const basePath = stripLocaleFromPathname(pathname)
   const isHomepage = basePath === "/"
@@ -103,7 +105,7 @@ export default function Navbar() {
   const localeHref = (targetLocale: AppLocale) => withLocaleHref(pathWithQuery, targetLocale)
 
   const handleLocaleChange = (targetLocale: AppLocale) => (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (targetLocale === currentLocale) {
+    if (isLocaleSyncPending || targetLocale === routeLocale) {
       event.preventDefault()
       setIsOpen(false)
       return
@@ -183,7 +185,8 @@ export default function Navbar() {
                     key={option.value}
                     href={localeHref(option.value)}
                     onClick={handleLocaleChange(option.value)}
-                    className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${active
+                    aria-disabled={isLocaleSyncPending}
+                    className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${isLocaleSyncPending ? "pointer-events-none opacity-70" : ""} ${active
                       ? "bg-amber-500 text-white"
                       : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                       }`}
@@ -249,7 +252,8 @@ export default function Navbar() {
                     key={option.value}
                     href={localeHref(option.value)}
                     onClick={handleLocaleChange(option.value)}
-                    className={`flex-1 text-center px-2.5 py-2 text-xs font-semibold rounded-lg transition-all ${active
+                    aria-disabled={isLocaleSyncPending}
+                    className={`flex-1 text-center px-2.5 py-2 text-xs font-semibold rounded-lg transition-all ${isLocaleSyncPending ? "pointer-events-none opacity-70" : ""} ${active
                       ? "bg-amber-500 text-white"
                       : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                       }`}

@@ -409,6 +409,48 @@ function FiltersBar({
 }
 
 function QuoteDetail({ quote, messages, localeTag }: { quote: QuoteRow; messages: AdminMessages; localeTag: string }) {
+  const locale = useCurrentLocale()
+  const [shareUrl, setShareUrl] = useState("")
+  const [generatingShareLink, setGeneratingShareLink] = useState(false)
+  const [copiedShareLink, setCopiedShareLink] = useState(false)
+
+  async function generateShareLink() {
+    setGeneratingShareLink(true)
+    setCopiedShareLink(false)
+
+    try {
+      const response = await fetch("/api/admin/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: quote.id, locale }),
+      })
+      const data = await response.json().catch(() => null)
+
+      if (!response.ok || typeof data?.shareUrl !== "string") {
+        alert(messages.shareLink.generateFail)
+        return
+      }
+
+      setShareUrl(data.shareUrl)
+    } catch {
+      alert(messages.shareLink.generateFail)
+    } finally {
+      setGeneratingShareLink(false)
+    }
+  }
+
+  async function copyShareLink() {
+    if (!shareUrl) return
+
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopiedShareLink(true)
+      window.setTimeout(() => setCopiedShareLink(false), 2000)
+    } catch {
+      alert(messages.shareLink.copyFail)
+    }
+  }
+
   return (
     <div className="px-6 pb-6 pt-3 bg-slate-800/30 text-sm space-y-4 border-t border-slate-800">
       <div className="flex flex-wrap gap-3 items-center">
@@ -445,6 +487,62 @@ function QuoteDetail({ quote, messages, localeTag }: { quote: QuoteRow; messages
             <Calendar size={13} className="text-amber-400" /> {applyTemplate(messages.quick.eventDateLine, { date: quote.date, time: quote.timeSlot ? ` - ${quote.timeSlot}` : "" })}
           </span>
         )}
+      </div>
+
+      <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-3">
+        <div>
+          <p className="text-slate-200 text-xs font-semibold uppercase tracking-wide">{messages.shareLink.title}</p>
+          <p className="text-slate-500 text-xs mt-1">{messages.shareLink.description}</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={generateShareLink}
+            disabled={generatingShareLink}
+            className="inline-flex items-center justify-center px-3 py-1.5 rounded-xl text-xs font-medium bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50 transition-colors"
+          >
+            {generatingShareLink
+              ? messages.shareLink.generating
+              : shareUrl
+                ? messages.shareLink.regenerate
+                : messages.shareLink.generate}
+          </button>
+
+          <button
+            type="button"
+            onClick={copyShareLink}
+            disabled={!shareUrl}
+            className="inline-flex items-center justify-center px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800 border border-slate-700 text-slate-300 hover:text-white disabled:opacity-50 transition-colors"
+          >
+            {copiedShareLink ? messages.shareLink.copied : messages.shareLink.copy}
+          </button>
+
+          {shareUrl ? (
+            <a
+              href={shareUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800 border border-slate-700 text-slate-300 hover:text-white transition-colors"
+            >
+              {messages.shareLink.open}
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="inline-flex items-center justify-center px-3 py-1.5 rounded-xl text-xs font-medium bg-slate-800 border border-slate-700 text-slate-300 disabled:opacity-50 transition-colors"
+            >
+              {messages.shareLink.open}
+            </button>
+          )}
+        </div>
+
+        <p className={`text-xs break-all ${shareUrl ? "text-slate-400" : "text-slate-600"}`}>
+          {shareUrl || messages.shareLink.empty}
+        </p>
+
+        <p className="text-[11px] text-amber-400">{messages.shareLink.replacementNotice}</p>
       </div>
 
       {quote.events && quote.events.length > 0 && (
