@@ -285,12 +285,12 @@ function FAQSection({ service, messages }: { service: ServiceDetail; messages: S
   )
 }
 
-function RelatedServices({ service, renderedLocale, routeLocale, messages }: { service: ServiceDetail; renderedLocale: AppLocale; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
+function RelatedServices({ service, routeLocale, messages }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
 
   const relatedNames = service.relatedSlugs.map((slug) => ({
     slug,
-    name: getLocalizedServiceName(slug, renderedLocale),
+    name: getLocalizedServiceName(slug, routeLocale),
   }))
 
   return (
@@ -357,10 +357,10 @@ function ServiceCTA({ service, routeLocale, messages }: { service: ServiceDetail
 }
 
 export default function ServicePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { renderedLocale, routeLocale } = useLocaleSync()
-  const messages = getPageMessages(renderedLocale).serviceDetailPage
+  const { routeLocale } = useLocaleSync()
+  const messages = getPageMessages(routeLocale).serviceDetailPage
   const { slug } = use(params)
-  const service = getLocalizedServiceDetail(slug, renderedLocale)
+  const service = getLocalizedServiceDetail(slug, routeLocale)
 
   const serviceSchema = {
     "@context": "https://schema.org",
@@ -374,7 +374,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
     },
     areaServed: {
       "@type": "City",
-      name: renderedLocale === "hi" ? "बेंगलुरु" : "Bangalore",
+      name: routeLocale === "hi" ? "बेंगलुरु" : "Bangalore",
     },
     offers: service.packages.map((pkg) => ({
       "@type": "Offer",
@@ -384,7 +384,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
       availability: "https://schema.org/InStock",
     })),
     image: service.heroImage,
-    url: `https://orvexvisuals.com${withLocalePathname(`/services/${slug}`, renderedLocale)}`,
+    url: `https://orvexvisuals.com${withLocalePathname(`/services/${slug}`, routeLocale)}`,
   }
 
   const faqSchema = {
@@ -415,7 +415,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
       <PackagesSection service={service} routeLocale={routeLocale} messages={messages} />
       <ProcessSection service={service} messages={messages} />
       <FAQSection service={service} messages={messages} />
-      <RelatedServices service={service} renderedLocale={renderedLocale} routeLocale={routeLocale} messages={messages} />
+      <RelatedServices service={service} routeLocale={routeLocale} messages={messages} />
       <ServiceCTA service={service} routeLocale={routeLocale} messages={messages} />
     </main>
   )

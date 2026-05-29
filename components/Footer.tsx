@@ -15,7 +15,7 @@ import { getCommonMessages } from "@/lib/i18n/common"
 
 export default function Footer() {
   const { renderedLocale, routeLocale } = useLocaleSync()
-  const messages = getCommonMessages(renderedLocale)
+  const messages = getCommonMessages(routeLocale)
 
   return (
     <footer className="bg-slate-950 text-slate-300 pt-20 pb-8">

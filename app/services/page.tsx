@@ -41,10 +41,10 @@ function ServicesHero({ messages }: { messages: ServicesPageMessages }) {
   )
 }
 
-function ServicesGrid({ renderedLocale, routeLocale, messages }: { renderedLocale: AppLocale; routeLocale: AppLocale; messages: ServicesPageMessages }) {
+function ServicesGrid({ routeLocale, messages }: { routeLocale: AppLocale; messages: ServicesPageMessages }) {
   const [activeCategory, setActiveCategory] = useState<Category>("all")
   const [searchQuery, setSearchQuery] = useState("")
-  const localizedServices = getLocalizedServices(renderedLocale)
+  const localizedServices = getLocalizedServices(routeLocale)
 
   const filtered = localizedServices.filter((s) => {
     const matchesCategory = activeCategory === "all" || s.category === activeCategory
@@ -210,13 +210,13 @@ function ServicesCTA({ routeLocale, messages }: { routeLocale: AppLocale; messag
 }
 
 export default function ServicesPage() {
-  const { renderedLocale, routeLocale } = useLocaleSync()
-  const messages = getPageMessages(renderedLocale).servicesPage
+  const { routeLocale } = useLocaleSync()
+  const messages = getPageMessages(routeLocale).servicesPage
 
   return (
     <main>
       <ServicesHero messages={messages} />
-      <ServicesGrid renderedLocale={renderedLocale} routeLocale={routeLocale} messages={messages} />
+      <ServicesGrid routeLocale={routeLocale} messages={messages} />
       <ServicesCTA routeLocale={routeLocale} messages={messages} />
     </main>
   )

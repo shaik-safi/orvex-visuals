@@ -9,7 +9,7 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getWhatsAppLink, IMAGES } from "@/lib/constants"
 import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
-import { applyTemplate, type HomeMessages } from "@/lib/i18n/home"
+import { applyTemplate, getHomeMessages, type HomeMessages } from "@/lib/i18n/home"
 import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
 
 function getUpcomingMonths(localeTag: string) {
@@ -24,10 +24,20 @@ function getUpcomingMonths(localeTag: string) {
   }
 }
 
+function useRouteHomeMessages() {
+  const { routeLocale } = useLocaleSync()
+  return {
+    messages: getHomeMessages(routeLocale),
+    routeLocale,
+  }
+}
+
 export function Hero({ messages }: { messages: HomeMessages }) {
+  const live = useRouteHomeMessages()
+  messages = live.messages
   const heroImage = IMAGES.hero[0]
   const { next } = getUpcomingMonths(messages.localeTag)
-  const { routeLocale } = useLocaleSync()
+  const { routeLocale } = live
 
   return (
     <section id="home" className="relative flex min-h-svh items-start justify-center overflow-hidden pt-28 pb-20 sm:pt-32 md:pt-36 md:pb-24 lg:items-center lg:pt-40">
@@ -101,6 +111,7 @@ export function Hero({ messages }: { messages: HomeMessages }) {
 }
 
 export function FAQSection({ messages }: { messages: HomeMessages }) {
+  messages = useRouteHomeMessages().messages
   const [openIndex, setOpenIndex] = useState<number | null>(0)
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
@@ -144,9 +155,11 @@ export function FAQSection({ messages }: { messages: HomeMessages }) {
 }
 
 export function CTABanner({ messages }: { messages: HomeMessages }) {
+  const live = useRouteHomeMessages()
+  messages = live.messages
   const { ref, isVisible } = useScrollReveal()
   const { nextTwo } = getUpcomingMonths(messages.localeTag)
-  const { routeLocale } = useLocaleSync()
+  const { routeLocale } = live
 
   return (
     <section id="contact" ref={ref} className={`py-20 md:py-28 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>

@@ -6,8 +6,8 @@ import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { getCommonMessages } from "@/lib/i18n/common"
 
 export default function WhatsAppFloat() {
-  const { renderedLocale } = useLocaleSync()
-  const messages = getCommonMessages(renderedLocale)
+  const { routeLocale } = useLocaleSync()
+  const messages = getCommonMessages(routeLocale)
 
   return (
     <a
