@@ -39,8 +39,8 @@ interface QuoteData {
 }
 
 export default function QuotePage({ params }: { params: Promise<{ id: string }> }) {
-  const { renderedLocale, routeLocale } = useLocaleSync()
-  const messages = getPageMessages(renderedLocale).quotePage
+  const { routeLocale } = useLocaleSync()
+  const messages = getPageMessages(routeLocale).quotePage
   const { id } = use(params)
   const searchParams = useSearchParams()
 
@@ -94,25 +94,25 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
   }
 
   const createdDate = quote.createdAt
-    ? new Date(quote.createdAt).toLocaleDateString(getLocaleTag(renderedLocale), { day: "numeric", month: "long", year: "numeric" })
+    ? new Date(quote.createdAt).toLocaleDateString(getLocaleTag(routeLocale), { day: "numeric", month: "long", year: "numeric" })
     : messages.placeholders.na
   const venue = quote.city && quote.venue && quote.city.trim() === quote.venue.trim()
     ? quote.city
     : [quote.city, quote.venue].filter(Boolean).join(" - ")
-  const localizedService = localizeQuoteListValue(quote.service, renderedLocale)
-  const localizedTimeSlot = localizeQuoteValue(quote.timeSlot, renderedLocale)
+  const localizedService = localizeQuoteListValue(quote.service, routeLocale)
+  const localizedTimeSlot = localizeQuoteValue(quote.timeSlot, routeLocale)
   const localizedEvents = (quote.events ?? []).map((event) => ({
     ...event,
-    name: localizeQuoteValue(event.name, renderedLocale) || event.name,
-    duration: localizeQuoteValue(event.duration, renderedLocale) || event.duration,
+    name: localizeQuoteValue(event.name, routeLocale) || event.name,
+    duration: localizeQuoteValue(event.duration, routeLocale) || event.duration,
     selections: event.selections.map((item) => ({
       ...item,
-      name: localizeQuoteValue(item.name, renderedLocale) || item.name,
+      name: localizeQuoteValue(item.name, routeLocale) || item.name,
     })),
   }))
   const localizedGlobalAddOns = (quote.globalAddOns ?? []).map((addon) => ({
     ...addon,
-    name: localizeQuoteValue(addon.name, renderedLocale) || addon.name,
+    name: localizeQuoteValue(addon.name, routeLocale) || addon.name,
   }))
 
   const pricingHref = withLocaleHref(buildPricingHandoffHref({ from: "quote", source: messages.savedPackageSource, intent: "custom-package" }), routeLocale)
