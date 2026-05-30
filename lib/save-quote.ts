@@ -1,3 +1,5 @@
+import type { AppLocale } from "@/lib/i18n/config"
+
 export interface QuoteEvent {
   name: string
   duration: string
@@ -29,13 +31,13 @@ export interface SaveQuoteResult {
   accessToken: string
 }
 
-export async function saveQuote(payload: QuotePayload): Promise<SaveQuoteResult> {
+export async function saveQuote(payload: QuotePayload, options?: { locale?: AppLocale }): Promise<SaveQuoteResult> {
   const response = await fetch("/api/quotes", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(options?.locale ? { ...payload, locale: options.locale } : payload),
   })
 
   const data = await response.json().catch(() => null)

@@ -36,12 +36,25 @@ import { withLocalePathname } from "@/lib/i18n/routing"
 
 // ============ DATA ============
 
-const packages = PACKAGES.map((pkg) => ({
-  ...pkg,
-  price: computePackagePrice(pkg),
-  icon: pkg.name === "Starter" ? Star : pkg.name === "Signature" ? Crown : Gift,
-  popular: pkg.name === "Signature",
-}))
+const PACKAGE_MESSAGE_KEYS = {
+  Starter: "starter",
+  Signature: "signature",
+  Grand: "grand",
+} as const
+
+const TEMPLATE_MESSAGE_KEYS = {
+  "Hindu (South Indian)": "hinduSouthIndian",
+  "Hindu (North Indian)": "hinduNorthIndian",
+  "Muslim Wedding": "muslimWedding",
+  "Christian Wedding": "christianWedding",
+  "Sikh Wedding": "sikhWedding",
+  Engagement: "engagement",
+  "Pre-Wedding Shoot": "preWeddingShoot",
+  "Baby / Maternity": "babyMaternity",
+  "Birthday / Event": "birthdayEvent",
+  Housewarming: "housewarming",
+  "Corporate Event": "corporateEvent",
+} as const
 
 type BuilderPrefillRequest =
   | {
@@ -101,6 +114,8 @@ interface SelectedOptionalItem {
   label: string
   price: number
 }
+
+type PackageIdentifier = keyof typeof PACKAGE_MESSAGE_KEYS
 
 function getServicePrefill(serviceSlug: string, serviceName: string, messages: PricingMessages): ServicePrefillPreset | null {
   const lookup = `${serviceSlug} ${serviceName}`.toLowerCase()
@@ -197,6 +212,7 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>, mes
   const packageName = searchParams.get("package")
   const templateName = searchParams.get("template")
   const serviceSlug = searchParams.get("service")
+  const eventTemplates = getEventTemplates(messages)
 
   let prefill: BuilderPrefillRequest | null = null
   let prefillLabel = ""
@@ -209,7 +225,9 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>, mes
       sourceLabel,
       scrollToBuilder: false,
     }
-    prefillLabel = applyTemplate(messages.handoff.packageSelected, { name: packageName })
+    prefillLabel = applyTemplate(messages.handoff.packageSelected, {
+      name: getPackageContent(packageName as PackageIdentifier, messages).name,
+    })
   } else if (templateName && templateName in eventTemplates) {
     prefill = {
       key: `template:${templateName}`,
@@ -218,7 +236,7 @@ function getPricingHandoff(searchParams: ReturnType<typeof useSearchParams>, mes
       sourceLabel,
       scrollToBuilder: false,
     }
-    prefillLabel = applyTemplate(messages.handoff.templateSelected, { name: templateName })
+    prefillLabel = applyTemplate(messages.handoff.templateSelected, { name: eventTemplates[templateName].label })
   } else if (serviceSlug) {
     prefill = {
       key: `service:${serviceSlug}:${sourceLabel}`,
@@ -337,6 +355,7 @@ function PricingHero({ messages }: { messages: PricingMessages }) {
 // ============ PACKAGES SECTION ============
 function PackagesSection({ onCustomize, messages }: { onCustomize?: (packageName: string) => void; messages: PricingMessages }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
+  const packages = getPricingPackages(messages)
 
   return (
     <section id="packages" className="py-24 md:py-32 bg-white dark:bg-slate-950 transition-colors">
@@ -392,7 +411,7 @@ function PackagesSection({ onCustomize, messages }: { onCustomize?: (packageName
                   </div>
 
                   <ul className="space-y-3 mb-8">
-                    {pkg.features.map((feature, j) => (
+                    {pkg.features.map((feature: string, j: number) => (
                       <li key={j} className="flex items-start gap-2.5">
                         <CheckCircle2 size={14} className={`mt-0.5 flex-shrink-0 ${pkg.popular ? "text-amber-500 dark:text-amber-400/80" : "text-emerald-500 dark:text-emerald-500/70"}`} />
                         <span className="text-sm text-slate-600 dark:text-slate-300 leading-snug">{feature}</span>
@@ -402,7 +421,7 @@ function PackagesSection({ onCustomize, messages }: { onCustomize?: (packageName
 
                   <div className="space-y-2.5">
                     <button
-                      onClick={() => onCustomize?.(pkg.name)}
+                      onClick={() => onCustomize?.(pkg.id)}
                       className={`block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${pkg.popular
                         ? "bg-amber-500 text-white dark:text-slate-900 hover:bg-amber-400"
                         : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
@@ -454,25 +473,6 @@ interface EventBlock {
   addOns: Record<string, number>
 }
 
-const serviceRates: ServiceRate[] = [
-  { id: "traditional-photo", name: SERVICE_RATES["traditional-photo"].name, description: "Posed shots, group photos, ritual & stage coverage", icon: Camera, ratePerDay: SERVICE_RATES["traditional-photo"].ratePerDay, ratePerHalfDay: SERVICE_RATES["traditional-photo"].ratePerHalfDay, maxQty: 3 },
-  { id: "candid-photo", name: SERVICE_RATES["candid-photo"].name, description: "Unposed, natural moments — storytelling style", icon: Camera, ratePerDay: SERVICE_RATES["candid-photo"].ratePerDay, ratePerHalfDay: SERVICE_RATES["candid-photo"].ratePerHalfDay, maxQty: 3 },
-  { id: "traditional-video", name: SERVICE_RATES["traditional-video"].name, description: "Full event recording — every ritual documented", icon: Video, ratePerDay: SERVICE_RATES["traditional-video"].ratePerDay, ratePerHalfDay: SERVICE_RATES["traditional-video"].ratePerHalfDay, maxQty: 3 },
-  { id: "cinematic-video", name: SERVICE_RATES["cinematic-video"].name, description: "Film-style highlight reel with color grading & music", icon: Film, ratePerDay: SERVICE_RATES["cinematic-video"].ratePerDay, ratePerHalfDay: SERVICE_RATES["cinematic-video"].ratePerHalfDay, maxQty: 2, premium: true },
-]
-
-const eventAddOns: EventAddOn[] = [
-  { id: "drone", name: EVENT_ADDONS.drone.name, price: EVENT_ADDONS.drone.price, description: "Aerial photos + video for this event", icon: Plane, perEvent: true, maxQty: 1, premium: true },
-  { id: "led-wall", name: EVENT_ADDONS["led-wall"].name, price: EVENT_ADDONS["led-wall"].price, description: "Digital backdrop for this event", icon: Sparkles, perEvent: true, maxQty: 2 },
-  { id: "same-day-edit", name: EVENT_ADDONS["same-day-edit"].name, price: EVENT_ADDONS["same-day-edit"].price, description: "Highlight reel delivered same day", icon: Zap, perEvent: true, maxQty: 1, premium: true },
-  { id: "live-stream", name: EVENT_ADDONS["live-stream"].name, price: EVENT_ADDONS["live-stream"].price, description: "YouTube/Zoom live for remote guests", icon: Video, perEvent: true, maxQty: 1 },
-]
-
-const globalAddOns: EventAddOn[] = [
-  { id: "album-25", name: GLOBAL_ADDONS["album-25"].name, price: GLOBAL_ADDONS["album-25"].price, description: "Premium printed album", icon: BookOpen, perEvent: false, maxQty: 5 },
-  { id: "album-40", name: GLOBAL_ADDONS["album-40"].name, price: GLOBAL_ADDONS["album-40"].price, description: "Deluxe large album", icon: BookOpen, perEvent: false, maxQty: 5 },
-]
-
 // Pre-fill recommendations per event — services: Record<serviceId, qty>, addOns: Record<addonId, qty>
 interface EventPreset {
   name: string
@@ -481,58 +481,165 @@ interface EventPreset {
   addOns: Record<string, number>
 }
 
-const eventTemplates: Record<string, EventPreset[]> = {
-  "Hindu (South Indian)": [
-    { name: "Pellikuthuru / Nalangu", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-    { name: "Haldi / Pasupu", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
-    { name: "Sangeeth", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-    { name: "Muhurtham (Wedding)", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
-    { name: "Reception", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-  ],
-  "Hindu (North Indian)": [
-    { name: "Roka", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
-    { name: "Haldi", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
-    { name: "Mehendi", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-    { name: "Sangeet", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-    { name: "Baraat & Wedding", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
-    { name: "Reception", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-  ],
-  "Muslim Wedding": [
-    { name: "Haldi / Ubtan", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
-    { name: "Mehendi", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-    { name: "Nikah", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
-    { name: "Walima / Reception", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-  ],
-  "Christian Wedding": [
-    { name: "Engagement", duration: "Half Day", services: { "candid-photo": 1, "traditional-photo": 1 }, addOns: {} },
-    { name: "Church Ceremony", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
-    { name: "Reception / Party", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-  ],
-  "Sikh Wedding": [
-    { name: "Mehendi", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-    { name: "Anand Karaj (Gurudwara)", duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
-    { name: "Reception", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-  ],
-  "Engagement": [
-    { name: "Ring Ceremony", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-    { name: "Cocktail / After Party", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
-  ],
-  "Pre-Wedding Shoot": [
-    { name: "Pre-Wedding Photoshoot", duration: "Half Day", services: { "candid-photo": 1 }, addOns: { drone: 1 } },
-  ],
-  "Baby / Maternity": [
-    { name: "Photoshoot Session", duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
-  ],
-  "Birthday / Event": [
-    { name: "Event Coverage", duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-  ],
-  "Housewarming": [
-    { name: "Griha Pravesh / Housewarming", duration: "Half Day", services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} },
-  ],
-  "Corporate Event": [
-    { name: "Conference / Seminar", duration: "Full Day", services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} },
-    { name: "Award Ceremony", duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
-  ],
+interface EventTemplateDefinition {
+  label: string
+  presets: EventPreset[]
+}
+
+function getDisplayLocale(locale: ReturnType<typeof useCurrentLocale>) {
+  return locale === "hi" ? "hi-IN" : "en-IN"
+}
+
+function formatCurrencyValue(value: number, locale: ReturnType<typeof useCurrentLocale>) {
+  return value.toLocaleString(getDisplayLocale(locale))
+}
+
+function getPackageContent(packageName: PackageIdentifier, messages: PricingMessages) {
+  return messages.packagesSection.items[PACKAGE_MESSAGE_KEYS[packageName]]
+}
+
+function getPricingPackages(messages: PricingMessages) {
+  return PACKAGES.map((pkg) => {
+    const content = getPackageContent(pkg.name as PackageIdentifier, messages)
+
+    return {
+      ...pkg,
+      id: pkg.name,
+      name: content.name,
+      subtitle: content.subtitle,
+      features: content.features,
+      builderPreset: {
+        ...pkg.builderPreset,
+        events: pkg.builderPreset.events.map((event) => ({
+          ...event,
+          name: event.name === "Your Event" ? messages.builder.defaultPackageEventName : event.name,
+        })),
+      },
+      price: computePackagePrice(pkg),
+      icon: pkg.name === "Starter" ? Star : pkg.name === "Signature" ? Crown : Gift,
+      popular: pkg.name === "Signature",
+    }
+  })
+}
+
+function getDurationLabel(duration: EventBlock["duration"], messages: PricingMessages) {
+  return duration === "Full Day" ? messages.builder.fullDay : messages.builder.halfDay
+}
+
+function getServiceRates(messages: PricingMessages): ServiceRate[] {
+  return [
+    { id: "traditional-photo", name: messages.builder.serviceCatalog.traditionalPhoto.name, description: messages.builder.serviceCatalog.traditionalPhoto.description, icon: Camera, ratePerDay: SERVICE_RATES["traditional-photo"].ratePerDay, ratePerHalfDay: SERVICE_RATES["traditional-photo"].ratePerHalfDay, maxQty: 3 },
+    { id: "candid-photo", name: messages.builder.serviceCatalog.candidPhoto.name, description: messages.builder.serviceCatalog.candidPhoto.description, icon: Camera, ratePerDay: SERVICE_RATES["candid-photo"].ratePerDay, ratePerHalfDay: SERVICE_RATES["candid-photo"].ratePerHalfDay, maxQty: 3 },
+    { id: "traditional-video", name: messages.builder.serviceCatalog.traditionalVideo.name, description: messages.builder.serviceCatalog.traditionalVideo.description, icon: Video, ratePerDay: SERVICE_RATES["traditional-video"].ratePerDay, ratePerHalfDay: SERVICE_RATES["traditional-video"].ratePerHalfDay, maxQty: 3 },
+    { id: "cinematic-video", name: messages.builder.serviceCatalog.cinematicVideo.name, description: messages.builder.serviceCatalog.cinematicVideo.description, icon: Film, ratePerDay: SERVICE_RATES["cinematic-video"].ratePerDay, ratePerHalfDay: SERVICE_RATES["cinematic-video"].ratePerHalfDay, maxQty: 2, premium: true },
+  ]
+}
+
+function getEventAddOns(messages: PricingMessages): EventAddOn[] {
+  return [
+    { id: "drone", name: messages.builder.eventAddOnCatalog.drone.name, price: EVENT_ADDONS.drone.price, description: messages.builder.eventAddOnCatalog.drone.description, icon: Plane, perEvent: true, maxQty: 1, premium: true },
+    { id: "led-wall", name: messages.builder.eventAddOnCatalog.ledWall.name, price: EVENT_ADDONS["led-wall"].price, description: messages.builder.eventAddOnCatalog.ledWall.description, icon: Sparkles, perEvent: true, maxQty: 2 },
+    { id: "same-day-edit", name: messages.builder.eventAddOnCatalog.sameDayEdit.name, price: EVENT_ADDONS["same-day-edit"].price, description: messages.builder.eventAddOnCatalog.sameDayEdit.description, icon: Zap, perEvent: true, maxQty: 1, premium: true },
+    { id: "live-stream", name: messages.builder.eventAddOnCatalog.liveStream.name, price: EVENT_ADDONS["live-stream"].price, description: messages.builder.eventAddOnCatalog.liveStream.description, icon: Video, perEvent: true, maxQty: 1 },
+  ]
+}
+
+function getGlobalAddOns(messages: PricingMessages): EventAddOn[] {
+  return [
+    { id: "album-25", name: messages.builder.globalAddOnCatalog.album25.name, price: GLOBAL_ADDONS["album-25"].price, description: messages.builder.globalAddOnCatalog.album25.description, icon: BookOpen, perEvent: false, maxQty: 5 },
+    { id: "album-40", name: messages.builder.globalAddOnCatalog.album40.name, price: GLOBAL_ADDONS["album-40"].price, description: messages.builder.globalAddOnCatalog.album40.description, icon: BookOpen, perEvent: false, maxQty: 5 },
+  ]
+}
+
+function getEventTemplates(messages: PricingMessages): Record<string, EventTemplateDefinition> {
+  const templateMessages = messages.builder.templates
+
+  return {
+    "Hindu (South Indian)": {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS["Hindu (South Indian)"]].label,
+      presets: [
+        { name: templateMessages.hinduSouthIndian.events.pellikuthuru, duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+        { name: templateMessages.hinduSouthIndian.events.haldiPasupu, duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+        { name: templateMessages.hinduSouthIndian.events.sangeeth, duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+        { name: templateMessages.hinduSouthIndian.events.muhurtham, duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+        { name: templateMessages.hinduSouthIndian.events.reception, duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+      ],
+    },
+    "Hindu (North Indian)": {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS["Hindu (North Indian)"]].label,
+      presets: [
+        { name: templateMessages.hinduNorthIndian.events.roka, duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+        { name: templateMessages.hinduNorthIndian.events.haldi, duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+        { name: templateMessages.hinduNorthIndian.events.mehendi, duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+        { name: templateMessages.hinduNorthIndian.events.sangeet, duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+        { name: templateMessages.hinduNorthIndian.events.baraatWedding, duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+        { name: templateMessages.hinduNorthIndian.events.reception, duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+      ],
+    },
+    "Muslim Wedding": {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS["Muslim Wedding"]].label,
+      presets: [
+        { name: templateMessages.muslimWedding.events.haldiUbtan, duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+        { name: templateMessages.muslimWedding.events.mehendi, duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+        { name: templateMessages.muslimWedding.events.nikah, duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+        { name: templateMessages.muslimWedding.events.walimaReception, duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+      ],
+    },
+    "Christian Wedding": {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS["Christian Wedding"]].label,
+      presets: [
+        { name: templateMessages.christianWedding.events.engagement, duration: "Half Day", services: { "candid-photo": 1, "traditional-photo": 1 }, addOns: {} },
+        { name: templateMessages.christianWedding.events.churchCeremony, duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+        { name: templateMessages.christianWedding.events.receptionParty, duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+      ],
+    },
+    "Sikh Wedding": {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS["Sikh Wedding"]].label,
+      presets: [
+        { name: templateMessages.sikhWedding.events.mehendi, duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+        { name: templateMessages.sikhWedding.events.anandKaraj, duration: "Full Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
+        { name: templateMessages.sikhWedding.events.reception, duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+      ],
+    },
+    Engagement: {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS.Engagement].label,
+      presets: [
+        { name: templateMessages.engagement.events.ringCeremony, duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+        { name: templateMessages.engagement.events.cocktailAfterParty, duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+      ],
+    },
+    "Pre-Wedding Shoot": {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS["Pre-Wedding Shoot"]].label,
+      presets: [
+        { name: templateMessages.preWeddingShoot.events.preWeddingPhotoshoot, duration: "Half Day", services: { "candid-photo": 1 }, addOns: { drone: 1 } },
+      ],
+    },
+    "Baby / Maternity": {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS["Baby / Maternity"]].label,
+      presets: [
+        { name: templateMessages.babyMaternity.events.photoshootSession, duration: "Half Day", services: { "candid-photo": 1 }, addOns: {} },
+      ],
+    },
+    "Birthday / Event": {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS["Birthday / Event"]].label,
+      presets: [
+        { name: templateMessages.birthdayEvent.events.eventCoverage, duration: "Half Day", services: { "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+      ],
+    },
+    Housewarming: {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS.Housewarming].label,
+      presets: [
+        { name: templateMessages.housewarming.events.housewarming, duration: "Half Day", services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} },
+      ],
+    },
+    "Corporate Event": {
+      label: templateMessages[TEMPLATE_MESSAGE_KEYS["Corporate Event"]].label,
+      presets: [
+        { name: templateMessages.corporateEvent.events.conferenceSeminar, duration: "Full Day", services: { "traditional-photo": 1, "traditional-video": 1 }, addOns: {} },
+        { name: templateMessages.corporateEvent.events.awardCeremony, duration: "Half Day", services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1 }, addOns: {} },
+      ],
+    },
+  }
 }
 
 // Package-to-builder presets are now sourced from PACKAGES[].builderPreset in constants.ts
@@ -555,6 +662,11 @@ function PriceCalculator({
 }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
   const router = useRouter()
+  const serviceRates = getServiceRates(messages)
+  const eventAddOns = getEventAddOns(messages)
+  const globalAddOns = getGlobalAddOns(messages)
+  const eventTemplates = getEventTemplates(messages)
+  const packages = getPricingPackages(messages)
   const [events, setEvents] = useState<EventBlock[]>([])
   const [globalAddOnQty, setGlobalAddOnQty] = useState<Record<string, number>>({})
   const [showTemplates, setShowTemplates] = useState(false)
@@ -612,22 +724,22 @@ function PriceCalculator({
     if (!prefill) return
 
     if (prefill.type === "package") {
-      const pkg = PACKAGES.find((item) => item.name === prefill.packageName)
+      const pkg = packages.find((item) => item.id === prefill.packageName)
       if (!pkg || !pkg.builderPreset) return
       applyEventPresets(
         pkg.builderPreset.events,
         pkg.builderPreset.globalAddOns as Record<string, number>,
-        prefill.packageName,
+        pkg.id,
         prefill.scrollToBuilder,
-        { label: prefill.packageName, type: "package" }
+        { label: pkg.name, type: "package" }
       )
       return
     }
 
     if (prefill.type === "template") {
-      const presets = eventTemplates[prefill.templateName]
-      if (!presets) return
-      applyEventPresets(presets, {}, null, prefill.scrollToBuilder, { label: prefill.templateName, type: "setup" })
+      const templateDefinition = eventTemplates[prefill.templateName]
+      if (!templateDefinition) return
+      applyEventPresets(templateDefinition.presets, {}, null, prefill.scrollToBuilder, { label: templateDefinition.label, type: "setup" })
       return
     }
 
@@ -639,7 +751,7 @@ function PriceCalculator({
         type: "setup",
       })
     }
-  }, [prefill, messages])
+  }, [eventTemplates, packages, prefill, messages])
 
   const addEvent = (name: string) => {
     const newEvent: EventBlock = {
@@ -658,9 +770,9 @@ function PriceCalculator({
   }
 
   const addFromTemplate = (templateName: string) => {
-    const presets = eventTemplates[templateName]
-    if (!presets) return
-    applyEventPresets(presets, {}, null, false, { label: templateName, type: "setup" })
+    const templateDefinition = eventTemplates[templateName]
+    if (!templateDefinition) return
+    applyEventPresets(templateDefinition.presets, {}, null, false, { label: templateDefinition.label, type: "setup" })
   }
 
   const removeEvent = (id: string) => {
@@ -769,7 +881,7 @@ function PriceCalculator({
   const totalPrice = eventsTotal + globalAddOnTotal
 
   // Active package data (for badge display — price is always computed from rates)
-  const activePackageData = activePackage ? PACKAGES.find((p) => p.name === activePackage) : null
+  const activePackageData = activePackage ? packages.find((p) => p.id === activePackage) : null
   const hasContent = events.length > 0
 
   const configuredEvents = events.filter((e) => Object.keys(e.services).length > 0)
@@ -825,7 +937,7 @@ function PriceCalculator({
   const formatDate = (dateStr: string) => {
     if (!dateStr) return ""
     const d = new Date(dateStr)
-    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+    return d.toLocaleDateString(getDisplayLocale(locale), { day: "numeric", month: "short", year: "numeric" })
   }
 
   const generateWhatsAppMessage = () => {
@@ -836,8 +948,8 @@ function PriceCalculator({
     lines.push("")
     if (activePackage) {
       lines.push(applyTemplate(messages.builder.whatsapp.packageLine, {
-        name: activePackage,
-        total: totalPrice.toLocaleString("en-IN"),
+        name: activePackageData?.name || activePackage,
+        total: formatCurrencyValue(totalPrice, locale),
       }))
     } else {
       lines.push(messages.builder.whatsapp.eventsIntro)
@@ -859,7 +971,7 @@ function PriceCalculator({
         applyTemplate(messages.builder.whatsapp.eventLine, {
           index: String(idx + 1),
           name: event.name,
-          duration: event.duration,
+          duration: getDurationLabel(event.duration, messages),
         })
       )
       for (const [sid, qty] of Object.entries(event.services)) {
@@ -886,7 +998,7 @@ function PriceCalculator({
       }
       lines.push(
         applyTemplate(messages.builder.whatsapp.subtotal, {
-          value: getEventPrice(event).toLocaleString("en-IN"),
+          value: formatCurrencyValue(getEventPrice(event), locale),
         })
       )
       lines.push("")
@@ -900,7 +1012,7 @@ function PriceCalculator({
           ? applyTemplate(messages.builder.whatsapp.extraLine, {
             name: a.name,
             qty: qty > 1 ? ` x${qty}` : "",
-            value: (a.price * qty).toLocaleString("en-IN"),
+            value: formatCurrencyValue(a.price * qty, locale),
           })
           : null
       })
@@ -912,7 +1024,7 @@ function PriceCalculator({
       lines.push("")
     }
 
-    lines.push(applyTemplate(messages.builder.whatsapp.total, { value: totalPrice.toLocaleString("en-IN") }))
+    lines.push(applyTemplate(messages.builder.whatsapp.total, { value: formatCurrencyValue(totalPrice, locale) }))
     lines.push("")
 
     lines.push(messages.builder.whatsapp.confirm)
@@ -985,7 +1097,7 @@ function PriceCalculator({
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-400">{messages.builder.summaryTitle}</p>
-              <div className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">₹{totalPrice.toLocaleString("en-IN")}</div>
+              <div className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">₹{formatCurrencyValue(totalPrice, locale)}</div>
               <p className="text-[11px] text-emerald-500 dark:text-emerald-400/80 mt-1">{messages.builder.gstInclusive}</p>
             </div>
             <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 flex items-center justify-center text-amber-500 dark:text-amber-400">
@@ -1137,14 +1249,14 @@ function PriceCalculator({
                       </div>
                     )}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {Object.entries(eventTemplates).map(([template, presets]) => (
+                      {Object.entries(eventTemplates).map(([template, definition]) => (
                         <button
                           key={template}
                           onClick={() => addFromTemplate(template)}
                           className="px-3.5 py-2.5 rounded-lg text-left bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 hover:border-amber-400 dark:hover:border-amber-500/30 hover:text-amber-600 dark:hover:text-amber-400 transition-all"
                         >
-                          <span className="text-xs font-medium block">{template}</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500">{applyTemplate(messages.builder.templateCount, { count: String(presets.length) })}</span>
+                          <span className="text-xs font-medium block">{definition.label}</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500">{applyTemplate(messages.builder.templateCount, { count: String(definition.presets.length) })}</span>
                         </button>
                       ))}
                     </div>
@@ -1186,8 +1298,8 @@ function PriceCalculator({
                           <div className="flex-1 min-w-0 text-left">
                             <span className="text-sm font-medium text-slate-900 dark:text-white block truncate">{event.name}</span>
                             <span className="text-xs text-slate-500">
-                              {event.duration} - {serviceCount > 0 ? applyTemplate(messages.builder.servicesCount, { count: String(serviceCount) }) : messages.builder.noServicesYet}
-                              {eventPrice > 0 && ` - Rs.${(eventPrice / 1000).toFixed(0)}K`}
+                              {getDurationLabel(event.duration, messages)} - {serviceCount > 0 ? applyTemplate(messages.builder.servicesCount, { count: String(serviceCount) }) : messages.builder.noServicesYet}
+                              {eventPrice > 0 && ` - ₹${(eventPrice / 1000).toFixed(0)}K`}
                             </span>
                           </div>
                           <ChevronDown size={14} className={`text-slate-400 dark:text-slate-500 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
@@ -1259,7 +1371,7 @@ function PriceCalculator({
                                         {qty > 0 && <span className="ml-1.5 text-[10px] text-emerald-500 dark:text-emerald-400/80 font-normal">{messages.builder.added}</span>}
                                       </span>
                                       <span className="text-[11px] text-slate-400 dark:text-slate-500 block">{service.description}</span>
-                                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">₹{rate.toLocaleString("en-IN")} / {event.duration === "Full Day" ? messages.builder.rateDay : messages.builder.rateHalfDay}</span>
+                                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">₹{formatCurrencyValue(rate, locale)} / {event.duration === "Full Day" ? messages.builder.rateDay : messages.builder.rateHalfDay}</span>
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <button
@@ -1446,7 +1558,7 @@ function PriceCalculator({
                               <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <p className="text-slate-900 dark:text-white text-sm font-medium truncate">{event.name}</p>
-                                  <span className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">{event.duration}</span>
+                                  <span className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500">{getDurationLabel(event.duration, messages)}</span>
                                 </div>
                                 {visibleServices.length > 0 ? (
                                   <div className="mt-2 space-y-1">
@@ -1518,7 +1630,7 @@ function PriceCalculator({
                         </span>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-slate-900 dark:text-white">
-                            &#8377;{totalPrice.toLocaleString("en-IN")}
+                            &#8377;{formatCurrencyValue(totalPrice, locale)}
                           </div>
                           <span className="text-emerald-500 dark:text-emerald-400/70 text-[11px]">{messages.builder.gstInclusive}</span>
                         </div>
@@ -1589,35 +1701,26 @@ function PriceCalculator({
 }
 
 // ============ COMPARISON TABLE ============
-function ComparisonSection() {
+function ComparisonSection({ messages }: { messages: PricingMessages }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
-  const comparisons = [
-    { feature: "Pricing Transparency", orvex: "All prices on website", competitor: "\"Call for quote\"" },
-    { feature: "GST", orvex: "Included in price", competitor: "+18% surprise" },
-    { feature: "Photo Delivery", orvex: "5 days", competitor: "30-45 days" },
-    { feature: "Video Delivery", orvex: "15 days", competitor: "45-60 days" },
-    { feature: "Copyright", orvex: "100% yours", competitor: "Studio retains rights" },
-    { feature: "Booking Process", orvex: "Online in 2 min", competitor: "Phone calls only" },
-    { feature: "Overtime", orvex: "Flexible — no surprise charges", competitor: "₹3,000/hr (hidden)" },
-    { feature: "Cancellation", orvex: "Partial refund available", competitor: "Non-refundable" },
-  ]
+  const comparisons = messages.comparisonSection.rows
 
   return (
     <section className="py-24 md:py-32 bg-slate-50 dark:bg-slate-950 transition-colors">
       <div ref={ref} className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-14 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
-          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">Why We&apos;re Different</p>
+          <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">{messages.comparisonSection.badge}</p>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Orvex vs Others
+            {messages.comparisonSection.title}
           </h2>
         </div>
 
         <div className={`rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: "80ms" }}>
           {/* Header */}
           <div className="hidden md:grid md:grid-cols-3 bg-slate-100 dark:bg-slate-900">
-            <div className="p-4 md:p-5 text-xs font-medium text-slate-500 uppercase tracking-wider">Feature</div>
-            <div className="p-4 md:p-5 text-xs font-medium text-amber-500 dark:text-amber-400 text-center uppercase tracking-wider">Orvex</div>
-            <div className="p-4 md:p-5 text-xs font-medium text-slate-400 dark:text-slate-600 text-center uppercase tracking-wider">Others</div>
+            <div className="p-4 md:p-5 text-xs font-medium text-slate-500 uppercase tracking-wider">{messages.comparisonSection.columns.feature}</div>
+            <div className="p-4 md:p-5 text-xs font-medium text-amber-500 dark:text-amber-400 text-center uppercase tracking-wider">{messages.comparisonSection.columns.orvex}</div>
+            <div className="p-4 md:p-5 text-xs font-medium text-slate-400 dark:text-slate-600 text-center uppercase tracking-wider">{messages.comparisonSection.columns.others}</div>
           </div>
 
           {/* Rows */}
@@ -1629,18 +1732,18 @@ function ComparisonSection() {
             >
               <div className="grid gap-3 p-4 md:grid-cols-3 md:gap-0 md:p-0">
                 <div className="md:p-5">
-                  <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-slate-400 md:hidden">Feature</p>
+                  <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-slate-400 md:hidden">{messages.comparisonSection.columns.feature}</p>
                   <div className="text-sm text-slate-700 dark:text-slate-300">{row.feature}</div>
                 </div>
                 <div className="md:p-5 md:text-center">
-                  <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-amber-500 dark:text-amber-400 md:hidden">Orvex</p>
+                  <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-amber-500 dark:text-amber-400 md:hidden">{messages.comparisonSection.columns.orvex}</p>
                   <div className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400/90 font-medium md:justify-center">
                     <CheckCircle2 size={13} />
                     {row.orvex}
                   </div>
                 </div>
                 <div className="md:p-5 md:text-center">
-                  <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-600 md:hidden">Others</p>
+                  <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-600 md:hidden">{messages.comparisonSection.columns.others}</p>
                   <div className="text-sm text-slate-400 dark:text-slate-600">{row.competitor}</div>
                 </div>
               </div>
@@ -1722,7 +1825,7 @@ export default function PricingPage() {
         }
       />
       <PriceCalculator prefill={prefillRequest} handoff={handoff} locale={locale} messages={messages} />
-      <ComparisonSection />
+      <ComparisonSection messages={messages} />
       <PricingCTA locale={locale} messages={messages} />
     </main>
   )

@@ -599,14 +599,18 @@
     "checking": "Checking...",
     "signIn": "Sign In",
     "stats": {
-      "totalQuotes": "Total Quotes",
-      "pending": "Pending",
+      "totalLeads": "Total Leads",
+      "new": "New",
+      "followUp": "Follow Up",
+      "negotiating": "Negotiating",
       "confirmed": "Confirmed",
-      "confirmedRevenue": "Confirmed Revenue",
+      "cancelled": "Cancelled",
       "thisMonth": "{count} this month",
-      "awaiting": "Awaiting follow-up",
-      "conversion": "{rate}% conversion",
-      "revenueSub": "From confirmed bookings"
+      "incoming": "Fresh leads",
+      "needsAttention": "Needs a response",
+      "inDiscussion": "Currently in discussion",
+      "booked": "Booked work",
+      "closedLost": "Closed out"
     },
     "filters": {
       "searchPlaceholder": "Search name, phone, email, city, notes...",
@@ -632,6 +636,10 @@
     "statuses": {
       "all": "All",
       "new": "New",
+      "contacted": "Contacted",
+      "quote_sent": "Quote Sent",
+      "follow_up": "Follow Up",
+      "negotiating": "Negotiating",
       "confirmed": "Confirmed",
       "cancelled": "Cancelled"
     },
@@ -655,17 +663,113 @@
     },
     "shareLink": {
       "title": "Share Link Recovery",
-      "description": "Generate a fresh customer link when you need to reopen or resend this quote.",
-      "generate": "Generate Link",
+      "description": "View the current customer link or generate a new one when you need to replace it.",
+      "generate": "Generate New Link",
       "regenerate": "Generate New Link",
       "generating": "Generating...",
-      "copy": "Copy Link",
+      "loading": "Loading...",
+      "view": "View Active Link",
+      "copy": "Copy Active Link",
       "copied": "Copied",
-      "open": "Open Link",
-      "empty": "No generated link yet.",
+      "open": "Open Active Link",
+      "empty": "No active link loaded yet.",
+      "legacyUnavailable": "Active link unavailable. Generate a new link once to enable recovery.",
       "replacementNotice": "Generating a new link replaces the previous customer link.",
       "generateFail": "Could not generate a share link. Please try again.",
+      "loadFail": "Could not load the active link. Please try again.",
+      "updatedAt": "Active link updated",
       "copyFail": "Could not copy the link. Please try again."
+    },
+    "viewTracking": {
+      "title": "Quote View Status",
+      "description": "Shows whether this customer has opened the quote link.",
+      "status": "Status",
+      "viewed": "Viewed",
+      "notViewed": "Not Viewed",
+      "firstViewed": "First Viewed",
+      "lastViewed": "Last Viewed",
+      "viewCount": "View Count"
+    },
+    "internalNotes": {
+      "title": "Internal Notes",
+      "adminOnly": "Admin only",
+      "description": "Private follow-up notes for this lead. These never appear in customer quote pages or shared links.",
+      "placeholder": "Add an internal note for this lead...",
+      "add": "Add Note",
+      "saving": "Saving...",
+      "loading": "Loading internal notes...",
+      "empty": "No internal notes yet. Add follow-up context here for the admin team.",
+      "newestFirst": "Newest notes appear first.",
+      "createdAt": "Added",
+      "updatedAt": "Updated",
+      "loadFail": "Could not load internal notes. Please try again.",
+      "saveFail": "Could not save the internal note. Please try again."
+    },
+    "reminders": {
+      "title": "Follow-up Reminder",
+      "description": "Track the next follow-up date for this lead. Reminders stay inside admin only.",
+      "date": "Reminder Date",
+      "status": "Reminder Status",
+      "none": "No reminder set",
+      "set": "Set Reminder",
+      "update": "Update Reminder",
+      "complete": "Mark Completed",
+      "remove": "Remove Reminder",
+      "saving": "Saving...",
+      "updateFail": "Could not save the reminder. Please try again.",
+      "completeFail": "Could not mark the reminder completed. Please try again.",
+      "removeFail": "Could not remove the reminder. Please try again.",
+      "statuses": {
+        "pending": "Pending",
+        "due": "Due",
+        "completed": "Completed"
+      },
+      "filters": {
+        "label": "Reminders",
+        "all": "All",
+        "due_today": "Due Today",
+        "overdue": "Overdue",
+        "upcoming": "Upcoming",
+        "completed": "Completed"
+      },
+      "stats": {
+        "dueToday": "Due Today",
+        "overdue": "Overdue",
+        "upcoming": "Upcoming",
+        "dueTodaySub": "Needs action today",
+        "overdueSub": "Past due follow-ups",
+        "upcomingSub": "Next 7 days"
+      }
+    },
+    "payments": {
+      "title": "Payment Tracking",
+      "description": "Track received payments and the remaining balance for this quote inside admin only.",
+      "totalAmount": "Total Amount",
+      "amountReceived": "Amount Received",
+      "balanceDue": "Balance Due",
+      "status": "Payment Status",
+      "save": "Save Payment",
+      "saving": "Saving...",
+      "amountReceivedPlaceholder": "Enter amount received",
+      "unavailable": "Payment tracking is not available for quotes without a saved total amount.",
+      "updateFail": "Could not update payment tracking. Please try again.",
+      "statuses": {
+        "unpaid": "Unpaid",
+        "partially_paid": "Partially Paid",
+        "paid": "Paid"
+      },
+      "stats": {
+        "revenueReceived": "Revenue Received",
+        "outstandingBalance": "Outstanding Balance",
+        "paidQuotes": "Paid Quotes",
+        "partiallyPaidQuotes": "Partially Paid",
+        "unpaidQuotes": "Unpaid",
+        "revenueReceivedSub": "Captured payments",
+        "outstandingBalanceSub": "Still pending",
+        "paidQuotesSub": "Fully settled",
+        "partiallyPaidQuotesSub": "Payment in progress",
+        "unpaidQuotesSub": "No payment recorded"
+      }
     },
     "emptyValue": "-",
     "unknownCustomer": "Unknown customer",
@@ -711,7 +815,50 @@
       "onwards": "onwards",
       "gstInclusive": "GST inclusive",
       "startWith": "Choose {name}",
-      "changeAny": "This becomes your starting estimate below. You can review coverage first and open optional add-ons only if you need them."
+      "changeAny": "This becomes your starting estimate below. You can review coverage first and open optional add-ons only if you need them.",
+      "items": {
+        "starter": {
+          "name": "Starter",
+          "subtitle": "Perfect for intimate events",
+          "features": [
+            "1 Candid Photographer",
+            "Half-day coverage (5 hours)",
+            "Unlimited soft copies",
+            "50+ edited highlights",
+            "Digital delivery in 5 days",
+            "Pre-event planning call"
+          ]
+        },
+        "signature": {
+          "name": "Signature",
+          "subtitle": "Most popular for weddings",
+          "features": [
+            "2 Photographers (Traditional + Candid)",
+            "Full day coverage (10 hours)",
+            "Cinematic highlight reel",
+            "Drone aerial coverage",
+            "25-sheet premium album",
+            "150+ edited highlights",
+            "Digital delivery in 5 days",
+            "Dedicated coordinator"
+          ]
+        },
+        "grand": {
+          "name": "Grand",
+          "subtitle": "The complete experience",
+          "features": [
+            "2 Photographers + Videographer",
+            "Full day coverage (10 hours)",
+            "Cinematic film + Traditional video",
+            "Same-day edit highlight",
+            "Drone aerial coverage",
+            "LED wall backdrop",
+            "40-sheet premium album",
+            "300+ edited highlights",
+            "Priority 3-day delivery"
+          ]
+        }
+      }
     },
     "cta": {
       "urgency": "Start with a clear estimate. Availability is confirmed after your request.",
@@ -741,6 +888,7 @@
       "pickEventType": "Choose a starting setup",
       "replaceSelectionHint": "Changing the starting setup replaces the current plan",
       "templateCount": "{count} events",
+      "defaultPackageEventName": "Your Event",
       "newEventName": "Custom Event",
       "addEventDay": "Add Another Event",
       "servicesCount": "{count} services",
@@ -798,6 +946,138 @@
       "selectedCount": "{count} selected",
       "eventExtrasHint": "Open only if this event needs extras like drone, live stream, or same-day edits.",
       "globalExtrasClosedHint": "Open only if you need albums or full-estimate extras.",
+      "serviceCatalog": {
+        "traditionalPhoto": {
+          "name": "Traditional Photography",
+          "description": "Posed shots, group photos, ritual and stage coverage"
+        },
+        "candidPhoto": {
+          "name": "Candid Photography",
+          "description": "Unposed, natural moments with a storytelling style"
+        },
+        "traditionalVideo": {
+          "name": "Traditional Videography",
+          "description": "Full event recording with every ritual documented"
+        },
+        "cinematicVideo": {
+          "name": "Cinematic Videography",
+          "description": "Film-style highlight reel with color grading and music"
+        }
+      },
+      "eventAddOnCatalog": {
+        "drone": {
+          "name": "Drone Coverage",
+          "description": "Aerial photos and video for this event"
+        },
+        "ledWall": {
+          "name": "LED Wall Setup",
+          "description": "Digital backdrop for this event"
+        },
+        "sameDayEdit": {
+          "name": "Same-Day Edit",
+          "description": "Highlight reel delivered the same day"
+        },
+        "liveStream": {
+          "name": "Live Streaming",
+          "description": "YouTube or Zoom live for remote guests"
+        }
+      },
+      "globalAddOnCatalog": {
+        "album25": {
+          "name": "Photo Album (25 sheets)",
+          "description": "Premium printed album"
+        },
+        "album40": {
+          "name": "Photo Album (40 sheets)",
+          "description": "Deluxe large album"
+        }
+      },
+      "templates": {
+        "hinduSouthIndian": {
+          "label": "Hindu (South Indian)",
+          "events": {
+            "pellikuthuru": "Pellikuthuru / Nalangu",
+            "haldiPasupu": "Haldi / Pasupu",
+            "sangeeth": "Sangeeth",
+            "muhurtham": "Muhurtham (Wedding)",
+            "reception": "Reception"
+          }
+        },
+        "hinduNorthIndian": {
+          "label": "Hindu (North Indian)",
+          "events": {
+            "roka": "Roka",
+            "haldi": "Haldi",
+            "mehendi": "Mehendi",
+            "sangeet": "Sangeet",
+            "baraatWedding": "Baraat and Wedding",
+            "reception": "Reception"
+          }
+        },
+        "muslimWedding": {
+          "label": "Muslim Wedding",
+          "events": {
+            "haldiUbtan": "Haldi / Ubtan",
+            "mehendi": "Mehendi",
+            "nikah": "Nikah",
+            "walimaReception": "Walima / Reception"
+          }
+        },
+        "christianWedding": {
+          "label": "Christian Wedding",
+          "events": {
+            "engagement": "Engagement",
+            "churchCeremony": "Church Ceremony",
+            "receptionParty": "Reception / Party"
+          }
+        },
+        "sikhWedding": {
+          "label": "Sikh Wedding",
+          "events": {
+            "mehendi": "Mehendi",
+            "anandKaraj": "Anand Karaj (Gurudwara)",
+            "reception": "Reception"
+          }
+        },
+        "engagement": {
+          "label": "Engagement",
+          "events": {
+            "ringCeremony": "Ring Ceremony",
+            "cocktailAfterParty": "Cocktail / After Party"
+          }
+        },
+        "preWeddingShoot": {
+          "label": "Pre-Wedding Shoot",
+          "events": {
+            "preWeddingPhotoshoot": "Pre-Wedding Photoshoot"
+          }
+        },
+        "babyMaternity": {
+          "label": "Baby / Maternity",
+          "events": {
+            "photoshootSession": "Photoshoot Session"
+          }
+        },
+        "birthdayEvent": {
+          "label": "Birthday / Event",
+          "events": {
+            "eventCoverage": "Event Coverage"
+          }
+        },
+        "housewarming": {
+          "label": "Housewarming",
+          "events": {
+            "housewarming": "Griha Pravesh / Housewarming"
+          }
+        },
+        "corporateEvent": {
+          "label": "Corporate Event",
+          "events": {
+            "conferenceSeminar": "Conference / Seminar",
+            "awardCeremony": "Award Ceremony"
+          }
+        }
+      },
       "whatsapp": {
         "start": "Hi Orvex Visuals,",
         "packageLine": "I'd like to continue with the {name} starting estimate (Rs.{total}).",
@@ -812,6 +1092,57 @@
         "total": "Current estimate: Rs.{value}",
         "confirm": "Please confirm availability and the next step."
       }
+    },
+    "comparisonSection": {
+      "badge": "Why We're Different",
+      "title": "Orvex vs Others",
+      "columns": {
+        "feature": "Feature",
+        "orvex": "Orvex",
+        "others": "Others"
+      },
+      "rows": [
+        {
+          "feature": "Pricing Transparency",
+          "orvex": "All prices on website",
+          "competitor": "\"Call for quote\""
+        },
+        {
+          "feature": "GST",
+          "orvex": "Included in price",
+          "competitor": "+18% surprise"
+        },
+        {
+          "feature": "Photo Delivery",
+          "orvex": "5 days",
+          "competitor": "30-45 days"
+        },
+        {
+          "feature": "Video Delivery",
+          "orvex": "15 days",
+          "competitor": "45-60 days"
+        },
+        {
+          "feature": "Copyright",
+          "orvex": "100% yours",
+          "competitor": "Studio retains rights"
+        },
+        {
+          "feature": "Booking Process",
+          "orvex": "Online in 2 min",
+          "competitor": "Phone calls only"
+        },
+        {
+          "feature": "Overtime",
+          "orvex": "Flexible, no surprise charges",
+          "competitor": "₹3,000/hr (hidden)"
+        },
+        {
+          "feature": "Cancellation",
+          "orvex": "Partial refund available",
+          "competitor": "Non-refundable"
+        }
+      ]
     }
   },
   "system": {

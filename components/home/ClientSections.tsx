@@ -9,7 +9,7 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { getWhatsAppLink, IMAGES } from "@/lib/constants"
 import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
-import { applyTemplate, getHomeMessages, type HomeMessages } from "@/lib/i18n/home"
+import { applyTemplate, getHomeMessages } from "@/lib/i18n/home"
 import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
 
 function getUpcomingMonths(localeTag: string) {
@@ -32,21 +32,21 @@ function useRouteHomeMessages() {
   }
 }
 
-export function Hero({ messages }: { messages: HomeMessages }) {
+export function Hero() {
   const live = useRouteHomeMessages()
-  messages = live.messages
+  const messages = live.messages
   const heroImage = IMAGES.hero[0]
   const { next } = getUpcomingMonths(messages.localeTag)
   const { routeLocale } = live
 
   return (
-    <section id="home" className="relative flex min-h-svh items-start justify-center overflow-hidden pt-28 pb-20 sm:pt-32 md:pt-36 md:pb-24 lg:items-center lg:pt-40">
+    <section id="home" className="relative flex min-h-svh items-start justify-center overflow-hidden bg-[linear-gradient(180deg,#f4ebdf_0%,#f6eee4_42%,#faf5ed_100%)] pt-28 pb-20 sm:pt-32 md:pt-36 md:pb-24 lg:items-center lg:pt-40 dark:bg-transparent">
       {heroImage ? (
         <Image
           src={heroImage}
           alt=""
           fill
-          className="object-cover"
+          className="object-cover object-center brightness-[1.01] contrast-[0.99] saturate-[1.07] dark:brightness-100 dark:contrast-100 dark:saturate-100"
           sizes="100vw"
           priority
           quality={85}
@@ -55,33 +55,35 @@ export function Hero({ messages }: { messages: HomeMessages }) {
         />
       ) : null}
 
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/50 to-slate-900/80" />
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(250,244,235,0.32)_0%,rgba(245,236,224,0.2)_28%,rgba(237,225,210,0.25)_58%,rgba(244,237,228,0.38)_100%)] dark:bg-gradient-to-b dark:from-slate-900/70 dark:via-slate-900/50 dark:to-slate-900/80" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,248,240,0.3),transparent_28%),radial-gradient(circle_at_82%_18%,rgba(245,158,11,0.1),transparent_28%),radial-gradient(circle_at_50%_78%,rgba(255,247,238,0.1),transparent_34%)] dark:bg-[radial-gradient(circle_at_22%_18%,rgba(15,23,42,0.16),transparent_32%),radial-gradient(circle_at_78%_20%,rgba(251,191,36,0.12),transparent_28%),radial-gradient(circle_at_50%_82%,rgba(15,23,42,0.18),transparent_40%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,246,236,0.06)_0%,rgba(255,246,236,0.015)_46%,rgba(15,23,42,0.04)_100%)] dark:bg-[linear-gradient(90deg,rgba(2,6,23,0.18)_0%,rgba(2,6,23,0.08)_46%,rgba(2,6,23,0.2)_100%)]" />
 
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=\"0 0 256 256\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noise\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"0.65\" numOctaves=\"3\" stitchTiles=\"stitch\"/%3E%3C/filter%3E%3Crect width=\"100%25\" height=\"100%25\" filter=\"url(%23noise)\" opacity=\"1\"/%3E%3C/svg%3E')" }} />
+      <div className="absolute inset-0 opacity-[0.012] pointer-events-none dark:opacity-[0.03]" style={{ backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=\"0 0 256 256\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cfilter id=\"noise\"%3E%3CfeTurbulence type=\"fractalNoise\" baseFrequency=\"0.65\" numOctaves=\"3\" stitchTiles=\"stitch\"/%3E%3C/filter%3E%3Crect width=\"100%25\" height=\"100%25\" filter=\"url(%23noise)\" opacity=\"1\"/%3E%3C/svg%3E')" }} />
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 pt-4 text-center sm:px-6">
-        <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 backdrop-blur-sm mb-7 sm:px-5">
-          <span className="text-white/85 text-xs font-medium sm:text-sm">
+        <div className="mb-7 inline-flex items-center rounded-full border border-[rgba(255,247,237,0.74)] bg-[rgba(255,247,239,0.56)] px-4 py-2 text-slate-700 shadow-[0_18px_40px_rgba(168,129,86,0.12)] backdrop-blur-lg sm:px-5 dark:border-white/15 dark:bg-white/10 dark:text-white dark:shadow-none dark:backdrop-blur-sm">
+          <span className="text-xs font-medium text-slate-700 sm:text-sm dark:text-white/85">
             {applyTemplate(messages.hero.urgencyTemplate, { month: next })}
           </span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl 2xl:text-8xl font-bold text-white leading-[0.92] mb-6 tracking-tight">
+        <h1 className="mb-6 text-4xl font-bold leading-[0.92] tracking-tight text-slate-900 drop-shadow-[0_10px_28px_rgba(255,255,255,0.26)] sm:text-5xl md:text-6xl xl:text-7xl 2xl:text-8xl dark:text-white dark:drop-shadow-none">
           {messages.hero.headingLine1}
           <br />
-          <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 bg-clip-text text-transparent dark:from-amber-300 dark:via-amber-400 dark:to-orange-400">
             {messages.hero.headingHighlight}
           </span>
         </h1>
 
-        <p className="text-base text-white/72 mb-8 max-w-2xl mx-auto leading-relaxed sm:text-lg md:text-xl md:mb-10">
+        <p className="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-slate-700/90 drop-shadow-[0_8px_18px_rgba(255,255,255,0.2)] sm:text-lg md:mb-10 md:text-xl dark:text-white/72 dark:drop-shadow-none">
           {messages.hero.description}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href={withLocaleHref(buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability" }), routeLocale)}
-            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-3.5 rounded-2xl font-semibold text-base transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/30 hover:-translate-y-1 sm:px-8 sm:py-4 sm:text-lg"
+            className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-[0_20px_45px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1 hover:from-amber-600 hover:to-orange-600 hover:shadow-[0_24px_55px_rgba(245,158,11,0.4)] sm:px-8 sm:py-4 sm:text-lg dark:from-amber-500 dark:to-amber-600 dark:hover:from-amber-600 dark:hover:to-amber-700 dark:hover:shadow-2xl dark:hover:shadow-amber-500/30"
           >
             {messages.hero.primaryCta}
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -90,7 +92,7 @@ export function Hero({ messages }: { messages: HomeMessages }) {
             href={getWhatsAppLink(messages.hero.whatsappTemplate)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm border border-white/30 text-white hover:bg-white hover:text-slate-900 px-6 py-3.5 rounded-2xl font-semibold text-base transition-all duration-300 hover:-translate-y-1 sm:px-8 sm:py-4 sm:text-lg"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[rgba(255,247,238,0.76)] bg-[rgba(255,247,240,0.6)] px-6 py-3.5 text-base font-semibold text-slate-800 shadow-[0_20px_45px_rgba(168,129,86,0.12)] backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-amber-200/80 hover:bg-[rgba(255,250,245,0.78)] hover:text-amber-700 sm:px-8 sm:py-4 sm:text-lg dark:border-white/30 dark:bg-white/10 dark:text-white dark:shadow-none dark:backdrop-blur-sm dark:hover:bg-white dark:hover:text-slate-900"
           >
             <MessageCircle size={20} />
             {messages.hero.secondaryCta}
@@ -99,9 +101,9 @@ export function Hero({ messages }: { messages: HomeMessages }) {
 
         <div className="mt-10 grid max-w-3xl mx-auto grid-cols-1 gap-3 sm:grid-cols-3 md:mt-12">
           {messages.hero.stats.map((stat, index) => (
-            <div key={index} className="rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-3 backdrop-blur-sm text-left sm:px-5 sm:py-4">
-              <div className="text-sm md:text-base font-semibold text-white">{stat.number}</div>
-              <div className="text-white/55 text-xs md:text-sm mt-1 leading-snug">{stat.label}</div>
+            <div key={index} className="rounded-2xl border border-[rgba(255,247,238,0.74)] bg-[rgba(255,247,240,0.5)] px-4 py-3 text-left shadow-[0_18px_36px_rgba(168,129,86,0.1)] backdrop-blur-lg sm:px-5 sm:py-4 dark:border-white/10 dark:bg-white/[0.05] dark:shadow-none dark:backdrop-blur-sm">
+              <div className="text-sm font-semibold text-slate-900 md:text-base dark:text-white">{stat.number}</div>
+              <div className="mt-1 text-xs leading-snug text-slate-600 md:text-sm dark:text-white/55">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -110,8 +112,8 @@ export function Hero({ messages }: { messages: HomeMessages }) {
   )
 }
 
-export function FAQSection({ messages }: { messages: HomeMessages }) {
-  messages = useRouteHomeMessages().messages
+export function FAQSection() {
+  const { messages } = useRouteHomeMessages()
   const [openIndex, setOpenIndex] = useState<number | null>(0)
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
@@ -154,9 +156,9 @@ export function FAQSection({ messages }: { messages: HomeMessages }) {
   )
 }
 
-export function CTABanner({ messages }: { messages: HomeMessages }) {
+export function CTABanner() {
   const live = useRouteHomeMessages()
-  messages = live.messages
+  const messages = live.messages
   const { ref, isVisible } = useScrollReveal()
   const { nextTwo } = getUpcomingMonths(messages.localeTag)
   const { routeLocale } = live

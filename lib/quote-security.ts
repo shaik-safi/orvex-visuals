@@ -3,6 +3,7 @@ import "server-only"
 import { createCipheriv, createDecipheriv, createHash, randomBytes, randomUUID } from "node:crypto"
 
 const ALGORITHM = "aes-256-gcm"
+const ACTIVE_ACCESS_TOKEN_SCOPE = "active-access-token"
 
 function getSecret(): string {
   const secret = process.env.QUOTE_ACCESS_SECRET
@@ -14,6 +15,39 @@ function getSecret(): string {
 
 function getKey(): Buffer {
   return createHash("sha256").update(getSecret()).digest()
+}
+
+function getScopedKey(scope: string): Buffer {
+  return createHash("sha256").update(`${getSecret()}:${scope}`).digest()
+}
+
+function encryptString(value: string, key: Buffer): string {
+  const iv = randomBytes(12)
+  const cipher = createCipheriv(ALGORITHM, key, iv)
+  const encrypted = Buffer.concat([
+    cipher.update(value, "utf8"),
+    cipher.final(),
+  ])
+  const tag = cipher.getAuthTag()
+
+  return `${iv.toString("base64url")}.${tag.toString("base64url")}.${encrypted.toString("base64url")}`
+}
+
+function decryptString(value: string, key: Buffer): string {
+  const [ivEncoded, tagEncoded, payloadEncoded] = value.split(".")
+  if (!ivEncoded || !tagEncoded || !payloadEncoded) {
+    throw new Error("Invalid encrypted value")
+  }
+
+  const decipher = createDecipheriv(ALGORITHM, key, Buffer.from(ivEncoded, "base64url"))
+  decipher.setAuthTag(Buffer.from(tagEncoded, "base64url"))
+
+  const decrypted = Buffer.concat([
+    decipher.update(Buffer.from(payloadEncoded, "base64url")),
+    decipher.final(),
+  ])
+
+  return decrypted.toString("utf8")
 }
 
 export function generateQuoteId(): string {
@@ -29,30 +63,17 @@ export function hashAccessToken(token: string): string {
 }
 
 export function encryptQuotePayload(payload: unknown): string {
-  const iv = randomBytes(12)
-  const cipher = createCipheriv(ALGORITHM, getKey(), iv)
-  const encrypted = Buffer.concat([
-    cipher.update(JSON.stringify(payload), "utf8"),
-    cipher.final(),
-  ])
-  const tag = cipher.getAuthTag()
-
-  return `${iv.toString("base64url")}.${tag.toString("base64url")}.${encrypted.toString("base64url")}`
+  return encryptString(JSON.stringify(payload), getKey())
 }
 
 export function decryptQuotePayload<T>(value: string): T {
-  const [ivEncoded, tagEncoded, payloadEncoded] = value.split(".")
-  if (!ivEncoded || !tagEncoded || !payloadEncoded) {
-    throw new Error("Invalid encrypted quote payload")
-  }
+  return JSON.parse(decryptString(value, getKey())) as T
+}
 
-  const decipher = createDecipheriv(ALGORITHM, getKey(), Buffer.from(ivEncoded, "base64url"))
-  decipher.setAuthTag(Buffer.from(tagEncoded, "base64url"))
+export function encryptActiveAccessToken(token: string): string {
+  return encryptString(token, getScopedKey(ACTIVE_ACCESS_TOKEN_SCOPE))
+}
 
-  const decrypted = Buffer.concat([
-    decipher.update(Buffer.from(payloadEncoded, "base64url")),
-    decipher.final(),
-  ])
-
-  return JSON.parse(decrypted.toString("utf8")) as T
+export function decryptActiveAccessToken(value: string): string {
+  return decryptString(value, getScopedKey(ACTIVE_ACCESS_TOKEN_SCOPE))
 }

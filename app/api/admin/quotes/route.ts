@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 
 import { ADMIN_API_SESSION_COOKIE_NAME, ADMIN_SESSION_COOKIE_NAME, isValidAdminSession } from "@/lib/admin-auth"
+import {
+  DEFAULT_QUOTE_PIPELINE_STATUS,
+  isQuotePipelineStatus,
+  type QuotePipelineStatus,
+} from "@/lib/admin-quote-status"
+import { normalizeStoredAmountReceived } from "@/lib/admin-payments"
+import { normalizeReminderDate, normalizeStoredQuoteReminderStatus, type StoredQuoteReminderStatus } from "@/lib/admin-reminders"
 import { adminDb } from "@/lib/firebase-admin"
-import { normalizeLocale } from "@/lib/i18n/config"
+import { normalizeLocale, parseSupportedLocale, type AppLocale } from "@/lib/i18n/config"
 import { withLocaleHref } from "@/lib/i18n/routing"
-import { decryptQuotePayload, generateAccessToken, hashAccessToken } from "@/lib/quote-security"
+import { decryptQuotePayload, encryptActiveAccessToken, generateAccessToken, hashAccessToken } from "@/lib/quote-security"
 import type { QuotePayload } from "@/lib/save-quote"
 
 function checkAdminAuth(request: NextRequest): boolean {
@@ -13,10 +20,25 @@ function checkAdminAuth(request: NextRequest): boolean {
 }
 
 type QuoteDocument = {
-  status?: string
+  status?: QuotePipelineStatus
   createdAt?: Date | { toDate?: () => Date }
   accessTokenHash?: string
+  activeAccessTokenCiphertext?: string
+  activeLinkLocale?: AppLocale | string | null
+  activeAccessTokenUpdatedAt?: Date | { toDate?: () => Date } | null
   encryptedPayload?: string
+  firstViewedAt?: Date | { toDate?: () => Date }
+  lastViewedAt?: Date | { toDate?: () => Date }
+  viewCount?: number
+  amountReceived?: number | null
+  reminderDate?: string | Date | { toDate?: () => Date } | null
+  reminderStatus?: StoredQuoteReminderStatus | "due" | null
+}
+
+function toIsoString(value: Date | { toDate?: () => Date } | null | undefined): string | null {
+  if (value instanceof Date) return value.toISOString()
+  if (typeof value?.toDate === "function") return value.toDate().toISOString()
+  return null
 }
 
 export async function GET(request: NextRequest) {
@@ -38,12 +60,18 @@ export async function GET(request: NextRequest) {
     const quotes = snapshot.docs.map((doc: { id: string; data: () => QuoteDocument }) => {
       const data = doc.data() as QuoteDocument
 
-      const createdAt =
-        data.createdAt instanceof Date
-          ? data.createdAt.toISOString()
-          : typeof data.createdAt?.toDate === "function"
-            ? data.createdAt.toDate().toISOString()
-            : null
+      const createdAt = toIsoString(data.createdAt)
+      const firstViewedAt = toIsoString(data.firstViewedAt)
+      const lastViewedAt = toIsoString(data.lastViewedAt)
+      const viewCount = typeof data.viewCount === "number" && Number.isFinite(data.viewCount) ? data.viewCount : 0
+      const amountReceived = normalizeStoredAmountReceived(data.amountReceived)
+      const reminderDate = normalizeReminderDate(data.reminderDate)
+      const reminderStatus = normalizeStoredQuoteReminderStatus(data.reminderStatus)
+      const hasRecoverableActiveLink = typeof data.activeAccessTokenCiphertext === "string" && data.activeAccessTokenCiphertext.length > 0
+      const activeLinkLocale = hasRecoverableActiveLink
+        ? parseSupportedLocale(typeof data.activeLinkLocale === "string" ? data.activeLinkLocale : null)
+        : null
+      const activeAccessTokenUpdatedAt = hasRecoverableActiveLink ? toIsoString(data.activeAccessTokenUpdatedAt) : null
 
       // Decrypt the payload
       let payload: QuotePayload | null = null
@@ -58,8 +86,17 @@ export async function GET(request: NextRequest) {
 
       return {
         id: doc.id,
-        status: data.status ?? "new",
+        status: isQuotePipelineStatus(data.status) ? data.status : DEFAULT_QUOTE_PIPELINE_STATUS,
         createdAt,
+        firstViewedAt,
+        lastViewedAt,
+        viewCount,
+        hasRecoverableActiveLink,
+        activeLinkLocale,
+        activeAccessTokenUpdatedAt,
+        amountReceived,
+        reminderDate,
+        reminderStatus,
         ...(payload ?? {}),
       }
     })
@@ -98,18 +135,31 @@ export async function POST(request: NextRequest) {
     }
 
     const accessToken = generateAccessToken()
-    await quoteRef.update({ accessTokenHash: hashAccessToken(accessToken) })
+    const activeLinkLocale = normalizeLocale(locale)
+    const activeAccessTokenUpdatedAt = new Date()
 
-    const sharePath = withLocaleHref(`/quote/${id}?token=${encodeURIComponent(accessToken)}`, normalizeLocale(locale))
+    await quoteRef.update({
+      accessTokenHash: hashAccessToken(accessToken),
+      activeAccessTokenCiphertext: encryptActiveAccessToken(accessToken),
+      activeLinkLocale,
+      activeAccessTokenUpdatedAt,
+    })
+
+    const sharePath = withLocaleHref(`/quote/${id}?token=${encodeURIComponent(accessToken)}`, activeLinkLocale)
     const shareUrl = `${request.nextUrl.origin}${sharePath}`
 
-    return NextResponse.json({ sharePath, shareUrl })
+    return NextResponse.json({
+      sharePath,
+      shareUrl,
+      activeLinkLocale,
+      activeAccessTokenUpdatedAt: activeAccessTokenUpdatedAt.toISOString(),
+    })
   } catch {
     return NextResponse.json({ error: "Failed to generate share link" }, { status: 500 })
   }
 }
 
-// Update quote status (new → confirmed / cancelled)
+// Update quote status within the lead pipeline.
 export async function PATCH(request: NextRequest) {
   if (!checkAdminAuth(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -121,7 +171,7 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const { id, status } = await request.json()
-    if (!id || !["new", "confirmed", "cancelled"].includes(status)) {
+    if (!id || !isQuotePipelineStatus(status)) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 })
     }
 

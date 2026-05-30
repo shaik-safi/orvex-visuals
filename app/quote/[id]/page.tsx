@@ -16,7 +16,6 @@ import { localizeQuoteListValue, localizeQuoteValue } from "@/lib/quote-localiza
 
 interface QuoteData {
   source: string
-  status: string
   createdAt: string | null
   customerName: string
   customerPhone: string

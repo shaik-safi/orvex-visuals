@@ -6,23 +6,18 @@ import {
   HowItWorks,
   TestimonialsSection,
 } from "@/components/home/HomeServerSections"
-import { getHomeMessages } from "@/lib/i18n/home"
-import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
 
-export default async function Home() {
-  const locale = await resolveRequestLocale()
-  const messages = getHomeMessages(locale)
-
+export default function Home() {
   return (
     <main>
-      <Hero messages={messages} />
-      <TrustBar messages={messages} />
-      <ServicesSection messages={messages} />
-      <WhyOrvex messages={messages} />
-      <HowItWorks messages={messages} />
-      <TestimonialsSection messages={messages} />
-      <FAQSection messages={messages} />
-      <CTABanner messages={messages} />
+      <Hero />
+      <TrustBar />
+      <ServicesSection />
+      <WhyOrvex />
+      <HowItWorks />
+      <TestimonialsSection />
+      <FAQSection />
+      <CTABanner />
     </main>
   )
 }

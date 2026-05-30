@@ -1,11 +1,16 @@
 import { adminDb } from "@/lib/firebase-admin"
+import { normalizeLocale } from "@/lib/i18n/config"
 import { guardPublicWriteRequest } from "@/lib/public-write-guard"
-import { encryptQuotePayload, generateAccessToken, generateQuoteId, hashAccessToken } from "@/lib/quote-security"
+import { encryptActiveAccessToken, encryptQuotePayload, generateAccessToken, generateQuoteId, hashAccessToken } from "@/lib/quote-security"
 import type { QuotePayload } from "@/lib/save-quote"
 
 const QUOTE_MAX_BYTES = 64 * 1024
 const QUOTE_RATE_LIMIT = 4
 const QUOTE_RATE_WINDOW_MS = 10 * 60 * 1000
+
+type QuoteCreateRequest = QuotePayload & {
+  locale?: string | null
+}
 
 function normalizeString(value: unknown, maxLength: number): string | undefined {
   if (typeof value !== "string") return undefined
@@ -135,14 +140,20 @@ export async function POST(request: Request) {
       return guardedRequest.response
     }
 
-    const payload = sanitizeQuotePayload(guardedRequest.body)
+    const requestBody = guardedRequest.body as QuoteCreateRequest | null
+    const payload = sanitizeQuotePayload(requestBody)
     const quoteId = generateQuoteId()
     const accessToken = generateAccessToken()
+    const activeLinkLocale = normalizeLocale(requestBody?.locale)
+    const now = new Date()
 
     await adminDb.collection("quotes").doc(quoteId).set({
       status: "new",
-      createdAt: new Date(),
+      createdAt: now,
       accessTokenHash: hashAccessToken(accessToken),
+      activeAccessTokenCiphertext: encryptActiveAccessToken(accessToken),
+      activeLinkLocale,
+      activeAccessTokenUpdatedAt: now,
       encryptedPayload: encryptQuotePayload(payload),
     })
 

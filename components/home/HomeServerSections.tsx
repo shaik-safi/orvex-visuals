@@ -1,14 +1,27 @@
+"use client"
+
 import { Clock, Shield, Receipt, Smartphone, ArrowRight } from "lucide-react"
 import Link from "next/link"
 
 import { services as allServices } from "@/app/services/data"
 import { getHomeServices } from "@/components/home/home-data"
-import type { HomeMessages } from "@/lib/i18n/home"
+import { getHomeMessages } from "@/lib/i18n/home"
+import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { withLocalePathname } from "@/lib/i18n/routing"
 
 const FEATURE_ICONS = [Clock, Shield, Receipt, Smartphone] as const
 
-export function TrustBar({ messages }: { messages: HomeMessages }) {
+function useRouteHomeMessages() {
+  const { routeLocale } = useLocaleSync()
+  return {
+    messages: getHomeMessages(routeLocale),
+    routeLocale,
+  }
+}
+
+export function TrustBar() {
+  const { messages } = useRouteHomeMessages()
+
   return (
     <div className="py-5 bg-slate-900 dark:bg-slate-800 border-y border-white/5">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -28,7 +41,8 @@ export function TrustBar({ messages }: { messages: HomeMessages }) {
   )
 }
 
-export function ServicesSection({ messages }: { messages: HomeMessages }) {
+export function ServicesSection() {
+  const { messages } = useRouteHomeMessages()
   const homeServices = getHomeServices(messages.locale)
 
   return (
@@ -88,7 +102,9 @@ export function ServicesSection({ messages }: { messages: HomeMessages }) {
   )
 }
 
-export function WhyOrvex({ messages }: { messages: HomeMessages }) {
+export function WhyOrvex() {
+  const { messages } = useRouteHomeMessages()
+
   return (
     <section id="why-us" className="py-24 md:py-32 bg-gradient-to-b from-slate-900 to-slate-950 relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[min(82vw,50rem)] w-[min(82vw,50rem)] bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -136,7 +152,9 @@ export function WhyOrvex({ messages }: { messages: HomeMessages }) {
   )
 }
 
-export function HowItWorks({ messages }: { messages: HomeMessages }) {
+export function HowItWorks() {
+  const { messages } = useRouteHomeMessages()
+
   return (
     <section className="py-24 md:py-32 bg-slate-50 dark:bg-slate-900 transition-colors duration-500">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -170,7 +188,9 @@ export function HowItWorks({ messages }: { messages: HomeMessages }) {
   )
 }
 
-export function TestimonialsSection({ messages }: { messages: HomeMessages }) {
+export function TestimonialsSection() {
+  const { messages } = useRouteHomeMessages()
+
   return (
     <section className="py-24 md:py-32 bg-white dark:bg-slate-950 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

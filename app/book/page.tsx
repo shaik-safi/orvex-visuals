@@ -244,7 +244,7 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
         })),
         globalAddOns: plan?.addOns,
         total: plan?.total,
-      })
+      }, { locale })
       const savedDetails = buildSavedWhatsAppDetails(quoteId, accessToken)
       nextSubmissionResult = "saved"
       nextSavedEstimateHref = savedDetails.savedEstimateHref

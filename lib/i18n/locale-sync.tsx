@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react"
+import { createContext, useContext, useMemo, type ReactNode } from "react"
 import { usePathname } from "next/navigation"
 
 import { DEFAULT_LOCALE, type AppLocale } from "@/lib/i18n/config"
@@ -21,8 +21,7 @@ export function LocaleSyncProvider({
   renderedLocale: AppLocale
   children: ReactNode
 }) {
-  const pathname = usePathname() || "/"
-  const routeLocale = extractLocaleFromPathname(pathname) ?? DEFAULT_LOCALE
+  const routeLocale = extractLocaleFromPathname(usePathname() || "/") ?? DEFAULT_LOCALE
   const isPending = routeLocale !== renderedLocale
 
   const value = useMemo(
@@ -33,16 +32,6 @@ export function LocaleSyncProvider({
     }),
     [renderedLocale, routeLocale, isPending],
   )
-
-  useEffect(() => {
-    console.log("[LocaleSyncProvider]", {
-      pathname,
-      routeLocale,
-      renderedLocale,
-      isPending,
-      targetLocale: null,
-    })
-  }, [pathname, routeLocale, renderedLocale, isPending])
 
   return <LocaleSyncContext.Provider value={value}>{children}</LocaleSyncContext.Provider>
 }
