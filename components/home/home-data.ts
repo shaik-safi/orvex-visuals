@@ -1,19 +1,17 @@
-import { getLocalizedServices } from "@/app/services/data"
+import { getLocalizedServices, getServiceClassification } from "@/app/services/data"
 import type { AppLocale } from "@/lib/i18n/config"
 
 export const homepageSlugs = [
+  // ── Parent Product Pages (event-first hierarchy) ──────────
   "wedding-photography",
-  "wedding-videography",
   "pre-wedding-photoshoot",
   "engagement-photography",
   "birthday-photography",
-  "baby-shower-photography",
-  "haldi-mehendi-photography",
-  "sangeet-photography",
-  "naming-ceremony-photography",
-  "anniversary-photoshoot",
+  "housewarming-photography",
+  "events-photography",
+  "baby-photoshoot",
+  "maternity-photography",
   "corporate-photography",
-  "drone-photography",
 ]
 
 export function getHomeServices(locale: AppLocale) {
@@ -23,10 +21,12 @@ export function getHomeServices(locale: AppLocale) {
     const service = services.find((item) => item.slug === slug)
     if (!service) return []
 
+    const { role } = getServiceClassification(slug)
+
     return [{
       name: service.name,
       icon: service.icon,
-      price: `₹${service.startingPrice.toLocaleString("en-IN")}`,
+      price: role === "parent" ? `₹${service.startingPrice.toLocaleString("en-IN")}` : null,
       desc: service.description,
       slug: service.slug,
     }]

@@ -82,7 +82,7 @@ export function Hero() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability" }), routeLocale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability", scrollToBuilder: true }), routeLocale)}
             className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-[0_20px_45px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1 hover:from-amber-600 hover:to-orange-600 hover:shadow-[0_24px_55px_rgba(245,158,11,0.4)] sm:px-8 sm:py-4 sm:text-lg dark:from-amber-500 dark:to-amber-600 dark:hover:from-amber-600 dark:hover:to-amber-700 dark:hover:shadow-2xl dark:hover:shadow-amber-500/30"
           >
             {messages.hero.primaryCta}
@@ -193,7 +193,7 @@ export function CTABanner() {
             <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
           </a>
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "availability" }), routeLocale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "availability", scrollToBuilder: true }), routeLocale)}
             className="inline-flex items-center justify-center border-2 border-white/40 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
           >
             {messages.cta.bookingCta}

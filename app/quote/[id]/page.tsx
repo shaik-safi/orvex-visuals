@@ -13,6 +13,7 @@ import { applyTemplate } from "@/lib/i18n/home"
 import { withLocaleHref } from "@/lib/i18n/routing"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 import { localizeQuoteListValue, localizeQuoteValue } from "@/lib/quote-localization"
+import { detectCoverageProfileFromSelectionNames, COVERAGE_PROFILES } from "@/lib/pricing-presets"
 
 interface QuoteData {
   source: string
@@ -60,7 +61,7 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
         const response = await fetch(`/api/quotes/${id}?token=${encodeURIComponent(token)}`, { cache: "no-store" })
         const data = await response.json().catch(() => null)
         if (!response.ok || !data?.quote) {
-          setError(data?.error || messages.notFoundDescription)
+          setError(messages.notFoundDescription)
           return
         }
         setQuote(data.quote as QuoteData)
@@ -84,10 +85,23 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
     return (
       <div className="pt-32 pb-20 text-center px-4">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{messages.notFoundTitle}</h1>
-        <p className="text-slate-500 dark:text-slate-400 mb-6">{error || messages.notFoundDescription}</p>
-        <Link href={withLocaleHref(buildPricingHandoffHref({ from: "quote", source: messages.savedPackageSource, intent: "custom-package" }), routeLocale)} className="text-amber-600 dark:text-amber-400 font-medium hover:underline">
-          {messages.newPackage}
-        </Link>
+        <p className="text-slate-500 dark:text-slate-400 mb-6">{messages.notFoundDescription}</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <a
+            href={getWhatsAppLink(applyTemplate(messages.notFoundWhatsappTemplate, { BRAND_NAME }))}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 rounded-xl font-semibold text-sm transition-colors duration-200"
+          >
+            <MessageCircle size={16} /> {messages.notFoundWhatsapp}
+          </a>
+          <Link
+            href={withLocaleHref(buildPricingHandoffHref({ from: "quote", source: messages.savedPackageSource, intent: "custom-package", scrollToBuilder: true }), routeLocale)}
+            className="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 px-5 py-3 rounded-xl font-semibold text-sm hover:border-slate-300 dark:hover:border-slate-600 transition-colors duration-200"
+          >
+            {messages.newPackage}
+          </Link>
+        </div>
       </div>
     )
   }
@@ -113,6 +127,15 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
     ...addon,
     name: localizeQuoteValue(addon.name, routeLocale) || addon.name,
   }))
+
+  // Derive coverage profile from stored English selection names
+  const allSelectionNames = (quote.events ?? []).flatMap((e) => e.selections.map((s) => s.name))
+  const quoteProfileId = detectCoverageProfileFromSelectionNames(allSelectionNames)
+  const quoteProfile = quoteProfileId ? COVERAGE_PROFILES[quoteProfileId] : null
+  const quoteCoverageProfiles = getPageMessages(routeLocale).pricingPage.coverageProfiles
+  const quoteProfileCopy = quoteProfile
+    ? quoteCoverageProfiles[quoteProfile.messageKey as keyof typeof quoteCoverageProfiles]
+    : null
 
   const pricingHref = withLocaleHref(buildPricingHandoffHref({ from: "quote", source: messages.savedPackageSource, intent: "custom-package" }), routeLocale)
 
@@ -183,6 +206,12 @@ export default function QuotePage({ params }: { params: Promise<{ id: string }> 
           {localizedEvents.length > 0 && (
             <section className="px-6 py-6 border-b border-slate-100 dark:border-slate-800 sm:px-8 print:px-0 print-section">
               <h2 className="text-xs uppercase tracking-wide text-slate-400 mb-4 print-section-label">{messages.headings.eventCoverage}</h2>
+              {quoteProfileCopy && (
+                <div className="mb-3 flex items-center gap-1.5 text-xs">
+                  <span className="font-medium text-slate-400">{messages.labels.coverageFormat}:</span>
+                  <span className="font-semibold text-slate-700 dark:text-slate-200 print:text-slate-900">{quoteProfileCopy.label} · {quoteProfileCopy.crewLabel}</span>
+                </div>
+              )}
               <div className="space-y-4">
                 {localizedEvents.map((event, index) => (
                   <div key={index} className="rounded-xl bg-slate-50 dark:bg-slate-800/60 p-4 print-section avoid-break">

@@ -12,13 +12,15 @@ import {
   Clock,
   MapPin,
   ChevronDown,
+  Calculator,
 } from "lucide-react"
 
 import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import type { AppLocale } from "@/lib/i18n/config"
 import { useLocaleSync } from "@/lib/i18n/locale-sync"
-import { getLocalizedServiceDetail, getLocalizedServiceName, type ServiceDetail } from "../data"
-import { PHOTO_DELIVERY_DAYS, getWhatsAppLink } from "@/lib/constants"
+import { getLocalizedServiceDetail, getLocalizedServiceName, getServiceClassification, type ServiceDetail, type ServiceClassification } from "../data"
+import { PACKAGES, computePackagePrice, PHOTO_DELIVERY_DAYS, getWhatsAppLink } from "@/lib/constants"
+import { resolvePresetCoverageProfile, COVERAGE_PROFILES } from "@/lib/pricing-presets"
 import { applyTemplate } from "@/lib/i18n/home"
 import { getPageMessages } from "@/lib/i18n/pages"
 import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
@@ -26,7 +28,7 @@ import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 
 type ServiceDetailMessages = ReturnType<typeof getPageMessages>["serviceDetailPage"]
 
-function ServiceHero({ service, routeLocale, messages }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
+function ServiceHero({ service, routeLocale, messages, classification }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages; classification: ServiceClassification }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
   const Icon = service.icon
 
@@ -57,26 +59,88 @@ function ServiceHero({ service, routeLocale, messages }: { service: ServiceDetai
         <p className="text-slate-300 max-w-2xl mx-auto text-base md:text-lg">{service.description}</p>
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" }), routeLocale)}
-            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
-          >
-            {messages.hero.checkPricing}
-            <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
-          </Link>
-          <a
-            href="#packages"
-            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-semibold transition-colors duration-300"
-          >
-            {messages.hero.viewPackages} <ArrowRight size={16} />
-          </a>
+          {classification.role === "parent" && (
+            <>
+              <Link
+                href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability", scrollToBuilder: true }), routeLocale)}
+                className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
+              >
+                {messages.hero.checkPricing}
+                <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+              </Link>
+              <a
+                href="#coverage"
+                className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-semibold transition-colors duration-300"
+              >
+                {messages.hero.viewPackages} <ArrowRight size={16} />
+              </a>
+            </>
+          )}
+          {classification.role === "variant" && (classification.parentSlugs?.length ?? 0) === 1 && (
+            <>
+              <Link
+                href={withLocalePathname(`/services/${classification.parentSlugs![0]}`, routeLocale)}
+                className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
+              >
+                {messages.discovery.viewCoverageTemplate.replace("{name}", getLocalizedServiceName(classification.parentSlugs![0], routeLocale))}
+                <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+              </Link>
+              <Link
+                href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: classification.parentSlugs![0], intent: "availability", scrollToBuilder: true }), routeLocale)}
+                className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-semibold transition-colors duration-300"
+              >
+                {messages.hero.checkPricing} <ArrowRight size={16} />
+              </Link>
+            </>
+          )}
+          {classification.role === "variant" && (classification.parentSlugs?.length ?? 0) > 1 && (
+            <>
+              <a
+                href="#coverage-options"
+                className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
+              >
+                {messages.discovery.viewRelatedCoverage}
+                <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+              </a>
+              <a
+                href={getWhatsAppLink(applyTemplate(messages.cta.whatsappTemplate, { service: service.name }))}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-semibold transition-colors duration-300"
+              >
+                <MessageCircle size={16} /> {messages.cta.whatsapp}
+              </a>
+            </>
+          )}
+          {classification.role === "ancillary" && (
+            <>
+              <a
+                href={getWhatsAppLink(applyTemplate(messages.discovery.ancillaryWhatsappTemplate, { service: service.name }))}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
+              >
+                <MessageCircle size={18} /> {messages.cta.whatsapp}
+              </a>
+              <Link
+                href={withLocalePathname("/contact", routeLocale)}
+                className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white/10 px-7 py-3.5 rounded-2xl font-semibold transition-colors duration-300"
+              >
+                {messages.discovery.contactUs} <ArrowRight size={16} />
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm text-white/70">
           <span className="flex items-center gap-1.5"><Shield size={14} className="text-green-400" /> {messages.hero.badgeGst}</span>
-          <span className="flex items-center gap-1.5"><Clock size={14} className="text-blue-400" /> {messages.hero.badgeDeliveryTemplate.replace("{PHOTO_DELIVERY_DAYS}", String(PHOTO_DELIVERY_DAYS))}</span>
+          {classification.role !== "ancillary" && (
+            <span className="flex items-center gap-1.5"><Clock size={14} className="text-blue-400" /> {messages.hero.badgeDeliveryTemplate.replace("{PHOTO_DELIVERY_DAYS}", String(PHOTO_DELIVERY_DAYS))}</span>
+          )}
           <span className="flex items-center gap-1.5"><MapPin size={14} className="text-amber-400" /> {messages.hero.badgeArea}</span>
-          <span className="flex items-center gap-1.5"><Star size={14} className="text-yellow-400" /> {messages.hero.badgeSummary}</span>
+          {classification.role !== "ancillary" && (
+            <span className="flex items-center gap-1.5"><Star size={14} className="text-yellow-400" /> {messages.hero.badgeSummary}</span>
+          )}
         </div>
       </div>
     </section>
@@ -128,85 +192,214 @@ function OverviewSection({ service, messages }: { service: ServiceDetail; messag
   )
 }
 
-function PackagesSection({ service, routeLocale, messages }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
+function CoverageEstimatesSection({ service, routeLocale, messages }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
   const { ref, isVisible } = useScrollReveal()
+  const coverageProfileMessages = getPageMessages(routeLocale).pricingPage.coverageProfiles
   return (
-    <section id="packages" ref={ref} className={`py-16 bg-slate-50 dark:bg-slate-900 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+    <section id="coverage" ref={ref} className={`py-16 bg-slate-50 dark:bg-slate-900 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            {messages.packages.pricingTemplate.replace("{service}", service.name)}
+            {messages.coverageEstimates.badge}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">
-            {messages.packages.titleTemplate.replace("{service}", service.name)}
+            {messages.coverageEstimates.titleTemplate.replace("{service}", service.name)}
           </h2>
           <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-            {messages.packages.description}
+            {messages.coverageEstimates.description}
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-5">
-          {service.packages.map((pkg) => (
-            <div
-              key={pkg.name}
-              className={`relative rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 ${pkg.popular
-                ? "bg-gradient-to-b from-amber-500 to-amber-600 text-white shadow-xl shadow-amber-500/15"
-                : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:shadow-lg"
+          {PACKAGES.map((pkg) => {
+            const total = computePackagePrice(pkg)
+            const profileId = resolvePresetCoverageProfile(pkg.builderPreset.events)
+            const profile = profileId ? COVERAGE_PROFILES[profileId] : null
+            const profileCopy = profile ? coverageProfileMessages[profile.messageKey as keyof typeof coverageProfileMessages] : null
+            return (
+              <div
+                key={pkg.name}
+                className={`relative rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 ${
+                  pkg.popular
+                    ? "bg-gradient-to-b from-amber-500 to-amber-600 text-white shadow-xl shadow-amber-500/15"
+                    : "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:shadow-lg"
                 }`}
-            >
-              {pkg.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-white text-amber-600 text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                    {messages.packages.mostPopular}
-                  </span>
-                </div>
-              )}
-
-              <div className="mb-4">
-                <h3 className={`text-lg font-bold mb-1 ${pkg.popular ? "text-white" : "text-slate-900 dark:text-white"}`}>
-                  {pkg.name}
-                </h3>
-                <div className="flex items-baseline gap-1">
-                  <span className={`text-3xl font-bold ${pkg.popular ? "text-white" : "text-slate-900 dark:text-white"}`}>
-                    &#8377;{pkg.price.toLocaleString("en-IN")}
-                  </span>
-                </div>
-                <p className={`text-sm mt-1 ${pkg.popular ? "text-white/80" : "text-slate-500 dark:text-slate-400"}`}>
-                  {messages.packages.durationPrefix} {pkg.duration}
-                </p>
-              </div>
-
-              <ul className="space-y-2.5 mb-6">
-                {pkg.features.map((feature, j) => (
-                  <li key={j} className="flex items-start gap-2.5">
-                    <Check size={14} className={`mt-0.5 flex-shrink-0 ${pkg.popular ? "text-white" : "text-amber-500"}`} />
-                    <span className={`text-sm ${pkg.popular ? "text-white/90" : "text-slate-600 dark:text-slate-300"}`}>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <a
-                href={getWhatsAppLink(applyTemplate(messages.packages.whatsappTemplate, { package: pkg.name, service: service.name }))}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-colors duration-300 ${pkg.popular
-                  ? "bg-white text-amber-600 hover:bg-amber-50"
-                  : "bg-amber-500 hover:bg-amber-600 text-white"
-                  }`}
               >
-                {messages.packages.askTemplate.replace("{package}", pkg.name)}
-              </a>
-            </div>
-          ))}
+                {pkg.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="bg-white text-amber-600 text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                      {messages.packages.mostPopular}
+                    </span>
+                  </div>
+                )}
+
+                <div className="mb-5">
+                  {profileCopy && (
+                    <span className={`inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full mb-2 ${pkg.popular ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400"}`}>
+                      {profileCopy.label}
+                    </span>
+                  )}
+                  <h3 className={`text-lg font-bold mb-1 ${pkg.popular ? "text-white" : "text-slate-900 dark:text-white"}`}>
+                    {pkg.name}
+                  </h3>
+                  <div className="flex items-baseline gap-1">
+                    <span className={`text-3xl font-bold ${pkg.popular ? "text-white" : "text-slate-900 dark:text-white"}`}>
+                      &#8377;{total.toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                  {profileCopy ? (
+                    <>
+                      <p className={`text-sm mt-2 leading-relaxed ${pkg.popular ? "text-white/80" : "text-slate-500 dark:text-slate-400"}`}>
+                        {profileCopy.summary}
+                      </p>
+                      <p className={`text-xs mt-1 font-medium ${pkg.popular ? "text-white/70" : "text-slate-400 dark:text-slate-500"}`}>
+                        {profileCopy.crewLabel}
+                      </p>
+                    </>
+                  ) : (
+                    <p className={`text-sm mt-2 leading-relaxed ${pkg.popular ? "text-white/80" : "text-slate-500 dark:text-slate-400"}`}>
+                      {pkg.name}
+                    </p>
+                  )}
+                </div>
+
+                <Link
+                  href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, packageName: pkg.name, intent: "availability", scrollToBuilder: true }), routeLocale)}
+                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-semibold text-sm transition-colors duration-300 ${
+                    pkg.popular
+                      ? "bg-white text-amber-600 hover:bg-amber-50"
+                      : "bg-amber-500 hover:bg-amber-600 text-white"
+                  }`}
+                >
+                  <Calculator size={14} />
+                  {messages.coverageEstimates.getEstimate}
+                </Link>
+              </div>
+            )
+          })}
         </div>
 
         <div className="text-center mt-10 pt-8 border-t border-slate-200 dark:border-slate-800">
-          <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">{messages.packages.customize}</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">{messages.coverageEstimates.customizeNote}</p>
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "custom-package" }), routeLocale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "custom-package", scrollToBuilder: true }), routeLocale)}
             className="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-sm hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
           >
-            {messages.packages.buildCustom} <ArrowRight size={15} />
+            {messages.coverageEstimates.buildCustom} <ArrowRight size={15} />
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function VariantDiscoverySection({
+  service,
+  routeLocale,
+  messages,
+  classification,
+}: {
+  service: ServiceDetail
+  routeLocale: AppLocale
+  messages: ServiceDetailMessages
+  classification: ServiceClassification
+}) {
+  const { ref, isVisible } = useScrollReveal()
+  const parentSlugs = classification.parentSlugs ?? []
+  const isSingleParent = parentSlugs.length === 1
+
+  return (
+    <section
+      id="coverage-options"
+      ref={ref}
+      className={`py-16 bg-slate-50 dark:bg-slate-900 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+    >
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          {messages.discovery.variantBadge}
+        </span>
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+          {isSingleParent ? messages.discovery.variantBridgeTitle : messages.discovery.multiParentBridgeTitle}
+        </h2>
+        <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto mb-10">
+          {isSingleParent
+            ? messages.discovery.variantBridgeNote.replace("{parent}", getLocalizedServiceName(parentSlugs[0], routeLocale))
+            : messages.discovery.multiParentBridgeNote}
+        </p>
+        <div className={`grid gap-4 ${isSingleParent ? "max-w-sm mx-auto" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
+          {parentSlugs.map((parentSlug) => {
+            const parentName = getLocalizedServiceName(parentSlug, routeLocale)
+            return (
+              <Link
+                key={parentSlug}
+                href={withLocalePathname(`/services/${parentSlug}`, routeLocale)}
+                className="group flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-amber-300 dark:hover:border-amber-500/40 rounded-2xl p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <span className="font-semibold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors text-left">
+                  {messages.discovery.viewCoverageTemplate.replace("{name}", parentName)}
+                </span>
+                <ArrowRight size={16} className="text-amber-500 flex-shrink-0 ml-3" />
+              </Link>
+            )
+          })}
+        </div>
+        {isSingleParent && (
+          <div className="mt-8">
+            <Link
+              href={withLocaleHref(
+                buildPricingHandoffHref({ from: "service", source: service.name, service: parentSlugs[0], intent: "availability", scrollToBuilder: true }),
+                routeLocale
+              )}
+              className="inline-flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-sm hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+            >
+              {messages.packages.buildCustom} <ArrowRight size={15} />
+            </Link>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+function AncillaryCTASection({
+  service,
+  routeLocale,
+  messages,
+}: {
+  service: ServiceDetail
+  routeLocale: AppLocale
+  messages: ServiceDetailMessages
+}) {
+  const { ref, isVisible } = useScrollReveal()
+  return (
+    <section
+      ref={ref}
+      className={`py-16 bg-slate-50 dark:bg-slate-900 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+    >
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+          {messages.discovery.ancillaryBadge}
+        </span>
+        <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+          {messages.discovery.ancillaryBridgeTitle}
+        </h2>
+        <p className="text-slate-500 dark:text-slate-400 mb-8">
+          {messages.discovery.ancillaryBridgeNote}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href={getWhatsAppLink(applyTemplate(messages.discovery.ancillaryWhatsappTemplate, { service: service.name }))}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
+          >
+            <MessageCircle size={18} /> {messages.cta.whatsapp}
+          </a>
+          <Link
+            href={withLocalePathname("/contact", routeLocale)}
+            className="inline-flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-amber-300 dark:hover:border-amber-500/40 px-7 py-3.5 rounded-2xl font-semibold transition-all duration-300 hover:-translate-y-0.5"
+          >
+            {messages.discovery.contactUs} <ArrowRight size={16} />
           </Link>
         </div>
       </div>
@@ -320,7 +513,7 @@ function RelatedServices({ service, routeLocale, messages }: { service: ServiceD
   )
 }
 
-function ServiceCTA({ service, routeLocale, messages }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages }) {
+function ServiceCTA({ service, routeLocale, messages, classification }: { service: ServiceDetail; routeLocale: AppLocale; messages: ServiceDetailMessages; classification: ServiceClassification }) {
   const { ref, isVisible } = useScrollReveal()
   return (
     <section ref={ref} className={`py-16 md:py-20 relative overflow-hidden transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
@@ -329,27 +522,48 @@ function ServiceCTA({ service, routeLocale, messages }: { service: ServiceDetail
 
       <div className="relative max-w-3xl mx-auto px-4 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-          {messages.cta.titleTemplate.replace("{service}", service.name)}
+          {classification.role === "ancillary"
+            ? messages.discovery.ancillaryCtaTitleTemplate.replace("{service}", service.name)
+            : messages.cta.titleTemplate.replace("{service}", service.name)}
         </h2>
         <p className="text-slate-400 text-base md:text-lg mb-7 max-w-xl mx-auto leading-relaxed">
-          {messages.cta.description}
+          {classification.role === "ancillary" ? messages.discovery.ancillaryCtaDescription : messages.cta.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "service", source: service.name, service: service.slug, intent: "availability" }), routeLocale)}
-            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
-          >
-            {messages.cta.checkPricing}
-            <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
-          </Link>
+          {(classification.role === "parent" || (classification.role === "variant" && (classification.parentSlugs?.length ?? 0) === 1)) && (
+            <Link
+              href={withLocaleHref(buildPricingHandoffHref({
+                from: "service",
+                source: service.name,
+                service: classification.role === "parent" ? service.slug : classification.parentSlugs![0],
+                intent: "availability",
+                scrollToBuilder: true,
+              }), routeLocale)}
+              className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
+            >
+              {messages.cta.checkPricing}
+              <ArrowRight size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+            </Link>
+          )}
           <a
-            href={getWhatsAppLink(applyTemplate(messages.cta.whatsappTemplate, { service: service.name }))}
+            href={getWhatsAppLink(applyTemplate(
+              classification.role === "ancillary" ? messages.discovery.ancillaryWhatsappTemplate : messages.cta.whatsappTemplate,
+              { service: service.name }
+            ))}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:-translate-y-0.5"
           >
             <MessageCircle size={18} /> {messages.cta.whatsapp}
           </a>
+          {classification.role === "ancillary" && (
+            <Link
+              href={withLocalePathname("/contact", routeLocale)}
+              className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:-translate-y-0.5"
+            >
+              {messages.discovery.contactUs} <ArrowRight size={18} />
+            </Link>
+          )}
         </div>
       </div>
     </section>
@@ -361,6 +575,7 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
   const messages = getPageMessages(routeLocale).serviceDetailPage
   const { slug } = use(params)
   const service = getLocalizedServiceDetail(slug, routeLocale)
+  const classification = getServiceClassification(slug)
 
   const serviceSchema = {
     "@context": "https://schema.org",
@@ -376,13 +591,6 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
       "@type": "City",
       name: routeLocale === "hi" ? "बेंगलुरु" : "Bangalore",
     },
-    offers: service.packages.map((pkg) => ({
-      "@type": "Offer",
-      name: pkg.name,
-      price: pkg.price,
-      priceCurrency: "INR",
-      availability: "https://schema.org/InStock",
-    })),
     image: service.heroImage,
     url: `https://orvexvisuals.com${withLocalePathname(`/services/${slug}`, routeLocale)}`,
   }
@@ -410,13 +618,17 @@ export default function ServicePage({ params }: { params: Promise<{ slug: string
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <ServiceHero service={service} routeLocale={routeLocale} messages={messages} />
+      <ServiceHero service={service} routeLocale={routeLocale} messages={messages} classification={classification} />
       <OverviewSection service={service} messages={messages} />
-      <PackagesSection service={service} routeLocale={routeLocale} messages={messages} />
+      {classification.role === "parent"
+        ? <CoverageEstimatesSection service={service} routeLocale={routeLocale} messages={messages} />
+        : classification.role === "variant"
+        ? <VariantDiscoverySection service={service} routeLocale={routeLocale} messages={messages} classification={classification} />
+        : <AncillaryCTASection service={service} routeLocale={routeLocale} messages={messages} />}
       <ProcessSection service={service} messages={messages} />
       <FAQSection service={service} messages={messages} />
       <RelatedServices service={service} routeLocale={routeLocale} messages={messages} />
-      <ServiceCTA service={service} routeLocale={routeLocale} messages={messages} />
+      <ServiceCTA service={service} routeLocale={routeLocale} messages={messages} classification={classification} />
     </main>
   )
 }

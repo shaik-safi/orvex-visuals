@@ -76,13 +76,33 @@ const QUOTE_VALUE_TRANSLATIONS_HI: Record<string, string> = {
   "Photo Frames & Canvas Prints": "फोटो फ्रेम्स और कैनवस प्रिंट्स",
   "Photo Restoration Service": "फोटो रिस्टोरेशन सर्विस",
   "Personalized Gifts & Mug Printing": "पर्सनलाइज़्ड गिफ्ट्स और मग प्रिंटिंग",
+  // Coverage profile labels (CoverageProfile.crew strings)
+  "Photography": "फोटोग्राफी",
+  "Videography": "वीडियोग्राफी",
+  "Photography + Videography": "फोटोग्राफी + वीडियोग्राफी",
+  "Photography + Cinematic Video": "फोटोग्राफी + सिनेमैटिक वीडियो",
+  "Full Coverage": "फुल कवरेज",
+  "1 Photographer": "1 फोटोग्राफर",
+  "1 Videographer": "1 वीडियोग्राफर",
+  "1 Photographer + 1 Videographer": "1 फोटोग्राफर + 1 वीडियोग्राफर",
+  "1 Photographer + 1 Cinematographer": "1 फोटोग्राफर + 1 सिनेमैटोग्राफर",
+  "2 Photographers + 1 Videographer + 1 Cinematographer": "2 फोटोग्राफर + 1 वीडियोग्राफर + 1 सिनेमैटोग्राफर",
 }
 
-function translateKnownQuoteValue(value: string, locale: AppLocale): string {
-  if (locale === "en") return value
+// Reverse map: recognized HI persisted labels → canonical EN labels, for EN-locale normalization.
+// Built from QUOTE_VALUE_TRANSLATIONS_HI so both maps stay in sync automatically.
+const QUOTE_VALUE_TRANSLATIONS_EN: Record<string, string> = Object.fromEntries(
+  Object.entries(QUOTE_VALUE_TRANSLATIONS_HI).map(([en, hi]) => [hi, en]),
+)
 
+function translateKnownQuoteValue(value: string, locale: AppLocale): string {
   const trimmed = value.trim()
-  return QUOTE_VALUE_TRANSLATIONS_HI[trimmed] ?? value
+  if (locale === "hi") {
+    // EN-stored label → HI display label
+    return QUOTE_VALUE_TRANSLATIONS_HI[trimmed] ?? value
+  }
+  // locale === "en": normalize any HI-stored label back to its canonical EN form
+  return QUOTE_VALUE_TRANSLATIONS_EN[trimmed] ?? value
 }
 
 export function localizeQuoteValue(value: string | undefined, locale: AppLocale): string | undefined {
@@ -92,7 +112,6 @@ export function localizeQuoteValue(value: string | undefined, locale: AppLocale)
 
 export function localizeQuoteListValue(value: string | undefined, locale: AppLocale): string | undefined {
   if (!value) return value
-  if (locale === "en") return value
 
   return value
     .split(",")

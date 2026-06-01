@@ -18,6 +18,7 @@ export interface QuotePayload {
   venue?: string
   events?: QuoteEvent[]
   globalAddOns?: { name: string; qty: number; price: number }[]
+  packageName?: string
   // direct booking-only fields
   service?: string
   budget?: string

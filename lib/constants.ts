@@ -76,16 +76,6 @@ export const MISC_SERVICE_RATES = {
 export const PACKAGES = [
   {
     name: "Starter",
-    subtitle: "Perfect for intimate events",
-    features: [
-      "1 Candid Photographer",
-      "Half-day coverage (5 hours)",
-      "Unlimited soft copies",
-      "50+ edited highlights",
-      "Digital delivery in 5 days",
-      "Pre-event planning call",
-    ],
-    notIncluded: ["Video", "Drone", "Album"],
     builderPreset: {
       events: [
         { name: "Your Event", duration: "Half Day" as const, services: { "candid-photo": 1 }, addOns: {} },
@@ -95,19 +85,7 @@ export const PACKAGES = [
   },
   {
     name: "Signature",
-    subtitle: "Most popular for weddings",
     popular: true,
-    features: [
-      "2 Photographers (Traditional + Candid)",
-      "Full day coverage (10 hours)",
-      "Cinematic highlight reel",
-      "Drone aerial coverage",
-      "25-sheet premium album",
-      "150+ edited highlights",
-      "Digital delivery in 5 days",
-      "Dedicated coordinator",
-    ],
-    notIncluded: ["LED Wall", "Same-Day Edit"],
     builderPreset: {
       events: [
         { name: "Your Event", duration: "Full Day" as const, services: { "traditional-photo": 1, "candid-photo": 1, "cinematic-video": 1 }, addOns: { drone: 1 } },
@@ -117,19 +95,6 @@ export const PACKAGES = [
   },
   {
     name: "Grand",
-    subtitle: "The complete experience",
-    features: [
-      "2 Photographers + Videographer",
-      "Full day coverage (10 hours)",
-      "Cinematic film + Traditional video",
-      "Same-day edit highlight",
-      "Drone aerial coverage",
-      "LED Wall backdrop",
-      "40-sheet premium album",
-      "300+ edited highlights",
-      "Priority 3-day delivery",
-    ],
-    notIncluded: [],
     builderPreset: {
       events: [
         { name: "Your Event", duration: "Full Day" as const, services: { "traditional-photo": 1, "candid-photo": 1, "traditional-video": 1, "cinematic-video": 1 }, addOns: { drone: 1, "same-day-edit": 1, "led-wall": 1 } },

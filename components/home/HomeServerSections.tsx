@@ -1,26 +1,16 @@
-"use client"
-
 import { Clock, Shield, Receipt, Smartphone, ArrowRight } from "lucide-react"
 import Link from "next/link"
 
 import { services as allServices } from "@/app/services/data"
 import { getHomeServices } from "@/components/home/home-data"
 import { getHomeMessages } from "@/lib/i18n/home"
-import { useLocaleSync } from "@/lib/i18n/locale-sync"
+import type { AppLocale } from "@/lib/i18n/config"
 import { withLocalePathname } from "@/lib/i18n/routing"
 
 const FEATURE_ICONS = [Clock, Shield, Receipt, Smartphone] as const
 
-function useRouteHomeMessages() {
-  const { routeLocale } = useLocaleSync()
-  return {
-    messages: getHomeMessages(routeLocale),
-    routeLocale,
-  }
-}
-
-export function TrustBar() {
-  const { messages } = useRouteHomeMessages()
+export function TrustBar({ locale }: { locale: AppLocale }) {
+  const messages = getHomeMessages(locale)
 
   return (
     <div className="py-5 bg-slate-900 dark:bg-slate-800 border-y border-white/5">
@@ -41,9 +31,9 @@ export function TrustBar() {
   )
 }
 
-export function ServicesSection() {
-  const { messages } = useRouteHomeMessages()
-  const homeServices = getHomeServices(messages.locale)
+export function ServicesSection({ locale }: { locale: AppLocale }) {
+  const messages = getHomeMessages(locale)
+  const homeServices = getHomeServices(locale)
 
   return (
     <section id="services" className="py-24 md:py-32 bg-white dark:bg-slate-950 transition-colors duration-500">
@@ -66,7 +56,7 @@ export function ServicesSection() {
             const Icon = service.icon
             return (
               <Link
-                href={withLocalePathname(`/services/${service.slug}`, messages.locale)}
+                href={withLocalePathname(`/services/${service.slug}`, locale)}
                 key={index}
                 className="group relative bg-slate-50 dark:bg-slate-900 rounded-2xl p-6 border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10"
               >
@@ -82,7 +72,10 @@ export function ServicesSection() {
                     </h3>
                     <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{service.desc}</p>
                     <div className="flex items-center justify-between mt-3">
-                      <span className="text-amber-700 dark:text-amber-300 font-bold text-sm">{messages.services.pricePrefix} {service.price}</span>
+                      {service.price !== null
+                        ? <span className="text-amber-700 dark:text-amber-300 font-bold text-sm">{messages.services.pricePrefix} {service.price}</span>
+                        : <span className="text-amber-600 dark:text-amber-400 text-xs font-medium uppercase tracking-wider">{messages.services.coverageStyle}</span>
+                      }
                       <ArrowRight size={14} className="text-slate-300 dark:text-slate-600 group-hover:text-amber-500 group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
@@ -93,7 +86,7 @@ export function ServicesSection() {
         </div>
 
         <div className="text-center mt-10">
-          <Link href={withLocalePathname("/services", messages.locale)} className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5">
+          <Link href={withLocalePathname("/services", locale)} className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-8 py-3.5 rounded-xl font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/20 hover:-translate-y-0.5">
             {messages.services.viewAllPrefix} {allServices.length}+ {messages.services.viewAllSuffix} <ArrowRight size={16} />
           </Link>
         </div>
@@ -102,8 +95,8 @@ export function ServicesSection() {
   )
 }
 
-export function WhyOrvex() {
-  const { messages } = useRouteHomeMessages()
+export function WhyOrvex({ locale }: { locale: AppLocale }) {
+  const messages = getHomeMessages(locale)
 
   return (
     <section id="why-us" className="py-24 md:py-32 bg-gradient-to-b from-slate-900 to-slate-950 relative overflow-hidden">
@@ -152,8 +145,8 @@ export function WhyOrvex() {
   )
 }
 
-export function HowItWorks() {
-  const { messages } = useRouteHomeMessages()
+export function HowItWorks({ locale }: { locale: AppLocale }) {
+  const messages = getHomeMessages(locale)
 
   return (
     <section className="py-24 md:py-32 bg-slate-50 dark:bg-slate-900 transition-colors duration-500">
@@ -188,8 +181,8 @@ export function HowItWorks() {
   )
 }
 
-export function TestimonialsSection() {
-  const { messages } = useRouteHomeMessages()
+export function TestimonialsSection({ locale }: { locale: AppLocale }) {
+  const messages = getHomeMessages(locale)
 
   return (
     <section className="py-24 md:py-32 bg-white dark:bg-slate-950 transition-colors duration-500">

@@ -63,18 +63,11 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const requestHeaders = await headers()
-  const pathname = requestHeaders.get("next-url") ?? requestHeaders.get("x-invoke-path") ?? requestHeaders.get("x-matched-path")
+  const rawSearch = requestHeaders.get("x-search-string") ?? ""
+  const searchString = rawSearch.startsWith("?") ? rawSearch.slice(1) : rawSearch
   const locale = await resolveRequestLocale()
   const copy = getMetadataCopy("root", locale)
   const localizedHomeUrl = getAbsoluteUrl(getLocalizedPathname("/", locale))
-
-  console.log("[RootLayout]", {
-    pathname,
-    routeLocale: null,
-    renderedLocale: locale,
-    isPending: null,
-    targetLocale: null,
-  })
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -127,10 +120,10 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <LocaleSyncProvider renderedLocale={locale}>
-          <Navbar />
+          <Navbar searchString={searchString} />
           {children}
-          <Footer />
-          <WhatsAppFloat />
+          <Footer locale={locale} />
+          <WhatsAppFloat locale={locale} />
           <Analytics />
         </LocaleSyncProvider>
       </body>

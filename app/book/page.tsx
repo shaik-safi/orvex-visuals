@@ -20,11 +20,14 @@ import { getPageMessages } from "@/lib/i18n/pages"
 import { applyTemplate } from "@/lib/i18n/home"
 import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
 import { closePopupWindow, navigatePopupWindow, openPopupPlaceholder, openPopupWindow } from "@/lib/popup-handoff"
+import { localizeQuoteValue } from "@/lib/quote-localization"
+import { detectCoverageProfileFromSelectionNames, COVERAGE_PROFILES } from "@/lib/pricing-presets"
 
 interface PlanData {
   services: { name: string; coverage: string; price: number; selections?: { name: string; qty: number; unitPrice?: number }[] }[]
   addOns: { name: string; qty: number; price: number }[]
   total: number
+  packageName?: string
   date?: string
   timeSlot?: string
   city?: string
@@ -47,6 +50,7 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
   const [savedEstimateHref, setSavedEstimateHref] = useState("")
   const [plan, setPlan] = useState<PlanData | null>(null)
   const [planReady, setPlanReady] = useState(false)
+  const [shouldClearStoredPlan, setShouldClearStoredPlan] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [form, setForm] = useState({
     name: "",
@@ -61,10 +65,21 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
   })
 
   useEffect(() => {
+    if (!shouldClearStoredPlan || typeof window === "undefined") return
+
+    window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
+    setShouldClearStoredPlan(false)
+  }, [shouldClearStoredPlan])
+
+  useEffect(() => {
     if (planLoadedRef.current) return
     planLoadedRef.current = true
 
     let parsedPlan: unknown = null
+    const clearStoredPlan = () => {
+      if (typeof window === "undefined") return
+      window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
+    }
 
     if (typeof window !== "undefined") {
       const storedPlan = window.sessionStorage.getItem(BOOKING_PLAN_STORAGE_KEY)
@@ -73,9 +88,7 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
           parsedPlan = JSON.parse(storedPlan)
         } catch {
           parsedPlan = null
-        }
-        if (parsedPlan) {
-          window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
+          clearStoredPlan()
         }
       }
     }
@@ -84,12 +97,33 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
       try {
         const parsed = parsedPlan as PlanData
         if (!parsed || !Array.isArray(parsed.services) || !Array.isArray(parsed.addOns) || typeof parsed.total !== "number") {
+          clearStoredPlan()
           setPlanReady(true)
           router.replace(withLocalePathname("/pricing", locale))
           return
         }
-        setPlan(parsed)
-        const serviceNames = parsed.services.map((serviceItem) => serviceItem.name).join(", ")
+        // Normalize stored labels to the active route locale so summary, form prefill,
+        // WhatsApp copy, and quote-save payload all use consistent locale-appropriate text.
+        // Unknown values pass through unchanged (Decision A: locale-active labels are
+        // the storage contract; bidirectional normalization is read-side only).
+        const normalizedPlan: PlanData = {
+          ...parsed,
+          services: parsed.services.map((serviceItem) => ({
+            ...serviceItem,
+            name: localizeQuoteValue(serviceItem.name, locale) ?? serviceItem.name,
+            coverage: localizeQuoteValue(serviceItem.coverage, locale) ?? serviceItem.coverage,
+            selections: (serviceItem.selections ?? []).map((sel) => ({
+              ...sel,
+              name: localizeQuoteValue(sel.name, locale) ?? sel.name,
+            })),
+          })),
+          addOns: parsed.addOns.map((addOn) => ({
+            ...addOn,
+            name: localizeQuoteValue(addOn.name, locale) ?? addOn.name,
+          })),
+        }
+        setPlan(normalizedPlan)
+        const serviceNames = normalizedPlan.services.map((serviceItem) => serviceItem.name).join(", ")
         const autoBudget = `\u20b9${parsed.total.toLocaleString("en-IN")}`
         setForm((prev: typeof form) => ({
           ...prev,
@@ -102,9 +136,11 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
           budget: autoBudget,
         }))
         setPlanReady(true)
+        // Do not clear sessionStorage here — plan must survive a locale switch on the
+        // booking page. The store is cleared after successful quote submission instead.
         return
       } catch {
-        // no-op
+        clearStoredPlan()
       }
     }
 
@@ -224,6 +260,7 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
         customerName: form.name,
         customerPhone: form.phone,
         customerEmail: form.email || undefined,
+        packageName: plan?.packageName || undefined,
         date: form.eventDate || undefined,
         timeSlot: plan?.timeSlot || undefined,
         city: plan?.city || undefined,
@@ -245,6 +282,11 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
         globalAddOns: plan?.addOns,
         total: plan?.total,
       }, { locale })
+      // Clear the stored plan after a successful save so locale switches before
+      // submission still work, but a back-navigation to /book starts fresh.
+      if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
+      }
       const savedDetails = buildSavedWhatsAppDetails(quoteId, accessToken)
       nextSubmissionResult = "saved"
       nextSavedEstimateHref = savedDetails.savedEstimateHref
@@ -361,6 +403,20 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
               </div>
             ))}
           </div>
+          {(() => {
+            const selectionNames = plan.services.flatMap((s) => (s.selections ?? []).map((sel) => sel.name))
+            const profileId = detectCoverageProfileFromSelectionNames(selectionNames)
+            if (!profileId) return null
+            const profile = COVERAGE_PROFILES[profileId]
+            const profileCopy = getPageMessages(locale).pricingPage.coverageProfiles[profile.messageKey as keyof ReturnType<typeof getPageMessages>["pricingPage"]["coverageProfiles"]]
+            if (!profileCopy) return null
+            return (
+              <div className="mt-2 pt-2 flex items-center gap-1.5 text-xs">
+                <span className="font-medium text-amber-600 dark:text-amber-400">{messages.summary.coverageFormat}:</span>
+                <span className="text-slate-600 dark:text-slate-300">{profileCopy.label} · {profileCopy.crewLabel}</span>
+              </div>
+            )
+          })()}
           <div className="border-t border-amber-200 dark:border-amber-500/20 mt-3 pt-3 flex justify-between font-bold text-amber-700 dark:text-amber-400">
             <span>{messages.summary.total}</span>
             <span>&#8377;{plan.total.toLocaleString("en-IN")}</span>

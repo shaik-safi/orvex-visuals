@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -26,14 +26,123 @@ const localeOptions: { value: AppLocale; label: string }[] = [
   { value: "hi", label: "HI" },
 ]
 
-export default function Navbar() {
+// ── Locale switcher items (pure render, no hooks) ─────────────────────────
+function LocaleSwitcherItems({
+  currentLocale,
+  localeHref,
+  handleLocaleChange,
+  variant,
+}: {
+  currentLocale: AppLocale
+  localeHref: (targetLocale: AppLocale) => string
+  handleLocaleChange?: (targetLocale: AppLocale) => (event: React.MouseEvent<HTMLAnchorElement>) => void
+  variant: "desktop" | "mobile"
+}) {
+  const containerClass =
+    variant === "desktop"
+      ? "hidden sm:flex items-center rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/70 dark:bg-slate-900/60 p-1"
+      : "mb-4 flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 p-1"
+
+  return (
+    <div className={containerClass}>
+      {localeOptions.map((option) => {
+        const active = option.value === currentLocale
+        const linkClass =
+          variant === "desktop"
+            ? `px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${active ? "pointer-events-none" : ""} ${
+                active ? "bg-amber-500 text-white" : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              }`
+            : `flex-1 text-center px-2.5 py-2 text-xs font-semibold rounded-lg transition-all ${active ? "pointer-events-none" : ""} ${
+                active ? "bg-amber-500 text-white" : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+              }`
+        return (
+          <Link
+            key={option.value}
+            href={localeHref(option.value)}
+            onClick={handleLocaleChange?.(option.value)}
+            aria-disabled={active}
+            className={linkClass}
+          >
+            {option.label}
+          </Link>
+        )
+      })}
+    </div>
+  )
+}
+
+// ── Locale switcher: useSearchParams isolated behind Suspense ─────────────
+function LocaleSwitcherContent({
+  pathname,
+  routeLocale,
+  variant,
+  onClose,
+}: {
+  pathname: string
+  routeLocale: AppLocale
+  variant: "desktop" | "mobile"
+  onClose: () => void
+}) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const query = searchParams.toString()
+  const pathWithQuery = query ? `${pathname}?${query}` : pathname
+  const localeHref = (targetLocale: AppLocale) => withLocaleHref(pathWithQuery, targetLocale)
+
+  const handleLocaleChange =
+    (targetLocale: AppLocale) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      if (targetLocale === routeLocale) {
+        event.preventDefault()
+        onClose()
+        return
+      }
+      event.preventDefault()
+      onClose()
+      router.replace(localeHref(targetLocale), { scroll: false })
+    }
+
+  return (
+    <LocaleSwitcherItems
+      currentLocale={routeLocale}
+      localeHref={localeHref}
+      handleLocaleChange={handleLocaleChange}
+      variant={variant}
+    />
+  )
+}
+
+// ── Locale switcher fallback (SSR + pre-hydration) ──────────────────────────
+// searchString is threaded from the server layout via the next-url request
+// header, so the SSR-rendered fallback already carries the full query string
+// (e.g. token=... on quote/[id] routes). No window access needed.
+function LocaleSwitcherFallback({
+  currentLocale,
+  pathname,
+  searchString,
+  variant,
+}: {
+  currentLocale: AppLocale
+  pathname: string
+  searchString: string
+  variant: "desktop" | "mobile"
+}) {
+  const fullPath = searchString ? `${pathname}?${searchString}` : pathname
+  const localeHref = (targetLocale: AppLocale) => withLocaleHref(fullPath, targetLocale)
+  return (
+    <LocaleSwitcherItems
+      currentLocale={currentLocale}
+      localeHref={localeHref}
+      variant={variant}
+    />
+  )
+}
+
+export default function Navbar({ searchString = "" }: { searchString?: string }) {
   const { isDark, toggle } = useDarkMode()
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const router = useRouter()
   const pathname = usePathname() || "/"
-  const searchParams = useSearchParams()
-  const { renderedLocale, routeLocale, isPending: isLocaleSyncPending } = useLocaleSync()
+  const { routeLocale } = useLocaleSync()
 
   const currentLocale = routeLocale
   const messages = getCommonMessages(currentLocale)
@@ -45,16 +154,6 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
-
-  useEffect(() => {
-    console.log("[Navbar]", {
-      pathname,
-      routeLocale,
-      renderedLocale,
-      isPending: isLocaleSyncPending,
-      targetLocale: null,
-    })
-  }, [pathname, routeLocale, renderedLocale, isLocaleSyncPending])
 
   const normalizeHref = (href: string) => stripLocaleFromPathname(href.split("?")[0].split("#")[0] || "/")
 
@@ -116,41 +215,8 @@ export default function Navbar() {
       : "lg:hidden p-2.5 rounded-xl transition-all duration-300 text-slate-800"
     : "lg:hidden p-2.5 rounded-xl transition-all duration-300 text-slate-700 dark:text-white"
 
-  const query = searchParams.toString()
-  const pathWithQuery = query ? `${pathname}?${query}` : pathname
-
-  const localeHref = (targetLocale: AppLocale) => withLocaleHref(pathWithQuery, targetLocale)
-
-  const handleLocaleChange = (targetLocale: AppLocale) => (event: React.MouseEvent<HTMLAnchorElement>) => {
-    console.log("[Navbar.handleLocaleChange]", {
-      pathname,
-      routeLocale,
-      renderedLocale,
-      isPending: isLocaleSyncPending,
-      targetLocale,
-    })
-
-    if (targetLocale === routeLocale) {
-      console.log("[Navbar.handleLocaleChange:block]", {
-        pathname,
-        routeLocale,
-        renderedLocale,
-        isPending: isLocaleSyncPending,
-        targetLocale,
-      })
-      event.preventDefault()
-      setIsOpen(false)
-      return
-    }
-
-    event.preventDefault()
-    setIsOpen(false)
-
-    router.replace(localeHref(targetLocale), { scroll: false })
-  }
-
   const estimateHref = withLocaleHref(
-    buildPricingHandoffHref({ from: "navbar", source: "Site Navigation", intent: "availability" }),
+    buildPricingHandoffHref({ from: "navbar", source: "Site Navigation", intent: "availability", scrollToBuilder: true }),
     routeLocale
   )
   const whatsappHref = getWhatsAppLink(messages.navbar.whatsappTemplate)
@@ -212,25 +278,9 @@ export default function Navbar() {
           </div>
 
           <div className="flex min-w-0 items-center gap-2">
-            <div className="hidden sm:flex items-center rounded-xl border border-slate-200/60 dark:border-slate-700/60 bg-white/70 dark:bg-slate-900/60 p-1">
-              {localeOptions.map((option) => {
-                const active = option.value === currentLocale
-                return (
-                  <Link
-                    key={option.value}
-                    href={localeHref(option.value)}
-                    onClick={handleLocaleChange(option.value)}
-                    aria-disabled={active}
-                    className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${active ? "pointer-events-none" : ""} ${active
-                      ? "bg-amber-500 text-white"
-                      : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      }`}
-                  >
-                    {option.label}
-                  </Link>
-                )
-              })}
-            </div>
+            <Suspense fallback={<LocaleSwitcherFallback variant="desktop" currentLocale={currentLocale} pathname={pathname} searchString={searchString} />}>
+              <LocaleSwitcherContent variant="desktop" pathname={pathname} routeLocale={routeLocale} onClose={() => setIsOpen(false)} />
+            </Suspense>
 
             <a href={callHref} className={utilityActionClasses} aria-label={messages.navbar.call}>
               <Phone size={15} />
@@ -279,25 +329,9 @@ export default function Navbar() {
 
         <div id="mobile-navigation" className={`lg:hidden overflow-hidden transition-all duration-500 ease-out ${isOpen ? "max-h-[calc(100svh-5.5rem)] opacity-100" : "max-h-0 opacity-0"}`}>
           <div className="mt-2 max-h-[calc(100svh-7rem)] overflow-y-auto overscroll-contain rounded-2xl bg-white/95 p-4 pb-6 pt-2 shadow-xl backdrop-blur-xl dark:bg-slate-900/95">
-            <div className="mb-4 flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 p-1">
-              {localeOptions.map((option) => {
-                const active = option.value === currentLocale
-                return (
-                  <Link
-                    key={option.value}
-                    href={localeHref(option.value)}
-                    onClick={handleLocaleChange(option.value)}
-                    aria-disabled={active}
-                    className={`flex-1 text-center px-2.5 py-2 text-xs font-semibold rounded-lg transition-all ${active ? "pointer-events-none" : ""} ${active
-                      ? "bg-amber-500 text-white"
-                      : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      }`}
-                  >
-                    {option.label}
-                  </Link>
-                )
-              })}
-            </div>
+            <Suspense fallback={<LocaleSwitcherFallback variant="mobile" currentLocale={currentLocale} pathname={pathname} searchString={searchString} />}>
+              <LocaleSwitcherContent variant="mobile" pathname={pathname} routeLocale={routeLocale} onClose={() => setIsOpen(false)} />
+            </Suspense>
 
             <div className="mb-4 space-y-3">
               <Link

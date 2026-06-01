@@ -53,6 +53,7 @@ export type HomeMessages = {
     pricePrefix: string
     viewAllPrefix: string
     viewAllSuffix: string
+    coverageStyle: string
   }
   why: {
     badge: string

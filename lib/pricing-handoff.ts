@@ -5,6 +5,7 @@ export interface PricingHandoffLinkOptions {
   service?: string
   packageName?: string
   template?: string
+  scrollToBuilder?: boolean
 }
 
 interface BlogPricingHandoffInput {
@@ -21,6 +22,7 @@ export function buildPricingHandoffHref({
   service,
   packageName,
   template,
+  scrollToBuilder,
 }: PricingHandoffLinkOptions): string {
   const params = new URLSearchParams()
   params.set("from", from)
@@ -29,11 +31,12 @@ export function buildPricingHandoffHref({
   if (service) params.set("service", service)
   if (packageName) params.set("package", packageName)
   if (template) params.set("template", template)
-  return `/pricing?${params.toString()}`
+  const href = `/pricing?${params.toString()}`
+  return scrollToBuilder ? `${href}#calculator` : href
 }
 
 export function getGalleryPricingHandoff(category: string): PricingHandoffLinkOptions {
-  const base = { from: "gallery", intent: "style" } as const
+  const base = { from: "gallery", intent: "style", scrollToBuilder: true } as const
 
   switch (category) {
     case "wedding":
@@ -55,7 +58,7 @@ export function getGalleryPricingHandoff(category: string): PricingHandoffLinkOp
 
 export function getBlogPricingHandoff({ title, slug, category, tags = [] }: BlogPricingHandoffInput): PricingHandoffLinkOptions {
   const searchText = `${title} ${slug} ${category} ${tags.join(" ")}`.toLowerCase()
-  const base = { from: "blog", source: title, intent: "quote" } as const
+  const base = { from: "blog", source: title, intent: "quote", scrollToBuilder: true } as const
 
   if (searchText.includes("pre-wedding")) {
     return { ...base, template: "Pre-Wedding Shoot" }

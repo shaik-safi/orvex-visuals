@@ -29,21 +29,51 @@
       ]
     },
     "stats": [
-      { "label": "Photo Delivery", "numberTemplate": "{PHOTO_DELIVERY_DAYS} Days" },
-      { "label": "Video Delivery", "numberTemplate": "{VIDEO_DELIVERY_DAYS} Days" },
-      { "label": "Advance To Confirm", "numberTemplate": "30%" },
-      { "label": "Copyright Yours", "numberTemplate": "100%" }
+      {
+        "label": "Photo Delivery",
+        "numberTemplate": "{PHOTO_DELIVERY_DAYS} Days"
+      },
+      {
+        "label": "Video Delivery",
+        "numberTemplate": "{VIDEO_DELIVERY_DAYS} Days"
+      },
+      {
+        "label": "Advance To Confirm",
+        "numberTemplate": "30%"
+      },
+      {
+        "label": "Copyright Yours",
+        "numberTemplate": "100%"
+      }
     ],
     "why": {
       "badge": "Why Orvex",
       "title": "What Sets Us Apart",
       "items": [
-        { "title": "Detail-Oriented", "description": "We obsess over every frame, every angle, every edit to ensure perfection." },
-        { "title": "Transparent Pricing", "description": "All prices are GST-inclusive. What we quote is what you pay. No surprises." },
-        { "title": "Quick Turnaround", "descriptionTemplate": "Photos in {PHOTO_DELIVERY_DAYS} working days. Videos in {VIDEO_DELIVERY_DAYS} working days." },
-        { "title": "Client-First Approach", "description": "Your vision drives our work. We listen, plan, and execute to your expectations." },
-        { "title": "Pro Equipment", "description": "Top-tier Sony and Canon gear with full backup sets on every shoot." },
-        { "title": "Always On Time", "description": "We arrive early, set up in advance, and never miss a moment." }
+        {
+          "title": "Detail-Oriented",
+          "description": "We obsess over every frame, every angle, every edit to ensure perfection."
+        },
+        {
+          "title": "Transparent Pricing",
+          "description": "All prices are GST-inclusive. What we quote is what you pay. No surprises."
+        },
+        {
+          "title": "Quick Turnaround",
+          "descriptionTemplate": "Photos in {PHOTO_DELIVERY_DAYS} working days. Videos in {VIDEO_DELIVERY_DAYS} working days."
+        },
+        {
+          "title": "Client-First Approach",
+          "description": "Your vision drives our work. We listen, plan, and execute to your expectations."
+        },
+        {
+          "title": "Pro Equipment",
+          "description": "Top-tier Sony and Canon gear with full backup sets on every shoot."
+        },
+        {
+          "title": "Always On Time",
+          "description": "We arrive early, set up in advance, and never miss a moment."
+        }
       ]
     },
     "team": {
@@ -81,22 +111,24 @@
       "titleLine1": "Every Moment",
       "titleHighlight": "Deserves",
       "titleLine2": "the Best",
-      "description": "From weddings to birthdays, corporate events to baby shoots - we have specialized photographers for every occasion."
+      "description": "Coverage for every event. Browse by type — weddings, pre-weddings, birthdays, babies, corporate, and more — or search below."
     },
     "searchPlaceholder": "Search services...",
     "categoryLabels": {
       "all": "All Services",
       "wedding": "Wedding",
       "pre-wedding": "Pre-Wedding",
-      "events": "Events and Ceremonies",
-      "baby-kids": "Baby and Kids",
+      "events": "Events",
+      "baby-kids": "Baby & Kids",
       "videography": "Videography",
-      "corporate": "Corporate and Portfolio",
-      "products": "Albums and Prints"
+      "corporate": "Corporate",
+      "products": "Albums & Prints"
     },
-    "resultsTemplate": "Showing {count} services",
+    "resultsTemplate": "{count} services",
     "popular": "Popular",
     "priceFrom": "From",
+    "contactForPricing": "Contact",
+    "variantBadge": "Style Variant",
     "viewDetails": "View Details",
     "emptyState": "No services found. Try a different search or category.",
     "cta": {
@@ -114,16 +146,16 @@
     },
     "hero": {
       "checkPricing": "Get Estimate",
-      "viewPackages": "View Packages",
+      "viewPackages": "View Coverage",
       "badgeGst": "GST Inclusive",
-      "badgeDeliveryTemplate": "{PHOTO_DELIVERY_DAYS}-Day Photo Delivery",
+      "badgeDeliveryTemplate": "{PHOTO_DELIVERY_DAYS} Working-Day Delivery",
       "badgeArea": "Bangalore and Beyond",
       "badgeSummary": "Estimate Summary Included"
     },
     "overview": {
       "badge": "About This Service",
       "title": "What We Offer",
-      "galleryAltTemplate": "{service} gallery image {index}",
+      "galleryAltTemplate": "{service} style reference {index}",
       "note": "Representative visual references while the verified client portfolio is being refreshed."
     },
     "packages": {
@@ -132,10 +164,20 @@
       "description": "For this service only. All prices GST-inclusive, no hidden charges.",
       "mostPopular": "MOST POPULAR",
       "durationPrefix": "Duration:",
-      "askTemplate": "Talk on WhatsApp",
-      "whatsappTemplate": "Hi Orvex, I'm interested in the {package} package for {service}. Can you guide me on availability and next steps?",
+      "viewEstimate": "Get Estimate",
       "customize": "Need something different? Mix and match services for your event.",
       "buildCustom": "Get Estimate"
+    },
+    "coverageEstimates": {
+      "badge": "Coverage Starting Points",
+      "titleTemplate": "Where to Start — {service}",
+      "description": "Representative totals computed from our base service rates. In the pricing builder, your estimate is shaped by your events, the coverage services selected for each, and any optional add-ons.",
+      "starterSummary": "Half-day candid photography coverage",
+      "signatureSummary": "Full-day photo + cinematic video + drone + album",
+      "grandSummary": "Full-day complete coverage team + premium album",
+      "getEstimate": "Get Estimate",
+      "customizeNote": "Every event is different. Your estimate updates with event count, duration, selected coverage services, and optional add-ons.",
+      "buildCustom": "Build Your Estimate"
     },
     "process": {
       "badge": "How It Works",
@@ -155,6 +197,22 @@
       "checkPricing": "Get Estimate",
       "whatsapp": "Talk on WhatsApp",
       "whatsappTemplate": "Hi Orvex, I'm interested in {service}. Can you help me choose the right coverage and check availability?"
+    },
+    "discovery": {
+      "viewCoverageTemplate": "View {name} Coverage",
+      "viewRelatedCoverage": "View Related Coverage",
+      "contactUs": "Contact Us",
+      "variantBridgeTitle": "Plan Your Coverage",
+      "variantBridgeNote": "This style is part of our {parent} coverage family. Use the pricing builder to plan your event coverage.",
+      "multiParentBridgeTitle": "Related Coverage Options",
+      "multiParentBridgeNote": "This service applies across multiple event types. Choose your primary event type to get started.",
+      "ancillaryBridgeTitle": "Discuss Your Requirements",
+      "ancillaryBridgeNote": "This service is arranged through a direct discussion — not through the online estimate builder. Share your brief with us and we will follow up with scope, timeline, and pricing.",
+      "variantBadge": "Style Variant",
+      "ancillaryBadge": "Book by Enquiry",
+      "ancillaryCtaTitleTemplate": "Interested in {service}?",
+      "ancillaryCtaDescription": "This service is scoped and priced through a direct consultation. Reach out on WhatsApp or the contact form and we will follow up with details.",
+      "ancillaryWhatsappTemplate": "Hi Orvex, I'm interested in {service}. Can you share details and check availability?"
     }
   },
   "blogPage": {
@@ -222,7 +280,7 @@
       "note": "These are style references, not presented as direct client proof."
     },
     "categories": {
-      "all": "All Work",
+      "all": "All Styles",
       "wedding": "Weddings",
       "pre-wedding": "Pre-Wedding",
       "events": "Events",
@@ -245,11 +303,11 @@
       "badge": "Contact Orvex",
       "titleLine1": "Tell Us About",
       "titleHighlight": "Your Event",
-      "description": "Ask a question, check availability, or share what you are planning. WhatsApp is usually the quickest way to reach us."
+      "description": "Ask a question, share what you are planning, or start a conversation before you are ready to book. WhatsApp is usually the quickest way to reach us."
     },
     "info": {
       "title": "Contact Info",
-      "description": "Choose the channel that feels easiest for you.",
+      "description": "WhatsApp is the quickest way to reach us. Use the form to share your details, or contact us directly.",
       "whatsapp": {
         "title": "WhatsApp (Fastest)",
         "subtitle": "Usually the quickest reply"
@@ -278,7 +336,7 @@
       "title": "Tell Us What You Need",
       "description": "Share a few details and we will reply with the best next step. If you prefer, you can continue on WhatsApp afterward.",
       "savedTitle": "Thanks, we have got your details",
-      "savedDescription": "We will review your inquiry and follow up using the details you shared.",
+      "savedDescription": "We will follow up during working hours. For a faster reply, use the WhatsApp button below to start a conversation now.",
       "waTitle": "Your WhatsApp message is ready",
       "waDescription": "We opened WhatsApp with your details. Review the draft there and send it when you are ready.",
       "waBlockedDescription": "We could not open WhatsApp automatically on this browser. Use the button below to continue with your prepared message.",
@@ -333,7 +391,7 @@
         },
         {
           "q": "How do I book a date?",
-          "a": "Submit the booking form or contact form first. Once we confirm availability, pay the required advance to lock your date."
+          "a": "Use the pricing builder to build your estimate, then submit an availability request. Once we confirm availability, pay the required advance to lock your date."
         },
         {
           "q": "Do you travel outside Bangalore?",
@@ -361,16 +419,17 @@
       "badge": "Availability Request",
       "titleLine1": "Share Your",
       "titleHighlight": "Request Details",
-      "description": "Share a few details and we will confirm availability and the best next step, usually within 2 hours."
+      "description": "Share a few details and we will confirm availability and the best next step, usually within 2 hours during working hours."
     },
     "summary": {
       "title": "Your Estimate Summary",
-      "total": "Total"
+      "total": "Total",
+      "coverageFormat": "Coverage Format"
     },
     "steps": {
       "details": "Your Details",
       "event": "Event Basics",
-      "budget": "Budget and Notes"
+      "budget": "Confirm and Send"
     },
     "fields": {
       "fullName": "Full Name *",
@@ -391,7 +450,14 @@
       "venue": "e.g., Palace Grounds, Bangalore",
       "requirements": "e.g., Need 2 photographers, want drone coverage, specific style preference..."
     },
-    "sourceOptions": ["Select", "Google Search", "Instagram", "Friend / Family", "Blog article", "Other"],
+    "sourceOptions": [
+      "Select",
+      "Google Search",
+      "Instagram",
+      "Friend / Family",
+      "Blog article",
+      "Other"
+    ],
     "errors": {
       "name": "Enter at least 2 characters",
       "phone": "Enter a valid 10-digit Indian mobile number",
@@ -406,7 +472,7 @@
       "preparing": "Preparing WhatsApp request..."
     },
     "trust": [
-      "Reply usually within 2 hours",
+      "Reply usually within 2 hours during working hours",
       "Your details stay private",
       "GST included from the start"
     ],
@@ -447,7 +513,7 @@
         "confirm": "Please confirm availability and the next step."
       }
     },
-    "fallback": "Preparing your booking form..."
+    "fallback": "Preparing your availability request..."
   },
   "privacyPage": {
     "title": "Privacy Policy",
@@ -455,11 +521,11 @@
     "sections": [
       {
         "title": "1. Information We Collect",
-        "body": "When you use our booking form, contact form, or WhatsApp, we may collect your name, phone number, email address (optional), event details (date, venue, type), and budget preferences. We do not collect payment card information. Payments, if applicable, are handled separately via UPI or bank transfer."
+        "body": "When you use our pricing calculator, booking form, contact form, or WhatsApp, we may collect your name, phone number, email address (optional), event details (date, venue, type), and budget preferences. We do not collect payment card information. Payments, if applicable, are handled separately via UPI or bank transfer."
       },
       {
         "title": "2. How We Use Your Information",
-        "body": "We use your information to respond to your inquiry, prepare estimates or booking summaries, coordinate your photography session, and continue the conversation over WhatsApp, email, or phone when needed. We never sell or rent your personal data for third-party marketing."
+        "body": "We use your information to respond to your inquiry, prepare your estimate summary, coordinate your photography session, and continue the conversation over WhatsApp, email, or phone when needed. We never sell or rent your personal data for third-party marketing."
       },
       {
         "title": "3. Photos and Media",
@@ -467,7 +533,7 @@
       },
       {
         "title": "4. Data Storage and Security",
-        "body": "Inquiry and booking details submitted through the site may be stored in secured systems that are accessible only to authorized team members. Some conversations may continue on WhatsApp or email after submission. Media retention and archival timelines can vary by project and are confirmed directly with the client instead of being guaranteed globally on the site."
+        "body": "Inquiry and estimate details submitted through the site may be stored in secured systems that are accessible only to authorized team members. Some conversations may continue on WhatsApp or email after submission. Media retention and archival timelines can vary by project and are confirmed directly with the client instead of being guaranteed globally on the site."
       },
       {
         "title": "5. Cookies and Analytics",
@@ -475,7 +541,7 @@
       },
       {
         "title": "6. Third-Party Services",
-        "body": "We use services such as WhatsApp Business (Meta) for communication, Firebase/Firestore for inquiry and booking storage, Google Drive or similar delivery tools for media handoff, and Vercel for hosting. Each service has its own privacy policy governing its handling of data."
+        "body": "We use services such as WhatsApp Business (Meta) for communication, Firebase/Firestore for inquiry and estimate storage, Google Drive or similar delivery tools for media handoff, and Vercel for hosting. Each service has its own privacy policy governing its handling of data."
       },
       {
         "title": "7. Your Rights",
@@ -541,7 +607,9 @@
   "quotePage": {
     "loading": "Opening your saved estimate...",
     "notFoundTitle": "Estimate Not Found",
-    "notFoundDescription": "This estimate does not exist or has expired.",
+    "notFoundDescription": "This link may have expired or the estimate was not found. Tap the button below to ask us to recover or resend it.",
+    "notFoundWhatsapp": "Ask on WhatsApp",
+    "notFoundWhatsappTemplate": "Hi {BRAND_NAME}, my saved estimate link is not working. Can you help me recover or resend it?",
     "newPackage": "Build a new estimate",
     "backToPricing": "Back to Pricing",
     "downloadPdf": "Download PDF",
@@ -559,6 +627,7 @@
       "service": "Service",
       "budget": "Estimate",
       "notes": "Notes",
+      "coverageFormat": "Coverage Format",
       "packageOverview": "Estimate Overview",
       "coveragePlan": "Coverage Plan",
       "addons": "Add-ons",
@@ -624,7 +693,7 @@
       "resetFilters": "Reset filters",
       "allSources": "All sources",
       "pricingSource": "Pricing calculator",
-      "bookingSource": "Direct booking form",
+      "bookingSource": "Booking page",
       "allCities": "All cities",
       "newest": "Newest first",
       "oldest": "Oldest first",
@@ -644,7 +713,22 @@
       "cancelled": "Cancelled"
     },
     "csv": {
-      "headers": ["ID", "Name", "Phone", "Email", "Status", "Event Date", "City", "Venue", "Service", "Total", "Source", "Found Via", "Notes", "Created At"],
+      "headers": [
+        "ID",
+        "Name",
+        "Phone",
+        "Email",
+        "Status",
+        "Event Date",
+        "City",
+        "Venue",
+        "Service",
+        "Total",
+        "Source",
+        "Found Via",
+        "Notes",
+        "Created At"
+      ],
       "filePrefix": "orvex-quotes",
       "exportTitle": "Export quotes as CSV"
     },
@@ -802,20 +886,25 @@
     "hero": {
       "tagline": "All prices are GST-inclusive, with no hidden charges",
       "titlePrefix": "Transparent",
-      "titleHighlight": "Pricing",
-      "description": "Review clear pricing, choose a starting point, and continue with a request only when the estimate feels right.",
-      "subDescription": "Start with a package or a guided setup. You can adjust coverage and optional add-ons before sending a request.",
-      "trustTags": ["GST Included", "No Hidden Fees", "You Own Copyright", "5-Day Delivery"]
+      "titleHighlight": "Estimate",
+      "description": "Review clear pricing, choose a starting point, and continue with an availability request only when the estimate feels right.",
+      "subDescription": "Start with a package or a guided setup. You can adjust coverage and optional add-ons before sending an availability request.",
+      "trustTags": [
+        "GST Included",
+        "No Hidden Fees",
+        "You Own Copyright",
+        "5 Working-Day Delivery"
+      ]
     },
     "packagesSection": {
       "badge": "Start with a Package",
       "title": "Choose Your Starting Point",
-      "description": "Pick the closest fit first. Below, you can review coverage and open optional add-ons only if you need them.",
+      "description": "Each package is a pre-selected set of coverage services for your event. Pick the closest fit as a starting point, then review and adjust the coverage in the estimate builder below.",
       "mostPopular": "Most Popular",
       "onwards": "onwards",
       "gstInclusive": "GST inclusive",
       "startWith": "Choose {name}",
-      "changeAny": "This becomes your starting estimate below. You can review coverage first and open optional add-ons only if you need them.",
+      "changeAny": "This loads a pre-selected set of coverage services into the estimate below. Review the services first, then open optional add-ons only if you need them.",
       "items": {
         "starter": {
           "name": "Starter",
@@ -863,7 +952,7 @@
     "cta": {
       "urgency": "Start with a clear estimate. Availability is confirmed after your request.",
       "title": "Review the Estimate, Then Continue",
-      "description": "Compare the options above, shape the coverage, and continue only when the estimate feels right.",
+      "description": "Compare the options above, shape the coverage, and send an availability request only when the estimate feels right.",
       "build": "Review Estimate",
       "chat": "Talk on WhatsApp",
       "whatsappTemplate": "Hi Orvex, I'd like to discuss my event requirements."
@@ -871,7 +960,7 @@
     "builder": {
       "badge": "Estimate Details",
       "title": "Review and Adjust Your Estimate",
-      "description": "Start with a package or guided setup, then adjust only if needed. Optional add-ons stay tucked away until you open them.",
+      "description": "A package or guided setup pre-selects coverage services for each of your events. Review the services, adjust if needed, then open optional add-ons only when you want them.",
       "suggestedTitle": "Suggested Start",
       "suggestedDescription": "Based on {source}, we prepared a starting estimate for you.",
       "suggestedLabelSuffix": "{label}",
@@ -897,7 +986,7 @@
       "halfDay": "Half Day",
       "fullDay": "Full Day",
       "servicesTitle": "Services",
-      "servicesHint": "Start with the suggested coverage below. Keep it simple or adjust it as needed.",
+      "servicesHint": "These are the coverage types for this event — photographers and videographers. Start with the suggestion or adjust as needed.",
       "premium": "Premium",
       "added": "Added",
       "rateDay": "day",
@@ -923,19 +1012,22 @@
       "estimatedTotal": "Current Estimate",
       "gstInclusive": "GST included",
       "computedNote": "This estimate updates with your selections. Nothing is locked in until you send a request.",
+      "coverageFormatLabel": "Coverage Format",
       "addServiceHint": "Add at least one coverage service to continue.",
       "nextStepLabel": "Next Step",
-      "nextStepHint": "Continue with your request when the estimate feels right, or talk on WhatsApp first if you want to check anything.",
-      "proceedToBook": "Continue to Request",
+      "nextStepHint": "Continue with an availability request when the estimate feels right, or talk on WhatsApp first if you want to check anything.",
+      "proceedToBook": "Request Availability",
       "openingWhatsapp": "Opening WhatsApp...",
       "sendEstimate": "Talk on WhatsApp",
       "estimateNote": "GST is included. Availability is confirmed after your request, and you can still adjust details before sending.",
+      "storageError": "We could not save this estimate in your browser yet. Please keep site storage enabled and try again before opening the request form.",
       "trustSignals": [
         "GST included from the start",
         "Optional add-ons stay visible",
         "Availability confirmed after your request",
         "You can adjust anything before sending"
       ],
+      "eventsHint": "Each entry is one occasion in your celebration — Haldi, Reception, Birthday. Coverage services are assigned per event.",
       "selectedStartingPointLabel": "Selected starting point",
       "selectedStartingPointPackage": "{name} package selected",
       "selectedStartingPointSetup": "{name} setup selected",
@@ -944,8 +1036,8 @@
       "hideStartingPointOptions": "Hide starting setup options",
       "optionalClosed": "Optional for now",
       "selectedCount": "{count} selected",
-      "eventExtrasHint": "Open only if this event needs extras like drone, live stream, or same-day edits.",
-      "globalExtrasClosedHint": "Open only if you need albums or full-estimate extras.",
+      "eventExtrasHint": "Open for optional extras for this event — drone, LED wall, or same-day edit. These are additions on top of your coverage services.",
+      "globalExtrasClosedHint": "Open for albums and print products that apply once across the full estimate.",
       "serviceCatalog": {
         "traditionalPhoto": {
           "name": "Traditional Photography",
@@ -1091,6 +1183,57 @@
         "extraLine": "- {name}{qty} (Rs.{value})",
         "total": "Current estimate: Rs.{value}",
         "confirm": "Please confirm availability and the next step."
+      }
+    },
+    "coverageProfiles": {
+      "photoOnly": {
+        "label": "Photography",
+        "summary": "Candid and traditional photography coverage",
+        "crewLabel": "1 Photographer",
+        "deliverables": [
+          "Edited photo gallery",
+          "Digital delivery in 5 days"
+        ]
+      },
+      "videoOnly": {
+        "label": "Videography",
+        "summary": "Traditional and cinematic video documentation",
+        "crewLabel": "1 Videographer",
+        "deliverables": [
+          "Full event video",
+          "Digital delivery"
+        ]
+      },
+      "photoStandard": {
+        "label": "Photography + Videography",
+        "summary": "Photography with full event video documentation",
+        "crewLabel": "1 Photographer + 1 Videographer",
+        "deliverables": [
+          "Edited photo gallery",
+          "Full event video",
+          "Digital delivery in 5 days"
+        ]
+      },
+      "photoCinematic": {
+        "label": "Photography + Cinematic Video",
+        "summary": "Photography with a cinematic highlight film",
+        "crewLabel": "1 Photographer + 1 Cinematographer",
+        "deliverables": [
+          "Edited photo gallery",
+          "Cinematic highlight film",
+          "Digital delivery in 5 days"
+        ]
+      },
+      "fullCoverage": {
+        "label": "Full Coverage",
+        "summary": "Complete photo and video coverage with a dedicated crew",
+        "crewLabel": "2 Photographers + 1 Videographer + 1 Cinematographer",
+        "deliverables": [
+          "Edited photo gallery",
+          "Full event video",
+          "Cinematic highlight film",
+          "Digital delivery in 5 days"
+        ]
       }
     },
     "comparisonSection": {

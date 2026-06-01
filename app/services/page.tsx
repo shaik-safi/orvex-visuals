@@ -16,7 +16,7 @@ import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { getPageMessages } from "@/lib/i18n/pages"
 import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
-import { categories, getLocalizedServices, services, type Category } from "./data"
+import { categories, getLocalizedServices, getServiceClassification, services, type Category } from "./data"
 
 type ServicesPageMessages = ReturnType<typeof getPageMessages>["servicesPage"]
 
@@ -46,10 +46,15 @@ function ServicesGrid({ routeLocale, messages }: { routeLocale: AppLocale; messa
   const [searchQuery, setSearchQuery] = useState("")
   const localizedServices = getLocalizedServices(routeLocale)
 
+  const roleOrder: Record<string, number> = { parent: 0, variant: 1, ancillary: 2 }
   const filtered = localizedServices.filter((s) => {
     const matchesCategory = activeCategory === "all" || s.category === activeCategory
     const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) || s.description.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
+  }).sort((a, b) => {
+    const ra = getServiceClassification(a.slug).role
+    const rb = getServiceClassification(b.slug).role
+    return (roleOrder[ra] ?? 1) - (roleOrder[rb] ?? 1)
   })
 
   const getCategoryLabel = (id: Category) => messages.categoryLabels[id]
@@ -125,7 +130,11 @@ function ServicesGrid({ routeLocale, messages }: { routeLocale: AppLocale; messa
 
                   <div className="absolute bottom-3 right-3">
                     <span className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm text-slate-900 dark:text-white text-sm font-bold px-3 py-1.5 rounded-lg">
-                      {messages.priceFrom} &#8377;{service.startingPrice.toLocaleString("en-IN")}
+                      {getServiceClassification(service.slug).role === "ancillary"
+                        ? messages.contactForPricing
+                        : getServiceClassification(service.slug).role === "variant"
+                        ? messages.variantBadge
+                        : `${messages.priceFrom} \u20B9${service.startingPrice.toLocaleString("en-IN")}`}
                     </span>
                   </div>
                 </div>
@@ -188,7 +197,7 @@ function ServicesCTA({ routeLocale, messages }: { routeLocale: AppLocale; messag
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href={withLocaleHref(buildPricingHandoffHref({ from: "services", source: "Services Page", intent: "custom-package" }), routeLocale)}
+            href={withLocaleHref(buildPricingHandoffHref({ from: "services", source: "Services Page", intent: "custom-package", scrollToBuilder: true }), routeLocale)}
             className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
           >
             {messages.cta.build}

@@ -741,16 +741,19 @@ The main package cards come from `PACKAGES`.
 
 Each package contains:
 
-- visible feature text
-- `notIncluded`
-- `builderPreset`
+- `builderPreset` — the service and add-on composition used for price computation and builder pre-fill
+
+Feature text displayed on the package cards is owned exclusively by the i18n message files:
+
+- English: `lib/i18n/messages/pages.en.json` → `pricingPage.packagesSection.items`
+- Hindi: `lib/i18n/messages/pages.hi.json` → `pricingPage.packagesSection.items`
 
 Important rule:
 
 If you change what a package includes, update both:
 
-1. `builderPreset`
-2. visible feature / exclusion text
+1. `builderPreset` in `lib/constants.ts` — controls the price and builder pre-fill
+2. Feature text in `pages.en.json` and `pages.hi.json` — controls what the card displays
 
 Otherwise the card text and the actual computed total will no longer match.
 
@@ -1583,11 +1586,9 @@ lib/constants.ts
 
 Update the package inside `PACKAGES`:
 
-- `features`
-- `notIncluded`
-- `builderPreset`
+- `builderPreset` — controls the service composition, price computation, and builder pre-fill
 
-If pricing page wording also needs to change, update `pricingPage` text in `pages.en.json` and `pages.hi.json`.
+To change what the package card displays (name, subtitle, feature list), edit `pricingPage.packagesSection.items` in `pages.en.json` and `pages.hi.json`.
 
 ### Change WhatsApp text
 

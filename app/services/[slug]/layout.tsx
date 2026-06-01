@@ -3,7 +3,7 @@ import type React from "react"
 import { PHOTO_DELIVERY_DAYS } from "@/lib/constants"
 import { buildLocalizedMetadata } from "@/lib/i18n/metadata"
 import { resolveRequestLocale } from "@/lib/i18n/resolve-locale"
-import { getLocalizedServiceDetail, services } from "../data"
+import { getLocalizedServiceDetail, getServiceClassification, services } from "../data"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -14,34 +14,59 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const locale = await resolveRequestLocale()
   const { slug } = await params
   const service = getLocalizedServiceDetail(slug, locale)
-  const startingPrice = service.packages[0]?.price.toLocaleString("en-IN") || "7,999"
+  const { role } = getServiceClassification(slug)
+  const isAncillary = role === "ancillary"
 
   const title = locale === "hi"
-    ? `${service.name} बेंगलुरु में - शुरुआती कीमत ₹${startingPrice}`
-    : `${service.name} in Bangalore - Starting ₹${startingPrice}`
+    ? `${service.name} बेंगलुरु में - Orvex Visuals`
+    : `${service.name} in Bangalore - Orvex Visuals`
+
+  const descriptionSuffix = isAncillary
+    ? locale === "hi"
+      ? " अपने प्रोजेक्ट के बारे में बात करने के लिए संपर्क करें।"
+      : " Contact us to discuss your project."
+    : locale === "hi"
+      ? ` ${PHOTO_DELIVERY_DAYS}-दिन की फोटो डिलीवरी और GST शामिल। ऑनलाइन प्राइसिंग देखें।`
+      : ` ${PHOTO_DELIVERY_DAYS}-day photo delivery, GST inclusive. View pricing online.`
 
   const description = locale === "hi"
-    ? `${service.description} Orvex Visuals द्वारा बेंगलुरु में प्रोफेशनल ${service.name} सेवाएं। ${service.packages.length} पैकेज ₹${startingPrice} से शुरू। ${PHOTO_DELIVERY_DAYS}-दिन की फोटो डिलीवरी और GST शामिल।`
-    : `${service.description} Professional ${service.name.toLowerCase()} services in Bangalore by Orvex Visuals. ${service.packages.length} packages starting ₹${startingPrice}. ${PHOTO_DELIVERY_DAYS}-day photo delivery, GST inclusive.`
+    ? `${service.description} Orvex Visuals द्वारा बेंगलुरु में प्रोफेशनल ${service.name} सेवाएं।${descriptionSuffix}`
+    : `${service.description} Professional ${service.name.toLowerCase()} services in Bangalore by Orvex Visuals.${descriptionSuffix}`
 
-  const keywords = locale === "hi"
-    ? [
-        `${service.name} बेंगलुरु`,
-        `${service.name} मेरे पास`,
-        `${service.name} कीमत`,
-        `${service.name} पैकेज`,
-        "बेंगलुरु फोटोग्राफर",
-        "Orvex Visuals",
-      ]
-    : [
-        `${service.name.toLowerCase()} Bangalore`,
-        `${service.name.toLowerCase()} near me`,
-        `best ${service.name.toLowerCase()}`,
-        `${service.name.toLowerCase()} price`,
-        `${service.name.toLowerCase()} packages`,
-        "photographer Bangalore",
-        "Orvex Visuals",
-      ]
+  const keywords = isAncillary
+    ? locale === "hi"
+      ? [
+          `${service.name} बेंगलुरु`,
+          `${service.name} मेरे पास`,
+          `${service.name} सेवा`,
+          "बेंगलुरु फोटोग्राफर",
+          "Orvex Visuals",
+        ]
+      : [
+          `${service.name.toLowerCase()} Bangalore`,
+          `${service.name.toLowerCase()} near me`,
+          `${service.name.toLowerCase()} service`,
+          "photographer Bangalore",
+          "Orvex Visuals",
+        ]
+    : locale === "hi"
+      ? [
+          `${service.name} बेंगलुरु`,
+          `${service.name} मेरे पास`,
+          `${service.name} अनुमान`,
+          `${service.name} प्राइसिंग`,
+          "बेंगलुरु फोटोग्राफर",
+          "Orvex Visuals",
+        ]
+      : [
+          `${service.name.toLowerCase()} Bangalore`,
+          `${service.name.toLowerCase()} near me`,
+          `best ${service.name.toLowerCase()}`,
+          `${service.name.toLowerCase()} pricing`,
+          `${service.name.toLowerCase()} estimate`,
+          "photographer Bangalore",
+          "Orvex Visuals",
+        ]
 
   return buildLocalizedMetadata(locale, {
     pathname: `/services/${slug}`,

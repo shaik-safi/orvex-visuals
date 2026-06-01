@@ -65,6 +65,7 @@ interface QuoteRow {
   customerName?: string
   customerPhone?: string
   customerEmail?: string
+  packageName?: string
   date?: string
   timeSlot?: string
   city?: string
@@ -198,6 +199,12 @@ function paymentStatusLabel(status: QuotePaymentStatus, messages: AdminMessages)
   return messages.payments.statuses[status]
 }
 
+function sourceDisplayLabel(source: string, messages: AdminMessages) {
+  if (source === "calculator") return messages.filters.pricingSource
+  if (source === "booking") return messages.filters.bookingSource
+  return source
+}
+
 function isAppLocale(value: unknown): value is AppLocale {
   return value === "en" || value === "hi"
 }
@@ -214,6 +221,17 @@ function countQuotesByPaymentStatus(quotes: QuoteRow[], status: QuotePaymentStat
   return quotes.filter((quote) => getQuotePaymentStatus(getQuoteTotalAmount(quote.total), quote.amountReceived) === status).length
 }
 
+function getQuoteServiceSummary(quote: Pick<QuoteRow, "packageName" | "service" | "events">) {
+  const eventSummary = quote.events?.map((event) => event.name).join(" + ") ?? ""
+  const serviceSummary = quote.service ?? eventSummary
+
+  if (quote.packageName && serviceSummary) {
+    return `${quote.packageName} - ${serviceSummary}`
+  }
+
+  return quote.packageName ?? serviceSummary
+}
+
 function exportCSV(quotes: QuoteRow[], localeTag: string, messages: AdminMessages) {
   const headers = messages.csv.headers
   const rows = quotes.map((q) => [
@@ -225,7 +243,7 @@ function exportCSV(quotes: QuoteRow[], localeTag: string, messages: AdminMessage
     q.date ?? "",
     q.city ?? "",
     q.venue ?? "",
-    q.service ?? (q.events?.map((e) => e.name).join(" + ") ?? ""),
+    getQuoteServiceSummary(q),
     q.total ?? "",
     q.source ?? "",
     q.foundVia ?? "",
@@ -1318,11 +1336,11 @@ function QuoteDetail({
       )}
 
       <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-slate-300">
-        {quote.service && <span><span className="text-slate-500">{messages.quick.serviceLabel}</span> {quote.service}</span>}
+        {getQuoteServiceSummary(quote) && <span><span className="text-slate-500">{messages.quick.serviceLabel}</span> {getQuoteServiceSummary(quote)}</span>}
         {quote.budget && <span><span className="text-slate-500">{messages.quick.budgetLabel}</span> {quote.budget}</span>}
-        {quote.source && <span><span className="text-slate-500">{messages.quick.sourceLabel}</span> {quote.source}</span>}
+        {quote.source && <span><span className="text-slate-500">{messages.quick.sourceLabel}</span> {sourceDisplayLabel(quote.source, messages)}</span>}
         {quote.foundVia && <span><span className="text-slate-500">{messages.quick.foundViaLabel}</span> {quote.foundVia}</span>}
-        {!quote.service && !quote.budget && !quote.source && !quote.foundVia && (
+        {!getQuoteServiceSummary(quote) && !quote.budget && !quote.source && !quote.foundVia && (
           <span className="text-slate-500">{messages.emptyValue}</span>
         )}
       </div>
@@ -1515,7 +1533,7 @@ function Dashboard({
 
       if (filters.search) {
         const term = filters.search.toLowerCase()
-        const searchable = [quote.customerName, quote.customerPhone, quote.customerEmail, quote.city, quote.venue, quote.service, quote.notes]
+        const searchable = [quote.customerName, quote.customerPhone, quote.customerEmail, quote.city, quote.venue, getQuoteServiceSummary(quote), quote.notes]
         if (!searchable.some((value) => value?.toLowerCase().includes(term))) return false
       }
 

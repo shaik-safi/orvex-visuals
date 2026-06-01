@@ -26,6 +26,7 @@ export function middleware(request: NextRequest) {
 
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set("x-locale", localeInPath)
+    requestHeaders.set("x-search-string", request.nextUrl.search)
 
     const response = NextResponse.rewrite(rewriteUrl, {
       request: {

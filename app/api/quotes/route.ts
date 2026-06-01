@@ -1,3 +1,4 @@
+import { PACKAGES } from "@/lib/constants"
 import { adminDb } from "@/lib/firebase-admin"
 import { normalizeLocale } from "@/lib/i18n/config"
 import { guardPublicWriteRequest } from "@/lib/public-write-guard"
@@ -7,6 +8,7 @@ import type { QuotePayload } from "@/lib/save-quote"
 const QUOTE_MAX_BYTES = 64 * 1024
 const QUOTE_RATE_LIMIT = 4
 const QUOTE_RATE_WINDOW_MS = 10 * 60 * 1000
+const PACKAGE_NAMES = new Set(PACKAGES.map((pkg) => pkg.name))
 
 type QuoteCreateRequest = QuotePayload & {
   locale?: string | null
@@ -86,6 +88,12 @@ function normalizeGlobalAddOns(value: unknown): QuotePayload["globalAddOns"] {
   return addOns.length > 0 ? addOns : undefined
 }
 
+function normalizePackageName(value: unknown): QuotePayload["packageName"] {
+  const packageName = normalizeString(value, 80)
+  if (!packageName) return undefined
+  return PACKAGE_NAMES.has(packageName) ? packageName : undefined
+}
+
 function sanitizeQuotePayload(input: unknown): QuotePayload {
   if (!input || typeof input !== "object") {
     throw new Error("Invalid quote payload")
@@ -109,6 +117,7 @@ function sanitizeQuotePayload(input: unknown): QuotePayload {
     customerName,
     customerPhone,
     customerEmail: normalizeString(source.customerEmail, 160),
+    packageName: normalizePackageName(source.packageName),
     date: normalizeString(source.date, 40),
     timeSlot: normalizeString(source.timeSlot, 80),
     city: normalizeString(source.city, 80),
