@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from "react"
+import { createContext, useContext, useEffect, useMemo, useRef, startTransition, type ReactNode } from "react"
 import { usePathname, useRouter } from "next/navigation"
 
 import { DEFAULT_LOCALE, type AppLocale } from "@/lib/i18n/config"
@@ -37,8 +37,7 @@ export function LocaleSyncProvider({
     if (lastRefreshKeyRef.current === refreshKey) return
 
     lastRefreshKeyRef.current = refreshKey
-    router.refresh()
-  }, [isPending, pathname, renderedLocale, routeLocale, router])
+  }, [isPending, pathname, renderedLocale, routeLocale])
 
   const value = useMemo(
     () => ({

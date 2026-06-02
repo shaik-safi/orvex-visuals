@@ -18,7 +18,7 @@ import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 import { BRAND_NAME, getWhatsAppLink, PHONE_NUMBER } from "@/lib/constants"
 import type { AppLocale } from "@/lib/i18n/config"
 import { useLocaleSync } from "@/lib/i18n/locale-sync"
-import { stripLocaleFromPathname, withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
+import { extractLocaleFromPathname, withLocaleHref, stripLocaleFromPathname, withLocalePathname } from "@/lib/i18n/routing"
 import { getCommonMessages } from "@/lib/i18n/common"
 
 const localeOptions: { value: AppLocale; label: string }[] = [
@@ -98,7 +98,9 @@ function LocaleSwitcherContent({
       }
       event.preventDefault()
       onClose()
-      router.replace(localeHref(targetLocale), { scroll: false })
+      
+      // Use hard navigation to bypass Next.js client-side router cache for the layout segment
+      window.location.assign(localeHref(targetLocale))
     }
 
   return (
