@@ -1126,8 +1126,6 @@ function PriceCalculator({
               </div>
             </div>
 
-            {renderMobileEstimateAnchor()}
-
             {/* Step 1: Add Events */}
             <div className={`transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ transitionDelay: "100ms" }}>
               <div className="flex items-baseline justify-between mb-2">
