@@ -385,24 +385,26 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
           ))}
         </div>
 
-        <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-5 mb-6">
-          <h4 className="text-sm font-bold text-amber-700 dark:text-amber-400 mb-3 flex items-center gap-2">
-            <Camera size={16} /> {messages.summary.title}
+        <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-5 mb-6 shadow-sm">
+          <h4 className="text-sm font-bold text-amber-700 dark:text-amber-400 mb-4 flex items-center gap-2">
+            <Camera size={18} /> {messages.summary.title}
           </h4>
-          <div className="space-y-1.5 text-sm text-slate-700 dark:text-slate-300">
+          
+          <div className="space-y-2.5 text-sm text-slate-700 dark:text-slate-300">
             {plan.services.map((s, i) => (
-              <div key={i} className="flex justify-between">
-                <span>{s.name} <span className="text-slate-400">({s.coverage})</span></span>
-                <span className="font-medium">&#8377;{s.price.toLocaleString("en-IN")}</span>
+              <div key={i} className="flex justify-between gap-3">
+                <span className="min-w-0 break-words leading-snug">{s.name} <span className="text-slate-500 dark:text-slate-400">({s.coverage})</span></span>
+                <span className="font-semibold shrink-0">&#8377;{s.price.toLocaleString("en-IN")}</span>
               </div>
             ))}
             {plan.addOns.map((a, i) => (
-              <div key={i} className="flex justify-between text-slate-500 dark:text-slate-400">
-                <span>{a.name} x{a.qty}</span>
-                <span>+&#8377;{a.price.toLocaleString("en-IN")}</span>
+              <div key={i} className="flex justify-between gap-3 text-slate-600 dark:text-slate-400">
+                <span className="min-w-0 break-words leading-snug">{a.name} x{a.qty}</span>
+                <span className="shrink-0">+&#8377;{a.price.toLocaleString("en-IN")}</span>
               </div>
             ))}
           </div>
+
           {(() => {
             const selectionNames = plan.services.flatMap((s) => (s.selections ?? []).map((sel) => sel.name))
             const profileId = detectCoverageProfileFromSelectionNames(selectionNames)
@@ -411,15 +413,16 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
             const profileCopy = getPageMessages(locale).pricingPage.coverageProfiles[profile.messageKey as keyof ReturnType<typeof getPageMessages>["pricingPage"]["coverageProfiles"]]
             if (!profileCopy) return null
             return (
-              <div className="mt-2 pt-2 flex items-center gap-1.5 text-xs">
-                <span className="font-medium text-amber-600 dark:text-amber-400">{messages.summary.coverageFormat}:</span>
-                <span className="text-slate-600 dark:text-slate-300">{profileCopy.label} · {profileCopy.crewLabel}</span>
+              <div className="mt-4 pt-4 border-t border-amber-200/50 dark:border-amber-500/10 flex flex-col gap-1 text-sm">
+                <span className="font-semibold text-amber-700 dark:text-amber-500">{messages.summary.coverageFormat}</span>
+                <span className="text-slate-700 dark:text-slate-300 leading-snug break-words">{profileCopy.label} · {profileCopy.crewLabel}</span>
               </div>
             )
           })()}
-          <div className="border-t border-amber-200 dark:border-amber-500/20 mt-3 pt-3 flex justify-between font-bold text-amber-700 dark:text-amber-400">
-            <span>{messages.summary.total}</span>
-            <span>&#8377;{plan.total.toLocaleString("en-IN")}</span>
+
+          <div className="border-t border-amber-200 dark:border-amber-500/20 mt-4 pt-4 flex justify-between gap-3 text-base font-bold text-amber-800 dark:text-amber-400">
+            <span className="shrink-0">{messages.summary.total}</span>
+            <span className="shrink-0">&#8377;{plan.total.toLocaleString("en-IN")}</span>
           </div>
         </div>
 
