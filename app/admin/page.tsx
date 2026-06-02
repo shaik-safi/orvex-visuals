@@ -1400,14 +1400,14 @@ function QuoteItem({
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-colors">
-      <div className="flex items-center justify-between px-5 py-4 gap-3">
-        <button onClick={() => setExpanded((prev) => !prev)} className="flex items-center gap-3 min-w-0 flex-1 text-left">
-          <span className="text-slate-500 hover:text-white transition-colors shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 gap-4 sm:gap-3">
+        <button onClick={() => setExpanded((prev) => !prev)} className="flex items-start sm:items-center gap-3 min-w-0 w-full sm:flex-1 text-left">
+          <span className="text-slate-500 hover:text-white transition-colors shrink-0 mt-0.5 sm:mt-0">
             {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </span>
 
-          <div className="min-w-0">
-            <p className="font-semibold text-white truncate text-sm">{quote.customerName ?? messages.unknownCustomer}</p>
+          <div className="min-w-0 w-full">
+            <p className="font-semibold text-white break-words sm:truncate text-sm">{quote.customerName ?? messages.unknownCustomer}</p>
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
               <span className="text-slate-500 text-xs">#{quote.id}</span>
               <span className="text-slate-600 text-xs">·</span>
@@ -1430,7 +1430,7 @@ function QuoteItem({
           </div>
         </button>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0 pl-7 sm:pl-0">
           {quote.total ? (
             <span className="text-amber-400 font-semibold text-sm hidden sm:block">{fmtRupee(quote.total, messages.emptyValue)}</span>
           ) : null}
