@@ -128,11 +128,11 @@ export function WhyOrvex({ locale }: { locale: AppLocale }) {
                   <div className="w-14 h-14 bg-gradient-to-br from-amber-400/20 to-amber-600/10 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                     <Icon className="w-7 h-7 text-amber-400" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-bold text-white">{feature.title}</h3>
-                      <span className="text-xs bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-full font-medium">{feature.stat}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="mb-2">
+                      <span className="inline-flex text-xs font-semibold bg-amber-500/10 border border-amber-500/20 text-amber-400 px-3 py-1 rounded-md">{feature.stat}</span>
                     </div>
+                    <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
                     <p className="text-slate-400 leading-relaxed">{feature.desc}</p>
                   </div>
                 </div>

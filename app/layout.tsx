@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { headers } from "next/headers"
 import { Inter, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
@@ -15,6 +15,16 @@ import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-body" })
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-heading" })
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "#020617" }, // tailwind slate-950
+  ],
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await resolveRequestLocale()
