@@ -37,7 +37,7 @@ function ContactHero({ messages }: { messages: ContactMessages }) {
           {messages.hero.titleLine1}{" "}
           <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">{messages.hero.titleHighlight}</span>
         </h1>
-        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+        <p className="text-base md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           {messages.hero.description}
         </p>
       </div>
@@ -194,7 +194,7 @@ function ContactSection({ messages }: { messages: ContactMessages }) {
           </div>
 
           <div className="lg:col-span-3">
-            <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-100 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-slate-900 rounded-3xl p-5 md:p-8 border border-slate-100 dark:border-slate-800">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">{messages.form.title}</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{messages.form.description}</p>
 
@@ -259,7 +259,7 @@ function ContactSection({ messages }: { messages: ContactMessages }) {
                         value={formState.name}
                         onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                         placeholder={messages.form.placeholders.name}
-                        className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
+                        className="w-full px-4 py-2.5 md:py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
                       />
                     </div>
                     <div>
@@ -270,7 +270,7 @@ function ContactSection({ messages }: { messages: ContactMessages }) {
                         value={formState.phone}
                         onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
                         placeholder={messages.form.placeholders.phone}
-                        className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
+                        className="w-full px-4 py-2.5 md:py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
                       />
                     </div>
                   </div>
@@ -282,7 +282,7 @@ function ContactSection({ messages }: { messages: ContactMessages }) {
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
                       placeholder={messages.form.placeholders.email}
-                      className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
+                      className="w-full px-4 py-2.5 md:py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
                     />
                   </div>
 
@@ -293,7 +293,7 @@ function ContactSection({ messages }: { messages: ContactMessages }) {
                         required
                         value={formState.service}
                         onChange={(e) => setFormState({ ...formState, service: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm appearance-none"
+                        className="w-full px-4 py-2.5 md:py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm appearance-none"
                       >
                         <option value="">{messages.form.serviceSelectPlaceholder}</option>
                         {messages.form.serviceOptions.map((option) => (
@@ -307,7 +307,7 @@ function ContactSection({ messages }: { messages: ContactMessages }) {
                         type="date"
                         value={formState.date}
                         onChange={(e) => setFormState({ ...formState, date: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
+                        className="w-full px-4 py-2.5 md:py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm"
                       />
                     </div>
                   </div>
@@ -319,14 +319,14 @@ function ContactSection({ messages }: { messages: ContactMessages }) {
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                       placeholder={messages.form.placeholders.message}
-                      className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm resize-none"
+                      className="w-full px-4 py-2.5 md:py-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all text-sm resize-none"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-3.5 rounded-xl font-semibold text-sm transition-colors duration-300 disabled:opacity-60"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-3 md:py-3.5 rounded-xl font-semibold text-sm transition-colors duration-300 disabled:opacity-60"
                   >
                     <Send size={16} /> {isSubmitting ? messages.form.sending : messages.form.send}
                   </button>

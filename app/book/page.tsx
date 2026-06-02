@@ -426,23 +426,23 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 shadow-lg">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 md:p-8 shadow-lg">
           {step === 1 && (
             <div className="space-y-5">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2"><User size={20} className="text-amber-500" /> {messages.steps.details}</h3>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.fields.fullName}</label>
-                <input type="text" value={form.name} onChange={(e) => updateField("name", e.target.value)} placeholder={messages.placeholders.fullName} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border ${step1Errors.name ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all`} />
+                <input type="text" value={form.name} onChange={(e) => updateField("name", e.target.value)} placeholder={messages.placeholders.fullName} className={`w-full px-4 py-2.5 md:py-3 rounded-xl text-sm md:text-base bg-slate-50 dark:bg-slate-800 border ${step1Errors.name ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all`} />
                 {step1Errors.name && <p className="text-red-500 text-xs mt-1">{messages.errors.name}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.fields.phone}</label>
-                <input type="tel" value={form.phone} onChange={(e) => updateField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder={messages.placeholders.phone} maxLength={15} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border ${step1Errors.phone ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all`} />
+                <input type="tel" value={form.phone} onChange={(e) => updateField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))} placeholder={messages.placeholders.phone} maxLength={15} className={`w-full px-4 py-2.5 md:py-3 rounded-xl text-sm md:text-base bg-slate-50 dark:bg-slate-800 border ${step1Errors.phone ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all`} />
                 {step1Errors.phone && <p className="text-red-500 text-xs mt-1">{messages.errors.phone}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.fields.email}</label>
-                <input type="email" value={form.email} onChange={(e) => updateField("email", e.target.value)} placeholder={messages.placeholders.email} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border ${step1Errors.email ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all`} />
+                <input type="email" value={form.email} onChange={(e) => updateField("email", e.target.value)} placeholder={messages.placeholders.email} className={`w-full px-4 py-2.5 md:py-3 rounded-xl text-sm md:text-base bg-slate-50 dark:bg-slate-800 border ${step1Errors.email ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all`} />
                 {step1Errors.email && <p className="text-red-500 text-xs mt-1">{messages.errors.email}</p>}
               </div>
               <button onClick={() => { if (step1Valid && isValidEmail(form.email)) setStep(2) }} disabled={!step1Valid || !isValidEmail(form.email)} className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-semibold transition-colors duration-300">
@@ -456,16 +456,16 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
               <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2"><Camera size={20} className="text-amber-500" /> {messages.steps.event}</h3>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.fields.service}</label>
-                <input type="text" value={form.service} onChange={(e) => updateField("service", e.target.value)} placeholder={messages.placeholders.service} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all" />
+                <input type="text" value={form.service} onChange={(e) => updateField("service", e.target.value)} placeholder={messages.placeholders.service} className="w-full px-4 py-2.5 md:py-3 rounded-xl text-sm md:text-base bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.fields.eventDate}</label>
-                <input type="date" min={todayStr} value={form.eventDate} onChange={(e) => updateField("eventDate", e.target.value)} className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border ${isDateInPast(form.eventDate) ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all dark:[color-scheme:dark]`} />
+                <input type="date" min={todayStr} value={form.eventDate} onChange={(e) => updateField("eventDate", e.target.value)} className={`w-full px-4 py-2.5 md:py-3 rounded-xl text-sm md:text-base bg-slate-50 dark:bg-slate-800 border ${isDateInPast(form.eventDate) ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700"} text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all dark:[color-scheme:dark]`} />
                 {isDateInPast(form.eventDate) && <p className="text-red-500 text-xs mt-1">{messages.errors.date}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.fields.venue}</label>
-                <input type="text" value={form.venue} onChange={(e) => updateField("venue", e.target.value)} placeholder={messages.placeholders.venue} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all" />
+                <input type="text" value={form.venue} onChange={(e) => updateField("venue", e.target.value)} placeholder={messages.placeholders.venue} className="w-full px-4 py-2.5 md:py-3 rounded-xl text-sm md:text-base bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all" />
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep(1)} className="flex-1 flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 py-3.5 rounded-xl font-semibold transition-all hover:bg-slate-200 dark:hover:bg-slate-700">
@@ -483,15 +483,15 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
               <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2"><Calendar size={20} className="text-amber-500" /> {messages.steps.budget}</h3>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.fields.budget}</label>
-                <input type="text" value={form.budget} onChange={(e) => updateField("budget", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all" />
+                <input type="text" value={form.budget} onChange={(e) => updateField("budget", e.target.value)} className="w-full px-4 py-2.5 md:py-3 rounded-xl text-sm md:text-base bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.fields.requirements}</label>
-                <textarea value={form.message} onChange={(e) => updateField("message", e.target.value)} rows={3} placeholder={messages.placeholders.requirements} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all resize-none" />
+                <textarea value={form.message} onChange={(e) => updateField("message", e.target.value)} rows={3} placeholder={messages.placeholders.requirements} className="w-full px-4 py-2.5 md:py-3 rounded-xl text-sm md:text-base bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all resize-none" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{messages.fields.source}</label>
-                <select value={form.source} onChange={(e) => updateField("source", e.target.value)} className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all">
+                <select value={form.source} onChange={(e) => updateField("source", e.target.value)} className="w-full px-4 py-2.5 md:py-3 rounded-xl text-sm md:text-base bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all">
                   {messages.sourceOptions.map((option, index) => (
                     <option key={option} value={index === 0 ? "" : option}>{option}</option>
                   ))}

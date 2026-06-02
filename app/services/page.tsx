@@ -33,7 +33,7 @@ function ServicesHero({ messages }: { messages: ServicesPageMessages }) {
           <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">{messages.hero.titleHighlight}</span>
           <br />{messages.hero.titleLine2}
         </h1>
-        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
+        <p className="text-base md:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto">
           {messages.hero.description}
         </p>
       </div>
@@ -184,7 +184,7 @@ function ServicesGrid({ routeLocale, messages }: { routeLocale: AppLocale; messa
 
 function ServicesCTA({ routeLocale, messages }: { routeLocale: AppLocale; messages: ServicesPageMessages }) {
   return (
-    <section className="py-16 md:py-20 relative overflow-hidden">
+    <section className="py-12 md:py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(245,158,11,0.1),transparent)]" />
 
@@ -198,7 +198,7 @@ function ServicesCTA({ routeLocale, messages }: { routeLocale: AppLocale; messag
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href={withLocaleHref(buildPricingHandoffHref({ from: "services", source: "Services Page", intent: "custom-package", scrollToBuilder: true }), routeLocale)}
-            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
+            className="group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-5 py-2.5 md:px-7 md:py-3.5 rounded-2xl font-semibold text-sm md:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5"
           >
             {messages.cta.build}
             <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
@@ -207,7 +207,7 @@ function ServicesCTA({ routeLocale, messages }: { routeLocale: AppLocale; messag
             href={getWhatsAppLink(messages.cta.whatsappTemplate)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-7 py-3.5 rounded-2xl font-semibold text-base md:text-lg transition-all duration-300 hover:-translate-y-0.5"
+            className="inline-flex items-center justify-center gap-2 border-2 border-white/20 text-white hover:bg-white hover:text-slate-900 px-5 py-2.5 md:px-7 md:py-3.5 rounded-2xl font-semibold text-sm md:text-lg transition-all duration-300 hover:-translate-y-0.5"
           >
             <MessageCircle size={20} />
             {messages.cta.talk}

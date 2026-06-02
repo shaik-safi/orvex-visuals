@@ -14,7 +14,7 @@ export function PricingHero({ messages }: { messages: PricingMessages }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section className="pt-32 pb-20 md:pt-44 md:pb-28 bg-gradient-to-b from-slate-50 via-white to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 relative overflow-hidden">
+    <section className="pt-32 pb-12 md:pt-44 md:pb-28 bg-gradient-to-b from-slate-50 via-white to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(245,158,11,0.04),transparent_70%)]" />
 
       <div ref={ref} className={`max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
@@ -30,7 +30,7 @@ export function PricingHero({ messages }: { messages: PricingMessages }) {
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-xl mx-auto mb-10 leading-relaxed">
+        <p className="text-base md:text-xl text-slate-500 dark:text-slate-400 max-w-xl mx-auto mb-10 leading-relaxed">
           {messages.hero.description}
         </p>
 
@@ -58,7 +58,7 @@ export function ComparisonSection({ messages }: { messages: PricingMessages }) {
   const comparisons = messages.comparisonSection.rows
 
   return (
-    <section className="py-24 md:py-32 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <section className="py-16 md:py-32 bg-slate-50 dark:bg-slate-950 transition-colors">
       <div ref={ref} className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-14 transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
           <p className="text-amber-500 dark:text-amber-400 text-sm font-medium tracking-widest uppercase mb-4">{messages.comparisonSection.badge}</p>
@@ -108,7 +108,7 @@ export function PricingCTA({ locale, messages }: { locale: AppLocale; messages: 
   const { ref, isVisible } = useScrollReveal()
 
   return (
-    <section ref={ref} className={`py-24 md:py-32 relative overflow-hidden transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+    <section ref={ref} className={`py-16 md:py-32 relative overflow-hidden transition-all duration-500 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
       <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.08),transparent)]" />
 
@@ -119,13 +119,13 @@ export function PricingCTA({ locale, messages }: { locale: AppLocale; messages: 
         <h2 className="text-3xl md:text-4xl font-bold text-white mb-5 tracking-tight">
           {messages.cta.title}
         </h2>
-        <p className="text-amber-100/80 text-lg mb-10 max-w-md mx-auto">
+        <p className="text-amber-100/80 text-base md:text-lg mb-10 max-w-md mx-auto">
           {messages.cta.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
             href={`${withLocalePathname("/pricing", locale)}#calculator`}
-            className="inline-flex items-center justify-center gap-2 bg-white text-amber-700 hover:bg-slate-900 hover:text-white px-8 py-4 rounded-xl font-bold transition-all duration-300"
+            className="inline-flex items-center justify-center gap-2 bg-white text-amber-700 hover:bg-slate-900 hover:text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition-all duration-300"
           >
             {messages.cta.build}
           </a>
@@ -133,7 +133,7 @@ export function PricingCTA({ locale, messages }: { locale: AppLocale; messages: 
             href={getWhatsAppLink(messages.cta.whatsappTemplate)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center border-2 border-white/30 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-xl font-bold transition-all duration-300"
+            className="inline-flex items-center justify-center border-2 border-white/30 text-white hover:bg-white hover:text-amber-700 px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition-all duration-300"
           >
             <MessageCircle size={18} />
             {messages.cta.chat}

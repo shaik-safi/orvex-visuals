@@ -76,14 +76,14 @@ export function Hero() {
           </span>
         </h1>
 
-        <p className="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-slate-700/90 drop-shadow-[0_8px_18px_rgba(255,255,255,0.2)] sm:text-lg md:mb-10 md:text-xl dark:text-white/72 dark:drop-shadow-none">
+        <p className="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-slate-700/90 drop-shadow-[0_8px_18px_rgba(255,255,255,0.2)] md:mb-10 md:text-xl dark:text-white/72 dark:drop-shadow-none">
           {messages.hero.description}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href={withLocaleHref(buildPricingHandoffHref({ from: "home", source: "Homepage Hero", intent: "availability", scrollToBuilder: true }), routeLocale)}
-            className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3.5 text-base font-semibold text-white shadow-[0_20px_45px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1 hover:from-amber-600 hover:to-orange-600 hover:shadow-[0_24px_55px_rgba(245,158,11,0.4)] sm:px-8 sm:py-4 sm:text-lg dark:from-amber-500 dark:to-amber-600 dark:hover:from-amber-600 dark:hover:to-amber-700 dark:hover:shadow-2xl dark:hover:shadow-amber-500/30"
+            className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3 text-base font-semibold text-white shadow-[0_20px_45px_rgba(245,158,11,0.3)] transition-all duration-300 hover:-translate-y-1 hover:from-amber-600 hover:to-orange-600 hover:shadow-[0_24px_55px_rgba(245,158,11,0.4)] sm:px-8 sm:py-4 sm:text-lg dark:from-amber-500 dark:to-amber-600 dark:hover:from-amber-600 dark:hover:to-amber-700 dark:hover:shadow-2xl dark:hover:shadow-amber-500/30"
           >
             {messages.hero.primaryCta}
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -92,7 +92,7 @@ export function Hero() {
             href={getWhatsAppLink(messages.hero.whatsappTemplate)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[rgba(255,247,238,0.76)] bg-[rgba(255,247,240,0.6)] px-6 py-3.5 text-base font-semibold text-slate-800 shadow-[0_20px_45px_rgba(168,129,86,0.12)] backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-amber-200/80 hover:bg-[rgba(255,250,245,0.78)] hover:text-amber-700 sm:px-8 sm:py-4 sm:text-lg dark:border-white/30 dark:bg-white/10 dark:text-white dark:shadow-none dark:backdrop-blur-sm dark:hover:bg-white dark:hover:text-slate-900"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[rgba(255,247,238,0.76)] bg-[rgba(255,247,240,0.6)] px-6 py-3 text-base font-semibold text-slate-800 shadow-[0_20px_45px_rgba(168,129,86,0.12)] backdrop-blur-lg transition-all duration-300 hover:-translate-y-1 hover:border-amber-200/80 hover:bg-[rgba(255,250,245,0.78)] hover:text-amber-700 sm:px-8 sm:py-4 sm:text-lg dark:border-white/30 dark:bg-white/10 dark:text-white dark:shadow-none dark:backdrop-blur-sm dark:hover:bg-white dark:hover:text-slate-900"
           >
             <MessageCircle size={20} />
             {messages.hero.secondaryCta}
@@ -118,7 +118,7 @@ export function FAQSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section id="faq" className="py-24 md:py-32 bg-slate-50 dark:bg-slate-900 transition-colors duration-500">
+    <section id="faq" className="py-16 md:py-32 bg-slate-50 dark:bg-slate-900 transition-colors duration-500">
       <div ref={ref} className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-16 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <span className="inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
@@ -136,7 +136,7 @@ export function FAQSection() {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-6 text-left"
+                className="w-full flex items-center justify-between p-5 md:p-6 text-left"
               >
                 <span className="font-semibold text-slate-900 dark:text-white pr-4">{faq.q}</span>
                 <div className={`w-8 h-8 bg-amber-50 dark:bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300 ${openIndex === index ? "rotate-180" : ""}`}>
@@ -144,7 +144,7 @@ export function FAQSection() {
                 </div>
               </button>
               <div className={`overflow-hidden transition-all duration-300 ${openIndex === index ? "max-h-40 opacity-100" : "max-h-0 opacity-0"}`}>
-                <div className="px-6 pb-6 -mt-2">
+                <div className="px-5 pb-5 md:px-6 md:pb-6 -mt-2">
                   <p className="text-slate-600 dark:text-slate-400 leading-relaxed">{faq.a}</p>
                 </div>
               </div>
@@ -164,7 +164,7 @@ export function CTABanner() {
   const { routeLocale } = live
 
   return (
-    <section id="contact" ref={ref} className={`py-20 md:py-28 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+    <section id="contact" ref={ref} className={`py-12 md:py-28 relative overflow-hidden transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
       <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent)]" />
 
@@ -178,7 +178,7 @@ export function CTABanner() {
         <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
           {messages.cta.headingLine1}<br />{messages.cta.headingLine2}
         </h2>
-        <p className="text-amber-100 text-lg md:text-xl mb-10 max-w-xl mx-auto">
+        <p className="text-amber-100 text-base md:text-xl mb-10 max-w-xl mx-auto">
           {messages.cta.description}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -186,7 +186,7 @@ export function CTABanner() {
             href={getWhatsAppLink(messages.cta.whatsappTemplate)}
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center justify-center gap-3 bg-white text-amber-700 hover:bg-slate-900 hover:text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
+            className="group inline-flex items-center justify-center gap-3 bg-white text-amber-700 hover:bg-slate-900 hover:text-white px-6 py-3 md:px-8 md:py-4 rounded-2xl font-bold text-base md:text-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
           >
             <MessageCircle size={22} />
             {messages.cta.whatsappCta}
@@ -194,7 +194,7 @@ export function CTABanner() {
           </a>
           <Link
             href={withLocaleHref(buildPricingHandoffHref({ from: "home-banner", source: "Homepage CTA", intent: "availability", scrollToBuilder: true }), routeLocale)}
-            className="inline-flex items-center justify-center border-2 border-white/40 text-white hover:bg-white hover:text-amber-700 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:-translate-y-1"
+            className="inline-flex items-center justify-center border-2 border-white/40 text-white hover:bg-white hover:text-amber-700 px-6 py-3 md:px-8 md:py-4 rounded-2xl font-bold text-base md:text-lg transition-all duration-300 hover:-translate-y-1"
           >
             {messages.cta.bookingCta}
           </Link>
