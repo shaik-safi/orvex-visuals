@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 // saveQuote is only called from /book — pricing page sends estimates only
-import { BOOKING_PLAN_STORAGE_KEY, PACKAGES, SERVICE_RATES, EVENT_ADDONS, GLOBAL_ADDONS, PHONE_NUMBER, computePackagePrice } from "@/lib/constants"
+import { BOOKING_PLAN_STORAGE_KEY, PACKAGES, SERVICE_RATES, EVENT_ADDONS, GLOBAL_ADDONS, PHONE_NUMBER, computePackagePrice, getWhatsAppLink } from "@/lib/constants"
 import {
   Camera,
   Video,
@@ -30,6 +30,7 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal"
 import { useCurrentLocale } from "@/hooks/use-current-locale"
 import { getPageMessages } from "@/lib/i18n/pages"
 import { applyTemplate } from "@/lib/i18n/home"
+import { handleWhatsAppHandoff } from "@/lib/popup-handoff"
 import { withLocalePathname } from "@/lib/i18n/routing"
 import type { AppLocale } from "@/lib/i18n/config"
 import { EVENT_TEMPLATE_PRESETS, resolveServiceEntryPreset, resolvePresetCoverageProfile, COVERAGE_PROFILES, type CoverageProfileId } from "@/lib/pricing-presets"
@@ -587,6 +588,27 @@ function PriceCalculator({
   // Customer info
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [storageError, setStorageError] = useState<string | null>(null)
+  const [showValidationErrors, setShowValidationErrors] = useState(false)
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false)
+
+  useEffect(() => {
+    const handleFocusIn = (e: FocusEvent) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
+        setIsKeyboardOpen(true)
+      }
+    }
+    const handleFocusOut = () => {
+      setIsKeyboardOpen(false)
+    }
+
+    document.addEventListener('focusin', handleFocusIn)
+    document.addEventListener('focusout', handleFocusOut)
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn)
+      document.removeEventListener('focusout', handleFocusOut)
+    }
+  }, [])
 
   const todayStr = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
     .toISOString()
@@ -987,6 +1009,11 @@ function PriceCalculator({
 
   const handleProceedToBook = () => {
     if (!hasConfiguredEvents) return
+    if (!eventDate || !eventCity) {
+      setShowValidationErrors(true)
+      calculatorRef.current?.scrollIntoView({ behavior: "smooth" })
+      return
+    }
 
     const plan = buildBookingPlan()
     setStorageError(null)
@@ -1005,45 +1032,41 @@ function PriceCalculator({
 
   const handleSendEstimate = () => {
     if (!hasConfiguredEvents) return
+    if (!eventDate || !eventCity) {
+      setShowValidationErrors(true)
+      calculatorRef.current?.scrollIntoView({ behavior: "smooth" })
+      return
+    }
     setIsSubmitting(true)
-    window.open(`https://wa.me/${PHONE_NUMBER}?text=${generateWhatsAppMessage()}`, '_blank')
+    handleWhatsAppHandoff(getWhatsAppLink(generateWhatsAppMessage()))
     setTimeout(() => setIsSubmitting(false), 2000)
   }
 
-  const renderMobileEstimateAnchor = () => {
-    if (!hasContent) return null
+  const renderMobileStickyBar = () => {
+    if (!hasConfiguredEvents || isKeyboardOpen) return null
 
     return (
-      <div className="lg:hidden">
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-4 shadow-sm">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600 dark:text-amber-400">{messages.builder.summaryTitle}</p>
-              <div className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">₹{formatCurrencyValue(totalPrice, locale)}</div>
-              <p className="text-[11px] text-emerald-500 dark:text-emerald-400/80 mt-1">{messages.builder.gstInclusive}</p>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 flex items-center justify-center text-amber-500 dark:text-amber-400">
-              <Calculator size={16} />
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div className="flex items-center justify-between max-w-6xl mx-auto gap-4">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">{messages.builder.summaryTitle}</p>
+            <div className="text-xl font-bold text-slate-900 dark:text-white mt-0.5 truncate">
+              ₹{formatCurrencyValue(totalPrice, locale)}
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <span className="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800/70 px-3 py-1 text-[11px] text-slate-500 dark:text-slate-400">
-              {applyTemplate(messages.builder.summaryEventCount, { count: String(events.length) })}
-            </span>
-            <span className="inline-flex items-center rounded-full bg-slate-100 dark:bg-slate-800/70 px-3 py-1 text-[11px] text-slate-500 dark:text-slate-400">
-              {selectedOptionalCount > 0
-                ? applyTemplate(messages.builder.summaryOptionalSelected, { count: String(selectedOptionalCount) })
-                : messages.builder.summaryOptionalNone}
-            </span>
-          </div>
-          <p className="mt-3 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{messages.builder.summaryLiveLabel}</p>
+          <button
+            onClick={handleProceedToBook}
+            className="shrink-0 flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white dark:text-slate-900 px-5 py-3 rounded-xl font-semibold text-sm transition-all"
+          >
+            {messages.builder.proceedToBook} <ArrowRight size={14} />
+          </button>
         </div>
       </div>
     )
   }
 
   return (
-    <section id="calculator" ref={calculatorRef} className="py-24 md:py-32 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 relative overflow-hidden">
+    <section id="calculator" ref={calculatorRef} className="py-24 pb-32 md:py-32 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950 relative overflow-hidden">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[min(82vw,50rem)] w-[min(82vw,50rem)] bg-amber-500/[0.02] rounded-full blur-3xl pointer-events-none" />
 
       <div ref={ref} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -1100,7 +1123,7 @@ function PriceCalculator({
                     value={eventDate}
                     min={todayStr}
                     onChange={(e) => setEventDate(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-sm text-slate-900 dark:text-white focus:border-amber-500/50 focus:outline-none transition-colors dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-60 dark:[&::-webkit-calendar-picker-indicator]:invert"
+                    className={`w-full pl-10 pr-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border ${showValidationErrors && !eventDate ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700/60"} text-sm text-slate-900 dark:text-white focus:border-amber-500/50 focus:outline-none transition-colors dark:[color-scheme:dark] [&::-webkit-calendar-picker-indicator]:opacity-60 dark:[&::-webkit-calendar-picker-indicator]:invert`}
                   />
                 </div>
                 <div className="relative">
@@ -1109,7 +1132,7 @@ function PriceCalculator({
                     type="text"
                     value={eventCity}
                     onChange={(e) => setEventCity(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-amber-500/50 focus:outline-none transition-colors"
+                    className={`w-full pl-10 pr-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border ${showValidationErrors && !eventCity ? "border-red-400 dark:border-red-500" : "border-slate-200 dark:border-slate-700/60"} text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-amber-500/50 focus:outline-none transition-colors`}
                     placeholder={messages.builder.placeholders.city}
                   />
                 </div>
@@ -1367,8 +1390,6 @@ function PriceCalculator({
                 })}
               </div>
             )}
-
-            {events.length > 0 && renderMobileEstimateAnchor()}
 
             {/* Global Add-ons */}
             {events.length > 0 && (
@@ -1637,6 +1658,7 @@ function PriceCalculator({
           </div>
         </div>
       </div>
+      {renderMobileStickyBar()}
     </section>
   )
 }

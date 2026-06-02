@@ -19,7 +19,7 @@ import { useCurrentLocale } from "@/hooks/use-current-locale"
 import { EMAIL, getWhatsAppLink, PHONE_DISPLAY, PHONE_NUMBER, SOCIAL_LINKS } from "@/lib/constants"
 import { getPageMessages } from "@/lib/i18n/pages"
 import { applyTemplate } from "@/lib/i18n/home"
-import { openPopupWindow } from "@/lib/popup-handoff"
+import { handleWhatsAppHandoff, openPopupPlaceholder } from "@/lib/popup-handoff"
 
 type ContactMessages = ReturnType<typeof getPageMessages>["contactPage"]
 type ContactHandoffStatus = "idle" | "opened" | "blocked"
@@ -77,7 +77,8 @@ function ContactSection({ messages }: { messages: ContactMessages }) {
     ]
       .filter(Boolean)
       .join("\n")
-    const nextWhatsAppUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`
+    const nextWhatsAppUrl = getWhatsAppLink(message)
+    const popup = openPopupPlaceholder(messages.form.waTitle)
 
     setIsSubmitting(true)
     try {
@@ -98,14 +99,15 @@ function ContactSection({ messages }: { messages: ContactMessages }) {
 
       if (!response.ok) {
         setSubmissionResult("whatsapp")
-        setHandoffStatus(openPopupWindow(nextWhatsAppUrl) ? "opened" : "blocked")
+        setHandoffStatus(handleWhatsAppHandoff(nextWhatsAppUrl, popup) ? "opened" : "blocked")
       } else {
         setSubmissionResult("saved")
         setHandoffStatus("idle")
+        if (popup) popup.close()
       }
     } catch {
       setSubmissionResult("whatsapp")
-      setHandoffStatus(openPopupWindow(nextWhatsAppUrl) ? "opened" : "blocked")
+      setHandoffStatus(handleWhatsAppHandoff(nextWhatsAppUrl, popup) ? "opened" : "blocked")
     } finally {
       setWhatsAppUrl(nextWhatsAppUrl)
       setSubmitted(true)

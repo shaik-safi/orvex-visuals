@@ -104,8 +104,12 @@ function sanitizeQuotePayload(input: unknown): QuotePayload {
   const customerName = normalizeString(source.customerName, 120)
   const customerPhone = normalizeString(source.customerPhone, 20)
 
-  if (!quoteSource || !customerName || !customerPhone) {
-    throw new Error("Missing required quote fields")
+  const date = normalizeString(source.date, 40)
+  const city = normalizeString(source.city, 80)
+  const venue = normalizeString(source.venue, 160)
+
+  if (!quoteSource || !customerName || !customerPhone || !date || (!city && !venue)) {
+    throw new Error("Missing required quote fields (Name, Phone, Date, and Location are required)")
   }
 
   const total = typeof source.total === "number" && Number.isFinite(source.total)
@@ -118,10 +122,10 @@ function sanitizeQuotePayload(input: unknown): QuotePayload {
     customerPhone,
     customerEmail: normalizeString(source.customerEmail, 160),
     packageName: normalizePackageName(source.packageName),
-    date: normalizeString(source.date, 40),
+    date: date,
     timeSlot: normalizeString(source.timeSlot, 80),
-    city: normalizeString(source.city, 80),
-    venue: normalizeString(source.venue, 160),
+    city: city,
+    venue: venue,
     service: normalizeString(source.service, 160),
     budget: normalizeString(source.budget, 80),
     notes: normalizeString(source.notes, 2000),

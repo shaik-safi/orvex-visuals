@@ -178,12 +178,12 @@ function GalleryGrid({
   return (
     <section className="py-8 md:py-12 bg-white dark:bg-slate-950 transition-colors">
       <div ref={ref} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`mb-8 flex flex-wrap justify-center gap-2 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+        <div className={`mb-8 flex overflow-x-auto sm:flex-wrap justify-start sm:justify-center gap-2 pb-2 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 hide-scrollbar transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           {CATEGORY_ORDER.map((categoryId) => (
             <button
               key={categoryId}
               onClick={() => setActiveCategory(categoryId)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${activeCategory === categoryId
+              className={`whitespace-nowrap shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${activeCategory === categoryId
                 ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/20"
                 : "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-amber-300 dark:hover:border-amber-500/30"
                 }`}

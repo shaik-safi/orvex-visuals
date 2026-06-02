@@ -67,3 +67,20 @@ export function closePopupWindow(popup: Window | null) {
     // Ignore close failures.
   }
 }
+
+export function handleWhatsAppHandoff(url: string, popup?: Window | null): boolean {
+  if (typeof window === "undefined") return false
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+  
+  if (isMobile) {
+    if (popup) closePopupWindow(popup)
+    window.location.href = url
+    return true
+  }
+
+  if (popup) {
+    return navigatePopupWindow(popup, url) || openPopupWindow(url)
+  }
+  return openPopupWindow(url)
+}

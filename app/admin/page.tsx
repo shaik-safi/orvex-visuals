@@ -47,6 +47,7 @@ import { useCurrentLocale } from "@/hooks/use-current-locale"
 import { getLocaleTag, type AppLocale } from "@/lib/i18n/config"
 import { getPageMessages } from "@/lib/i18n/pages"
 import { applyTemplate } from "@/lib/i18n/home"
+import { getWhatsAppLink } from "@/lib/constants"
 
 interface QuoteRow {
   id: string
@@ -180,7 +181,7 @@ function waLink(phone: string | undefined) {
   if (!phone) return "#"
   const digits = phone.replace(/\D/g, "")
   const normalized = digits.startsWith("91") ? digits : `91${digits}`
-  return `https://wa.me/${normalized}`
+  return getWhatsAppLink(undefined, normalized)
 }
 
 function statusLabel(status: Filters["status"], messages: AdminMessages) {

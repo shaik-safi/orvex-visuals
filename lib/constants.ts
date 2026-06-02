@@ -18,10 +18,11 @@ export const SOCIAL_LINKS = {
 } as const
 
 // WhatsApp link builder
-export function getWhatsAppLink(message?: string): string {
-  const base = `https://wa.me/${PHONE_NUMBER}`
+export function getWhatsAppLink(message?: string, phoneOverride?: string): string {
+  const targetPhone = phoneOverride || PHONE_NUMBER
+  const base = `https://api.whatsapp.com/send?phone=${targetPhone}`
   if (!message) return base
-  return `${base}?text=${encodeURIComponent(message)}`
+  return `${base}&text=${encodeURIComponent(message)}`
 }
 
 // Pre-built WhatsApp messages

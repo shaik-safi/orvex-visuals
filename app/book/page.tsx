@@ -19,7 +19,7 @@ import { useCurrentLocale } from "@/hooks/use-current-locale"
 import { getPageMessages } from "@/lib/i18n/pages"
 import { applyTemplate } from "@/lib/i18n/home"
 import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
-import { closePopupWindow, navigatePopupWindow, openPopupPlaceholder, openPopupWindow } from "@/lib/popup-handoff"
+import { handleWhatsAppHandoff } from "@/lib/popup-handoff"
 import { localizeQuoteValue } from "@/lib/quote-localization"
 import { detectCoverageProfileFromSelectionNames, COVERAGE_PROFILES } from "@/lib/pricing-presets"
 
@@ -156,7 +156,7 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
   const isDateInPast = (dateStr: string) => !!dateStr && new Date(dateStr) < new Date(todayStr)
 
   const step1Valid = form.name.trim().length >= 2 && isValidPhone(form.phone) && isValidEmail(form.email)
-  const step2Valid = !!form.service.trim() && !isDateInPast(form.eventDate)
+  const step2Valid = !!form.service.trim() && !!form.eventDate && !isDateInPast(form.eventDate) && !!form.venue.trim()
   const step1Errors = {
     name: form.name.length > 0 && form.name.trim().length < 2,
     phone: form.phone.length > 0 && !isValidPhone(form.phone),
@@ -246,7 +246,6 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
   }
 
   const handleSubmit = async () => {
-    const popup = openPopupPlaceholder(messages.actions.preparing)
     setIsSubmitting(true)
 
     let nextSubmissionResult: SubmissionResult = "whatsapp"
@@ -295,11 +294,9 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
       nextWhatsAppUrl = buildFallbackWhatsAppUrl()
     } finally {
       if (nextWhatsAppUrl) {
-        nextHandoffStatus = navigatePopupWindow(popup, nextWhatsAppUrl) || openPopupWindow(nextWhatsAppUrl)
-          ? "opened"
-          : "blocked"
+        nextHandoffStatus = handleWhatsAppHandoff(nextWhatsAppUrl) ? "opened" : "blocked"
       } else {
-        closePopupWindow(popup)
+        nextHandoffStatus = "blocked"
       }
 
       setSubmissionResult(nextSubmissionResult)
