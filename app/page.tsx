@@ -14,12 +14,13 @@ export default async function Home() {
   return (
     <main>
       <Hero />
-      <TrustBar locale={locale} />
+      <TrustBar locale={locale} className="hidden md:block" />
       <ServicesSection locale={locale} />
       <WhyOrvex locale={locale} />
       <HowItWorks locale={locale} />
       <TestimonialsSection locale={locale} />
       <FAQSection />
+      <TrustBar locale={locale} className="md:hidden" />
       <CTABanner />
     </main>
   )

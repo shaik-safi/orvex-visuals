@@ -114,7 +114,7 @@ export function Hero() {
 
 export function FAQSection() {
   const { messages } = useRouteHomeMessages()
-  const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (

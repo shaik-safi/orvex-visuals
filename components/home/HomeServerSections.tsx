@@ -9,12 +9,12 @@ import { withLocalePathname } from "@/lib/i18n/routing"
 
 const FEATURE_ICONS = [Clock, Shield, Receipt, Smartphone] as const
 
-export function TrustBar({ locale }: { locale: AppLocale }) {
+export function TrustBar({ locale, className }: { locale: AppLocale, className?: string }) {
   const messages = getHomeMessages(locale)
 
   return (
-    <div className="py-5 bg-slate-900 dark:bg-slate-800 border-y border-white/5">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className={`py-5 bg-slate-900 dark:bg-slate-800 border-y border-white/5 ${className || ""}`}>
+      <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {messages.trustBar.map((item, index) => {
           return (
             <div key={index} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-white/75">
@@ -58,7 +58,7 @@ export function ServicesSection({ locale }: { locale: AppLocale }) {
               <Link
                 href={withLocalePathname(`/services/${service.slug}`, locale)}
                 key={index}
-                className="group relative bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10"
+                className={`group relative bg-slate-50 dark:bg-slate-900 rounded-2xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-500/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10 ${index >= 3 ? "hidden sm:block" : ""}`}
               >
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
