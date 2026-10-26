@@ -1,10 +1,12 @@
 "use client"
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useLocalDate } from "@/hooks/use-local-date"
 import { useRouter, useSearchParams } from "next/navigation"
 // saveQuote is only called from /book — pricing page sends estimates only
-import { BOOKING_PLAN_STORAGE_KEY, PACKAGES, SERVICE_RATES, EVENT_ADDONS, GLOBAL_ADDONS, PHONE_NUMBER, computePackagePrice, getWhatsAppLink } from "@/lib/constants"
+import { BOOKING_PLAN_STORAGE_KEY, PACKAGES, SERVICE_RATES, EVENT_ADDONS, GLOBAL_ADDONS, computePackagePrice, getWhatsAppLink } from "@/lib/constants"
 import {
+  type LucideIcon,
   Camera,
   Video,
   Sparkles,
@@ -334,7 +336,7 @@ interface ServiceRate {
   id: string
   name: string
   description: string
-  icon: any
+  icon: LucideIcon
   ratePerDay: number
   ratePerHalfDay: number
   maxQty: number
@@ -346,7 +348,7 @@ interface EventAddOn {
   name: string
   price: number
   description: string
-  icon: any
+  icon: LucideIcon
   perEvent: boolean
   maxQty: number
   premium?: boolean
@@ -537,11 +539,10 @@ function PricingHandoffBridge({
   onHandoffChange: (handoff: PricingHandoffContext | null) => void
 }) {
   const searchParams = useSearchParams()
-  const searchParamsKey = searchParams.toString()
   const locale = useCurrentLocale()
   const handoff = useMemo(
     () => getPricingHandoff(searchParams, messages, resolvedServiceLabel, locale),
-    [messages, resolvedServiceLabel, searchParamsKey, locale],
+    [messages, resolvedServiceLabel, searchParams, locale],
   )
 
   useEffect(() => {
@@ -610,23 +611,21 @@ function PriceCalculator({
     }
   }, [])
 
-  const todayStr = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-    .toISOString()
-    .split("T")[0]
+  const todayStr = useLocalDate()
 
   const calculatorRef = useRef<HTMLDivElement>(null)
   const summaryRef = useRef<HTMLDivElement>(null)
-  const lastAppliedPrefillKeyRef = useRef<string | null>(null)
+  const [lastAppliedPrefillKey, setLastAppliedPrefillKey] = useState<string | null>(null)
 
   const applyEventPresets = (
     presets: EventPreset[],
     globalAddOns: Record<string, number> = {},
     packageName?: string | null,
-    scrollToBuilder = false,
     nextStartingPoint?: StartingPointState | null,
+    idPrefix?: string,
   ) => {
-    const newEvents = presets.map((preset) => ({
-      id: generateEventId(),
+    const newEvents = presets.map((preset, index) => ({
+      id: idPrefix ? `${idPrefix}:${index}` : generateEventId(),
       name: preset.name,
       duration: preset.duration as "Half Day" | "Full Day",
       services: { ...preset.services } as Record<string, number>,
@@ -640,48 +639,42 @@ function PriceCalculator({
     setActivePackage(packageName || null)
     setStartingPoint(nextStartingPoint ?? (packageName ? { label: packageName, type: "package" } : null))
     setShowTemplates(false)
-    if (scrollToBuilder) {
-      setTimeout(() => calculatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100)
-    }
   }
 
   // Pre-fill from pricing handoff or package clicks.
-  useEffect(() => {
-    if (!prefill?.key) return
-    if (lastAppliedPrefillKeyRef.current === prefill.key) return
+  if (prefill?.key && lastAppliedPrefillKey !== prefill.key) {
+    setLastAppliedPrefillKey(prefill.key)
 
     if (prefill.type === "package") {
       const pkg = packages.find((item) => item.id === prefill.packageName)
-      if (!pkg || !pkg.builderPreset) return
-      lastAppliedPrefillKeyRef.current = prefill.key
-      applyEventPresets(
+      if (pkg?.builderPreset) applyEventPresets(
         pkg.builderPreset.events,
         pkg.builderPreset.globalAddOns as Record<string, number>,
         pkg.id,
-        prefill.scrollToBuilder,
-        { label: pkg.name, type: "package" }
+        { label: pkg.name, type: "package" },
+        prefill.key,
       )
-      return
     }
 
     if (prefill.type === "template") {
       const templateDefinition = eventTemplates[prefill.templateName]
-      if (!templateDefinition) return
-      lastAppliedPrefillKeyRef.current = prefill.key
-      applyEventPresets(templateDefinition.presets, {}, null, prefill.scrollToBuilder, { label: templateDefinition.label, type: "setup" })
-      return
+      if (templateDefinition) applyEventPresets(templateDefinition.presets, {}, null, { label: templateDefinition.label, type: "setup" }, prefill.key)
     }
 
     if (prefill.type === "service") {
       const servicePreset = getServicePrefill(prefill.serviceSlug, prefill.serviceName, messages)
-      if (!servicePreset) return
-      lastAppliedPrefillKeyRef.current = prefill.key
-      applyEventPresets(servicePreset.events, servicePreset.globalAddOns, null, prefill.scrollToBuilder, {
+      if (servicePreset) applyEventPresets(servicePreset.events, servicePreset.globalAddOns, null, {
         label: prefill.serviceName,
         type: "setup",
-      })
+      }, prefill.key)
     }
-  }, [eventTemplates, packages, prefill, messages])
+  }
+
+  useEffect(() => {
+    if (!prefill?.scrollToBuilder) return
+    const timeout = setTimeout(() => calculatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100)
+    return () => clearTimeout(timeout)
+  }, [prefill?.key, prefill?.scrollToBuilder])
 
   const addEvent = (name: string) => {
     const newEvent: EventBlock = {
@@ -702,7 +695,7 @@ function PriceCalculator({
   const addFromTemplate = (templateName: string) => {
     const templateDefinition = eventTemplates[templateName]
     if (!templateDefinition) return
-    applyEventPresets(templateDefinition.presets, {}, null, false, { label: templateDefinition.label, type: "setup" })
+    applyEventPresets(templateDefinition.presets, {}, null, { label: templateDefinition.label, type: "setup" })
   }
 
   const removeEvent = (id: string) => {
@@ -771,7 +764,8 @@ function PriceCalculator({
       const current = prev[id] || 0
       const next = Math.max(0, Math.min(addon.maxQty, current + delta))
       if (next === 0) {
-        const { [id]: _, ...rest } = prev
+        const rest = { ...prev }
+        delete rest[id]
         return rest
       }
       return { ...prev, [id]: next }
@@ -1687,9 +1681,12 @@ export default function PricingEstimatorShell({
     setPrefillRequest(nextHandoff?.prefill || null)
   }, [])
 
-  useEffect(() => {
-    handleHandoffChange(initialHandoff)
-  }, [handleHandoffChange, initialHandoff])
+  const [previousInitialHandoff, setPreviousInitialHandoff] = useState(initialHandoff)
+  if (previousInitialHandoff !== initialHandoff) {
+    setPreviousInitialHandoff(initialHandoff)
+    setHandoff(initialHandoff)
+    setPrefillRequest(initialHandoff?.prefill || null)
+  }
 
   return (
     <>

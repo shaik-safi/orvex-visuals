@@ -8,8 +8,6 @@ export const QUOTE_REMINDER_FILTERS = ["all", "due_today", "overdue", "upcoming"
 
 export type QuoteReminderFilter = (typeof QUOTE_REMINDER_FILTERS)[number]
 
-type ReminderTimestamp = Date | { toDate?: () => Date }
-
 function padDatePart(value: number) {
   return value.toString().padStart(2, "0")
 }

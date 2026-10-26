@@ -677,23 +677,30 @@ function QuoteDetail({
   const paymentStatus = getQuotePaymentStatus(totalAmount, quote.amountReceived)
   const reminderStatus = getQuoteReminderStatus(quote.reminderDate, quote.reminderStatus)
 
-  useEffect(() => {
+  const [previousPayment, setPreviousPayment] = useState({ id: quote.id, amount: quote.amountReceived })
+  const [previousReminder, setPreviousReminder] = useState({ id: quote.id, date: quote.reminderDate })
+  const [previousLink, setPreviousLink] = useState({ id: quote.id, recoverable: quote.hasRecoverableActiveLink, updatedAt: quote.activeAccessTokenUpdatedAt })
+
+  if (previousPayment.id !== quote.id || previousPayment.amount !== quote.amountReceived) {
+    setPreviousPayment({ id: quote.id, amount: quote.amountReceived })
     setAmountReceivedInput(quote.amountReceived != null ? String(quote.amountReceived) : "")
     setPaymentError("")
-  }, [quote.id, quote.amountReceived])
+  }
 
-  useEffect(() => {
+  if (previousReminder.id !== quote.id || previousReminder.date !== quote.reminderDate) {
+    setPreviousReminder({ id: quote.id, date: quote.reminderDate })
     setReminderDateInput(quote.reminderDate ?? "")
     setReminderError("")
-  }, [quote.id, quote.reminderDate])
+  }
 
-  useEffect(() => {
+  if (previousLink.id !== quote.id || previousLink.recoverable !== quote.hasRecoverableActiveLink || previousLink.updatedAt !== quote.activeAccessTokenUpdatedAt) {
+    setPreviousLink({ id: quote.id, recoverable: quote.hasRecoverableActiveLink, updatedAt: quote.activeAccessTokenUpdatedAt })
     setShareUrl("")
     setCopiedShareLink(false)
     setShareLinkError("")
     setShareLinkLegacy(!quote.hasRecoverableActiveLink)
     setShareLinkUpdatedAt(quote.activeAccessTokenUpdatedAt)
-  }, [quote.id, quote.hasRecoverableActiveLink, quote.activeAccessTokenUpdatedAt])
+  }
 
   useEffect(() => {
     let isMounted = true
@@ -1484,18 +1491,25 @@ function Dashboard({
     sort: "newest",
   })
 
-  const fetchQuotes = useCallback(async () => {
+  const [previousLoadError, setPreviousLoadError] = useState(messages.loadError)
+  if (previousLoadError !== messages.loadError) {
+    setPreviousLoadError(messages.loadError)
     setLoading(true)
     setError("")
-    try {
-      const res = await fetch("/api/admin/quotes", { cache: "no-store" })
-      if (!res.ok) throw new Error("load-failed")
-      const data = await res.json()
-      setQuotes(data.quotes ?? [])
-    } catch {
-      setError(messages.loadError)
-    }
-    setLoading(false)
+  }
+
+  const fetchQuotes = useCallback(() => {
+    return fetch("/api/admin/quotes", { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("load-failed")
+        return res.json()
+      })
+      .then((data) => {
+        setQuotes(data.quotes ?? [])
+        setError("")
+      })
+      .catch(() => setError(messages.loadError))
+      .finally(() => setLoading(false))
   }, [messages.loadError])
 
   useEffect(() => {
@@ -1569,7 +1583,11 @@ function Dashboard({
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={fetchQuotes}
+              onClick={() => {
+                setLoading(true)
+                setError("")
+                void fetchQuotes()
+              }}
               disabled={loading}
               className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors disabled:opacity-50"
               title={messages.refreshTitle}

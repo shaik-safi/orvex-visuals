@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef, Suspense } from "react"
+import { useState, useEffect, useSyncExternalStore, Suspense } from "react"
+import { useLocalDate } from "@/hooks/use-local-date"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -39,120 +40,87 @@ type BookMessages = ReturnType<typeof getPageMessages>["bookPage"]
 type SubmissionResult = "saved" | "whatsapp"
 type HandoffStatus = "opened" | "blocked"
 
-function BookingForm({ messages, locale }: { messages: BookMessages; locale: ReturnType<typeof useCurrentLocale> }) {
+function readBookingPlan(locale: ReturnType<typeof useCurrentLocale>): { plan: PlanData | null; clearInvalidPlan: boolean } {
+  const storedPlan = window.sessionStorage.getItem(BOOKING_PLAN_STORAGE_KEY)
+  if (!storedPlan) return { plan: null, clearInvalidPlan: false }
+  try {
+    const parsed = JSON.parse(storedPlan) as PlanData | null
+    if (!parsed) return { plan: null, clearInvalidPlan: false }
+    if (!Array.isArray(parsed.services) || !Array.isArray(parsed.addOns) || typeof parsed.total !== "number") {
+      return { plan: null, clearInvalidPlan: true }
+    }
+    // Normalize labels on read; retain storage until successful submission.
+    const plan: PlanData = {
+      ...parsed,
+      services: parsed.services.map((serviceItem) => ({
+        ...serviceItem,
+        name: localizeQuoteValue(serviceItem.name, locale) ?? serviceItem.name,
+        coverage: localizeQuoteValue(serviceItem.coverage, locale) ?? serviceItem.coverage,
+        selections: (serviceItem.selections ?? []).map((sel) => ({
+          ...sel,
+          name: localizeQuoteValue(sel.name, locale) ?? sel.name,
+        })),
+      })),
+      addOns: parsed.addOns.map((addOn) => ({
+        ...addOn,
+        name: localizeQuoteValue(addOn.name, locale) ?? addOn.name,
+      })),
+    }
+    return { plan, clearInvalidPlan: false }
+  } catch {
+    return { plan: null, clearInvalidPlan: true }
+  }
+}
+
+const subscribeToHydration = () => () => {}
+const getClientSnapshot = () => true
+const getServerSnapshot = () => false
+
+// Read sessionStorage only after hydration, then retain the plan through submission.
+function BookingForm(props: Parameters<typeof ReadyBookingForm>[0]) {
+  const hydrated = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot)
+  if (hydrated) return <ReadyBookingForm {...props} />
+  return (
+    <section className="pt-32 pb-20 bg-white dark:bg-slate-950">
+      <div className="max-w-lg mx-auto px-4 text-center text-slate-500 dark:text-slate-400">
+        {props.messages.redirecting}
+      </div>
+    </section>
+  )
+}
+
+function ReadyBookingForm({ messages, locale }: { messages: BookMessages; locale: ReturnType<typeof useCurrentLocale> }) {
   const router = useRouter()
-  const planLoadedRef = useRef(false)
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult>("saved")
   const [handoffStatus, setHandoffStatus] = useState<HandoffStatus>("opened")
   const [whatsAppUrl, setWhatsAppUrl] = useState("")
   const [savedEstimateHref, setSavedEstimateHref] = useState("")
-  const [plan, setPlan] = useState<PlanData | null>(null)
-  const [planReady, setPlanReady] = useState(false)
-  const [shouldClearStoredPlan, setShouldClearStoredPlan] = useState(false)
+  const [{ plan, clearInvalidPlan }] = useState(() => readBookingPlan(locale))
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    service: "",
-    eventDate: "",
-    venue: "",
-    budget: "",
+  const [form, setForm] = useState(() => ({
+    name: plan?.customer?.name || "",
+    phone: plan?.customer?.phone || "",
+    email: plan?.customer?.email || "",
+    service: plan?.services.map((item) => item.name).join(", ") || "",
+    eventDate: plan?.date || "",
+    venue: plan?.venue || plan?.city || "",
+    budget: plan ? `\u20b9${plan.total.toLocaleString("en-IN")}` : "",
     message: "",
     source: "",
-  })
+  }))
 
   useEffect(() => {
-    if (!shouldClearStoredPlan || typeof window === "undefined") return
-
-    window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
-    setShouldClearStoredPlan(false)
-  }, [shouldClearStoredPlan])
-
-  useEffect(() => {
-    if (planLoadedRef.current) return
-    planLoadedRef.current = true
-
-    let parsedPlan: unknown = null
-    const clearStoredPlan = () => {
-      if (typeof window === "undefined") return
-      window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
-    }
-
-    if (typeof window !== "undefined") {
-      const storedPlan = window.sessionStorage.getItem(BOOKING_PLAN_STORAGE_KEY)
-      if (storedPlan) {
-        try {
-          parsedPlan = JSON.parse(storedPlan)
-        } catch {
-          parsedPlan = null
-          clearStoredPlan()
-        }
-      }
-    }
-
-    if (parsedPlan) {
-      try {
-        const parsed = parsedPlan as PlanData
-        if (!parsed || !Array.isArray(parsed.services) || !Array.isArray(parsed.addOns) || typeof parsed.total !== "number") {
-          clearStoredPlan()
-          setPlanReady(true)
-          router.replace(withLocalePathname("/pricing", locale))
-          return
-        }
-        // Normalize stored labels to the active route locale so summary, form prefill,
-        // WhatsApp copy, and quote-save payload all use consistent locale-appropriate text.
-        // Unknown values pass through unchanged (Decision A: locale-active labels are
-        // the storage contract; bidirectional normalization is read-side only).
-        const normalizedPlan: PlanData = {
-          ...parsed,
-          services: parsed.services.map((serviceItem) => ({
-            ...serviceItem,
-            name: localizeQuoteValue(serviceItem.name, locale) ?? serviceItem.name,
-            coverage: localizeQuoteValue(serviceItem.coverage, locale) ?? serviceItem.coverage,
-            selections: (serviceItem.selections ?? []).map((sel) => ({
-              ...sel,
-              name: localizeQuoteValue(sel.name, locale) ?? sel.name,
-            })),
-          })),
-          addOns: parsed.addOns.map((addOn) => ({
-            ...addOn,
-            name: localizeQuoteValue(addOn.name, locale) ?? addOn.name,
-          })),
-        }
-        setPlan(normalizedPlan)
-        const serviceNames = normalizedPlan.services.map((serviceItem) => serviceItem.name).join(", ")
-        const autoBudget = `\u20b9${parsed.total.toLocaleString("en-IN")}`
-        setForm((prev: typeof form) => ({
-          ...prev,
-          service: serviceNames,
-          name: parsed.customer?.name || prev.name,
-          phone: parsed.customer?.phone || prev.phone,
-          email: parsed.customer?.email || prev.email,
-          eventDate: parsed.date || prev.eventDate,
-          venue: parsed.venue || parsed.city || prev.venue,
-          budget: autoBudget,
-        }))
-        setPlanReady(true)
-        // Do not clear sessionStorage here — plan must survive a locale switch on the
-        // booking page. The store is cleared after successful quote submission instead.
-        return
-      } catch {
-        clearStoredPlan()
-      }
-    }
-
-    setPlanReady(true)
-    router.replace(withLocalePathname("/pricing", locale))
-  }, [router, locale])
+    if (clearInvalidPlan) window.sessionStorage.removeItem(BOOKING_PLAN_STORAGE_KEY)
+    if (!plan) router.replace(withLocalePathname("/pricing", locale))
+  }, [clearInvalidPlan, plan, router, locale])
 
   const updateField = (field: string, value: string) => setForm({ ...form, [field]: value })
 
   const isValidPhone = (phone: string) => /^[6-9]\d{9}$/.test(phone)
   const isValidEmail = (email: string) => !email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  const todayStr = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0]
+  const todayStr = useLocalDate()
   const isDateInPast = (dateStr: string) => !!dateStr && new Date(dateStr) < new Date(todayStr)
 
   const step1Valid = form.name.trim().length >= 2 && isValidPhone(form.phone) && isValidEmail(form.email)
@@ -308,7 +276,7 @@ function BookingForm({ messages, locale }: { messages: BookMessages; locale: Ret
     }
   }
 
-  if (!planReady || !plan) {
+  if (!plan) {
     return (
       <section className="pt-32 pb-20 bg-white dark:bg-slate-950">
         <div className="max-w-lg mx-auto px-4 text-center text-slate-500 dark:text-slate-400">

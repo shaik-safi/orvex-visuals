@@ -5,6 +5,7 @@
 // ============================================================
 
 import {
+  type LucideIcon,
   Camera,
   Video,
   Heart,
@@ -49,7 +50,7 @@ export interface ServiceCard {
   category: Category
   description: string
   startingPrice: number
-  icon: any
+  icon: LucideIcon
   image: string
   popular?: boolean
 }
@@ -73,7 +74,7 @@ export interface ServiceDetail {
   tagline: string
   description: string
   longDescription: string
-  icon: any
+  icon: LucideIcon
   heroImage: string
   gallery: string[]
   packages: ServicePackage[]
@@ -84,7 +85,7 @@ export interface ServiceDetail {
 }
 
 // ============ CATEGORIES ============
-export const categories: { id: Category; label: string; icon: any }[] = [
+export const categories: { id: Category; label: string; icon: LucideIcon }[] = [
   { id: "all", label: "All Services", icon: Sparkles },
   { id: "wedding", label: "Wedding", icon: Crown },
   { id: "pre-wedding", label: "Pre-Wedding", icon: Heart },

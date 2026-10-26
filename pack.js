@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+const fs = process.getBuiltinModule("node:fs");
+const path = process.getBuiltinModule("node:path");
 
 const projectDir = process.argv[2];
 
@@ -32,7 +32,7 @@ const EXCLUDED_EXTENSIONS = new Set([
   ".mp3",
 ]);
 
-let output = [];
+const output = [];
 
 function walk(dir) {
   const items = fs.readdirSync(dir, { withFileTypes: true });
@@ -59,4 +59,14 @@ function walk(dir) {
 `===FILE_START===
 PATH:${relativePath}
 ===CONTENT===
-${content}
+${content}
+===FILE_END===
+`);
+    } catch (error) {
+      console.error(`Could not read ${relativePath}: ${error.message}`);
+    }
+  }
+}
+
+walk(projectDir);
+process.stdout.write(output.join("\n"));

@@ -10,7 +10,7 @@ import { getWhatsAppLink, IMAGES } from "@/lib/constants"
 import { useLocaleSync } from "@/lib/i18n/locale-sync"
 import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 import { applyTemplate, getHomeMessages } from "@/lib/i18n/home"
-import { withLocaleHref, withLocalePathname } from "@/lib/i18n/routing"
+import { withLocaleHref } from "@/lib/i18n/routing"
 
 function getUpcomingMonths(localeTag: string) {
   const now = new Date()

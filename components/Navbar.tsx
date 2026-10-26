@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, Suspense } from "react"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import {
@@ -18,7 +18,7 @@ import { buildPricingHandoffHref } from "@/lib/pricing-handoff"
 import { BRAND_NAME, getWhatsAppLink, PHONE_NUMBER } from "@/lib/constants"
 import type { AppLocale } from "@/lib/i18n/config"
 import { useLocaleSync } from "@/lib/i18n/locale-sync"
-import { extractLocaleFromPathname, withLocaleHref, stripLocaleFromPathname, withLocalePathname } from "@/lib/i18n/routing"
+import { withLocaleHref, stripLocaleFromPathname, withLocalePathname } from "@/lib/i18n/routing"
 import { getCommonMessages } from "@/lib/i18n/common"
 
 const localeOptions: { value: AppLocale; label: string }[] = [
@@ -84,7 +84,6 @@ function LocaleSwitcherContent({
   onClose: () => void
 }) {
   const searchParams = useSearchParams()
-  const router = useRouter()
   const query = searchParams.toString()
   const pathWithQuery = query ? `${pathname}?${query}` : pathname
   const localeHref = (targetLocale: AppLocale) => withLocaleHref(pathWithQuery, targetLocale)
