@@ -33,7 +33,7 @@ You do not need to redesign them to make normal content changes:
 - booking to saved-quote flow
 - secure quote link flow
 - browser print / PDF quote output
-- Firebase client + admin setup
+- Server-side Firebase Admin setup
 - signed admin sessions
 - Vercel deployment settings
 
@@ -87,7 +87,6 @@ When making owner-level changes, use this order:
 | Local images | `public/`, `public/images/`, `public/images/portfolio/` |
 | Current live logo asset | `public/orvex-logo-new.png` |
 | Local environment variables | `.env.local` |
-| Firebase client connection | `lib/firebase.ts` |
 | Firebase Admin connection | `lib/firebase-admin.ts` |
 | Quote encryption and access token logic | `lib/quote-security.ts` |
 | Save quote API | `app/api/quotes/route.ts` |
@@ -104,7 +103,7 @@ When making owner-level changes, use this order:
 
 Install these first:
 
-- Node.js 20 or newer recommended
+- Node.js 22 or newer required by Firebase Admin 14.x (local validation uses Node.js 22)
 - npm
 - Git
 
@@ -165,7 +164,7 @@ The repo expects `.env.local` locally, and Vercel env vars in production.
 ### Full env set for the current project
 
 ```env
-# PUBLIC FIREBASE (browser-side)
+# PUBLIC FIREBASE (legacy web app values; unused by the current application)
 NEXT_PUBLIC_FIREBASE_API_KEY=
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=
@@ -186,7 +185,7 @@ ADMIN_SESSION_SECRET=
 ### Ready-to-copy `.env.local` example
 
 ```env
-# PUBLIC FIREBASE (browser-side)
+# PUBLIC FIREBASE (legacy web app values; unused by the current application)
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key_here
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
@@ -212,7 +211,7 @@ Public client Firebase values:
 - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
 - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
 
-These are used by `lib/firebase.ts` for browser-side Firebase setup.
+These legacy web app values are not consumed by the current application. The unused browser SDK and its initialization module have been removed. Existing environment values and the registered Firebase web app can remain unchanged.
 
 Server-side Firebase Admin values:
 
@@ -458,25 +457,13 @@ That means:
 
 ## 6. Firebase And Database Setup
 
-This project uses Firebase in two layers.
+This project accesses its existing Firestore database through Firebase Admin in server-side API routes.
 
-### Client Firebase
+### Firebase browser SDK
 
-File:
+The browser SDK and its unused initialization module have been removed. Booking and inquiry submissions continue to use the existing API routes and Firebase Admin connection below.
 
-```ts
-lib/firebase.ts
-```
-
-Used for browser-side initialization.
-
-It reads:
-
-- `NEXT_PUBLIC_FIREBASE_API_KEY`
-- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
-- `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
-
-If `NEXT_PUBLIC_FIREBASE_PROJECT_ID` is missing, client Firebase safely does not initialize.
+This dependency cleanup does not remove or recreate the Firebase project, registered web app, database, collections, customer records, or environment configuration.
 
 ### Admin Firebase
 
@@ -487,6 +474,8 @@ lib/firebase-admin.ts
 ```
 
 Used for secure server-side Firestore access.
+
+Firebase Admin 14.x requires Node.js 22 or newer. Verify the Vercel project's build and function runtime before deployment; local Node.js does not establish the cloud setting. Node.js `22.x` matches the locally validated major version. This cleanup does not change Vercel settings.
 
 It reads:
 
